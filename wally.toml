@@ -1,0 +1,9 @@
+[package]
+name = "beastslash/roblox-dialogue-maker"
+version = "0.1.0"
+registry = "https://github.com/UpliftGames/wally-index"
+realm = "shared"
+private = true
+
+[dependencies]
+react = "jsdotlua/react@17.1.0"

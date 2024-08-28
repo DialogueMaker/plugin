@@ -1,7 +1,7 @@
 --!strict
 local Selection = game:GetService("Selection");
 local StarterPlayer = game:GetService("StarterPlayer");
-local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 -- Make sure we have all of the plugin GUI stuff.

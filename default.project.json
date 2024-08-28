@@ -1,0 +1,15 @@
+{
+  "name": "Dialogue Maker Testing Place",
+  "tree": {
+    "$className": "DataModel",
+    "ServerStorage": {
+      "$path": "src",
+      "DialoguePluginScript": {
+        "$path": "src/DialoguePluginScript",
+        "Packages": {
+          "$path": "Packages"
+        }
+      }
+    }
+  }
+}
