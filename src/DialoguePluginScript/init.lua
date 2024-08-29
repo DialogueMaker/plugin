@@ -11,57 +11,6 @@ local Window = require(script.ReactComponents.Window);
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
 
-local function repairNPC(): ()
-
-  if not Model:FindFirstChild("DialogueContainer") then
-
-    -- Add the dialogue container to the NPC
-    local DialogueContainer = Instance.new("Folder");
-    DialogueContainer.Name = "DialogueContainer";
-
-    -- Add the dialogue folder to the model
-    DialogueContainer.Parent = Model;
-    return;
-
-  end;
-
-  CurrentDialogueContainer = Model:FindFirstChild("DialogueContainer") :: ModuleScript;
-  assert(CurrentDialogueContainer, "[Dialogue Maker] DialogueContainer not found...");
-  
-  if not Model:FindFirstChild("NPCDialogueSettings") then
-
-    print("[Dialogue Maker] Adding settings script to "..Model.Name)
-
-    local SettingsScript = script.NPCSettingsTemplate:Clone();
-    SettingsScript.Name = "NPCDialogueSettings";
-    SettingsScript.Parent = Model;
-
-    print("[Dialogue Maker] Added settings script to "..Model.Name)
-
-  end;
-
-  -- Initialize DialogueLocations.
-  local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
-
-  assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
-
-  for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
-    
-    if dialogueLocation.Value == Model then
-      
-      return;
-      
-    end
-    
-  end;
-
-  local DialogueLocation = Instance.new("ObjectValue");
-  DialogueLocation.Value = Model;
-  DialogueLocation.Name = "DialogueLocation";
-  DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
-
-end;
-
 type EventTypes = {
   AddMessage: RBXScriptConnection?;
   AdjustSettingsRequested: RBXScriptConnection?;
@@ -99,7 +48,6 @@ end;
 local function openDialogueEditor(): ()
 
   PluginGui = plugin:CreateDockWidgetPluginGui("Dialogue Maker", DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 525, 241, 525, 139));
-  repairNPC();
   if PluginGui and CurrentDialogueContainer then
 
     PluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
@@ -160,6 +108,57 @@ EditDialogueButton.Click:Connect(function()
   end
 
   -- Verify NPC dialogue folder
+  local function repairNPC(): ()
+
+    if not Model:FindFirstChild("DialogueContainer") then
+  
+      -- Add the dialogue container to the NPC
+      local DialogueContainer = Instance.new("Folder");
+      DialogueContainer.Name = "DialogueContainer";
+  
+      -- Add the dialogue folder to the model
+      DialogueContainer.Parent = Model;
+      return;
+  
+    end;
+  
+    CurrentDialogueContainer = Model:FindFirstChild("DialogueContainer") :: ModuleScript;
+    assert(CurrentDialogueContainer, "[Dialogue Maker] DialogueContainer not found...");
+    
+    if not Model:FindFirstChild("NPCDialogueSettings") then
+  
+      print("[Dialogue Maker] Adding settings script to "..Model.Name)
+  
+      local SettingsScript = script.NPCSettingsTemplate:Clone();
+      SettingsScript.Name = "NPCDialogueSettings";
+      SettingsScript.Parent = Model;
+  
+      print("[Dialogue Maker] Added settings script to "..Model.Name)
+  
+    end;
+  
+    -- Initialize DialogueLocations.
+    local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
+  
+    assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
+  
+    for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
+      
+      if dialogueLocation.Value == Model then
+        
+        return;
+        
+      end
+      
+    end;
+  
+    local DialogueLocation = Instance.new("ObjectValue");
+    DialogueLocation.Value = Model;
+    DialogueLocation.Name = "DialogueLocation";
+    DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
+  
+  end;
+
   repairNPC();
 
   -- Add the chat receiver script in the starter player scripts
@@ -184,13 +183,11 @@ EditDialogueButton.Click:Connect(function()
 
 end);
 
-local isBusy = false;
 local ResetScriptsButton = Toolbar:CreateButton("Fix Scripts", "Reset DialogueMakerSharedDependencies and DialogueClientScript back to the a stable version.", "rbxassetid://14109193905");
 ResetScriptsButton.Click:Connect(function()
 
   -- Debounce
-  assert(not isBusy, "[Dialogue Maker] One moment please...");
-  isBusy = true;
+  ResetScriptsButton.Enabled = false;
 
   local Success, Msg = pcall(function()
     -- Set an undo point
@@ -250,7 +247,7 @@ ResetScriptsButton.Click:Connect(function()
   end)
 
   -- Done!
-  isBusy = false;
+  ResetScriptsButton.Enabled = true;
   print("[Dialogue Maker] " .. if Success then "Fixed Dialogue Maker scripts!" else ("Couldn't fix scripts: " .. Msg));
 
 end);
@@ -258,8 +255,7 @@ end);
 local RemoveUnusedInstancesButton = Toolbar:CreateButton("Remove Unused Instances", "Deletes unused actions, conditions, and dialogue locations.", "rbxassetid://14109207161")
 RemoveUnusedInstancesButton.Click:Connect(function()
 
-  assert(not isBusy, "[Dialogue Maker] One moment please...");
-  isBusy = true;
+  RemoveUnusedInstancesButton.Enabled = false;
 
   local count = 0;
   pcall(function()
@@ -318,7 +314,7 @@ RemoveUnusedInstancesButton.Click:Connect(function()
   end)
 
   -- Done!
-  isBusy = false;
+  RemoveUnusedInstancesButton.Enabled = true;
   local plural = if count ~= 1 then "s" else "";
   print(`[Dialogue Maker] Removed unused {count} Dialogue Maker instance{plural}!`)
 
