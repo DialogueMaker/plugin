@@ -19,48 +19,6 @@ local function DialogueItem(props: DialogueItemProperties)
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
   local contentScript = props.contentScript;
 
-  -- local DialogueMessageTypeDropdownButton = DialogueMessageContainerChildContainer:FindFirstChild("DialogueTypeDropdown") :: TextButton;
-  -- (DialogueMessageTypeDropdownButton:FindFirstChild("DialogueType") :: TextLabel).Text = childContentScript:GetAttribute("DialogueType") or "Message";
-  -- table.insert(Events.TypeDropdown, DialogueMessageTypeDropdownButton.MouseButton1Click:Connect(function()
-    
-  --   if isDeleteModeEnabled then
-      
-  --     showDeleteModePrompt();
-  --     return;
-      
-  --   end;
-    
-  --   local List = DialogueMessageTypeDropdownButton:FindFirstChild("List") :: ScrollingFrame;
-  --   List.Visible = not List.Visible;
-  --   if List.Visible then
-      
-  --     local MessageButton = List:FindFirstChild("Message") :: TextButton;
-  --     table.insert(Events.TypeDropdown, MessageButton.MouseButton1Click:Connect(function()
-        
-  --       childContentScript:SetAttribute("DialogueType", "Message");
-        
-  --     end));
-      
-  --     local RedirectButton = List:FindFirstChild("Redirect") :: TextButton;
-  --     table.insert(Events.TypeDropdown, RedirectButton.MouseButton1Click:Connect(function()
-
-  --       childContentScript:SetAttribute("DialogueType", "Redirect");
-
-  --     end));
-      
-  --     local ResponseButton = List:FindFirstChild("Response") :: TextButton;
-  --     table.insert(Events.TypeDropdown, ResponseButton.MouseButton1Click:Connect(function()
-
-  --       childContentScript:SetAttribute("DialogueType", "Response");
-
-  --     end));
-      
-  --   end
-    
-  -- end));
-  
-  -- table.insert(Events.AttributeChanged, ContentScript.AttributeChanged:Connect(refreshDialogueGUI));
-
   local function openSpecialScript(Folder: Folder, Template: ModuleScript): ()
 
     -- Search through the script list
@@ -134,12 +92,27 @@ local function DialogueItem(props: DialogueItemProperties)
       }, {
         MessageButton = React.createElement("TextButton", {
           LayoutOrder = 1;
+          [React.Event.Activated] = function()
+
+            props.contentScript:SetAttribute("DialogueType", "Message");
+
+          end;
         }, {});
         RedirectButton = React.createElement("TextButton", {
           LayoutOrder = 2;
+          [React.Event.Activated] = function()
+
+            props.contentScript:SetAttribute("DialogueType", "Redirect");
+
+          end;
         }, {});
         ResponseButton = React.createElement("TextButton", {
           LayoutOrder = 3;
+          [React.Event.Activated] = function()
+
+            props.contentScript:SetAttribute("DialogueType", "Response");
+
+          end;
         }, {});
       });
       OpenScriptsDropdown = React.createElement(Dropdown, {
