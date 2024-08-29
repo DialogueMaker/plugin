@@ -11,22 +11,6 @@ local Window = require(script.ReactComponents.Window);
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
 
-type EventTypes = {
-  AddMessage: RBXScriptConnection?;
-  AdjustSettingsRequested: RBXScriptConnection?;
-  AttributeChanged: {RBXScriptConnection?};
-  ChildAdded: RBXScriptConnection?;
-  ChildRemoved: RBXScriptConnection?;
-  DeleteMode: RBXScriptConnection?;
-  DeleteYesButton: RBXScriptConnection?;
-  DeleteNoButton: RBXScriptConnection?;
-  PriorityFocusLost: {RBXScriptConnection?};
-  TypeDropdown: {RBXScriptConnection?};
-  ViewChildren: {RBXScriptConnection?};
-  ViewContent: {RBXScriptConnection?};
-  ViewParent: RBXScriptConnection?;
-};
-
 local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
 local EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", "rbxassetid://14109181603");
 local isDialogueEditorOpen = false;
