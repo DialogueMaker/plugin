@@ -4,12 +4,10 @@ local StarterPlayer = game:GetService("StarterPlayer");
 local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
-local CurrentDialogueContainer: ModuleScript?;
-local Model;
-local Window = require(script.ReactComponents.Window);
-
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
+
+local Window = require(script.ReactComponents.Window);
 
 local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
 local EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", "rbxassetid://14109181603");
@@ -29,10 +27,10 @@ end;
 
 -- Open the editor when called.
 -- @since v1.0.0
-local function openDialogueEditor(): ()
+local function openDialogueEditor(model: Model): ()
 
   PluginGui = plugin:CreateDockWidgetPluginGui("Dialogue Maker", DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 525, 241, 525, 139));
-  if PluginGui and CurrentDialogueContainer then
+  if PluginGui then
 
     PluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
     PluginGui.Title = "Dialogue Maker";
@@ -40,7 +38,7 @@ local function openDialogueEditor(): ()
     
     local pluginGUIRoot = ReactRoblox.createRoot(PluginGui);
     pluginGUIRoot:render(React.createElement(Window, {
-      model = Model;
+      model = model;
     }));
     
   end;
@@ -57,6 +55,7 @@ EditDialogueButton.Click:Connect(function()
     
   end;
 
+  local model: Model;
   local isTestSuccessful, errorMessage = pcall(function()
     
     -- Check if the user is selecting an object.
@@ -65,11 +64,11 @@ EditDialogueButton.Click:Connect(function()
     assert(#SelectedObjects == 1, "You must select one object; not multiple objects.");
 
     -- Check if the model has a part
-    Model = SelectedObjects[1];
-    assert(Model:IsA("Model"), "You must select a Model, not a "..Model.ClassName..".");
+    model = SelectedObjects[1]
+    assert(model:IsA("Model"), `You must select a Model, not a {model.ClassName}.`);
 
     local ModelHasPart = false;
-    for _, object in Model:GetChildren() do
+    for _, object in model:GetChildren() do
       
       if object:IsA("BasePart") then
         
@@ -94,41 +93,38 @@ EditDialogueButton.Click:Connect(function()
   -- Verify NPC dialogue folder
   local function repairNPC(): ()
 
-    if not Model:FindFirstChild("DialogueContainer") then
+    if not model:FindFirstChild("DialogueContainer") then
   
       -- Add the dialogue container to the NPC
       local DialogueContainer = Instance.new("Folder");
       DialogueContainer.Name = "DialogueContainer";
   
       -- Add the dialogue folder to the model
-      DialogueContainer.Parent = Model;
+      DialogueContainer.Parent = model;
       return;
   
     end;
-  
-    CurrentDialogueContainer = Model:FindFirstChild("DialogueContainer") :: ModuleScript;
-    assert(CurrentDialogueContainer, "[Dialogue Maker] DialogueContainer not found...");
     
-    if not Model:FindFirstChild("NPCDialogueSettings") then
+    if not model:FindFirstChild("NPCDialogueSettings") then
   
-      print("[Dialogue Maker] Adding settings script to "..Model.Name)
+      print(`[Dialogue Maker] Adding settings script to {model.Name}`);
   
       local SettingsScript = script.NPCSettingsTemplate:Clone();
       SettingsScript.Name = "NPCDialogueSettings";
-      SettingsScript.Parent = Model;
+      SettingsScript.Parent = model;
   
-      print("[Dialogue Maker] Added settings script to "..Model.Name)
+      print(`[Dialogue Maker] Added settings script to {model.Name}`)
   
     end;
   
-    -- Initialize DialogueLocations.
+    -- Initialize DialogueLocations for indexing.
     local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
   
     assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
   
     for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
       
-      if dialogueLocation.Value == Model then
+      if dialogueLocation.Value == model then
         
         return;
         
@@ -137,7 +133,7 @@ EditDialogueButton.Click:Connect(function()
     end;
   
     local DialogueLocation = Instance.new("ObjectValue");
-    DialogueLocation.Value = Model;
+    DialogueLocation.Value = model;
     DialogueLocation.Name = "DialogueLocation";
     DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
   
@@ -145,7 +141,7 @@ EditDialogueButton.Click:Connect(function()
 
   repairNPC();
 
-  -- Add the chat receiver script in the starter player scripts
+  -- Add the chat receiver script in the StarterPlayerScripts.
   if not StarterPlayerScripts:FindFirstChild("DialogueClientScript") then
 
     print("[Dialogue Maker] Adding DialogueClientScript to the StarterPlayerScripts...");
@@ -156,14 +152,14 @@ EditDialogueButton.Click:Connect(function()
     
     -- Add this model to the DialogueManager
     local DialogueLocation = Instance.new("ObjectValue");
-    DialogueLocation.Value = Model;
+    DialogueLocation.Value = model;
     DialogueLocation.Name = "DialogueLocation";
     DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
 
   end;
 
   -- Now we can open the dialogue editor.
-  openDialogueEditor();
+  openDialogueEditor(model);
 
 end);
 
