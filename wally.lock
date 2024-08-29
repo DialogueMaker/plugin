@@ -5,7 +5,7 @@ registry = "test"
 [[package]]
 name = "beastslash/roblox-dialogue-maker"
 version = "0.1.0"
-dependencies = [["react", "jsdotlua/react@17.1.0"]]
+dependencies = [["react", "jsdotlua/react@17.1.0"], ["react-roblox", "jsdotlua/react-roblox@17.1.0"]]
 
 [[package]]
 name = "jsdotlua/boolean"
@@ -48,7 +48,27 @@ version = "1.2.7"
 dependencies = []
 
 [[package]]
+name = "jsdotlua/promise"
+version = "3.5.2"
+dependencies = []
+
+[[package]]
 name = "jsdotlua/react"
+version = "17.1.0"
+dependencies = [["luau-polyfill", "jsdotlua/luau-polyfill@1.2.7"], ["shared", "jsdotlua/shared@17.1.0"]]
+
+[[package]]
+name = "jsdotlua/react-reconciler"
+version = "17.1.0"
+dependencies = [["luau-polyfill", "jsdotlua/luau-polyfill@1.2.7"], ["promise", "jsdotlua/promise@3.5.2"], ["react", "jsdotlua/react@17.1.0"], ["scheduler", "jsdotlua/scheduler@17.1.0"], ["shared", "jsdotlua/shared@17.1.0"]]
+
+[[package]]
+name = "jsdotlua/react-roblox"
+version = "17.1.0"
+dependencies = [["luau-polyfill", "jsdotlua/luau-polyfill@1.2.7"], ["react", "jsdotlua/react@17.1.0"], ["react-reconciler", "jsdotlua/react-reconciler@17.1.0"], ["scheduler", "jsdotlua/scheduler@17.1.0"], ["shared", "jsdotlua/shared@17.1.0"]]
+
+[[package]]
+name = "jsdotlua/scheduler"
 version = "17.1.0"
 dependencies = [["luau-polyfill", "jsdotlua/luau-polyfill@1.2.7"], ["shared", "jsdotlua/shared@17.1.0"]]
 

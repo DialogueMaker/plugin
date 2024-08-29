@@ -47,7 +47,7 @@ end
 
 -- Iterate through every NPC
 print("[Dialogue Maker]: Preparing dialogue received from the server...");
-for _, NPCLocation: ObjectValue in ipairs(script.NPCLocations:GetChildren()) do
+for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
   
   -- Make sure all NPCs aren't affected if this one doesn't load properly
   if not NPCLocation:IsA("ObjectValue") then

@@ -20,7 +20,7 @@ function DialogueModule.getDefaultThemeName(viewportWidth: number, viewportHeigh
   assert(defaultThemes, "[Dialogue Maker] Couldn't get default themes from the server.");
 
   local defaultThemeName;
-  for _, themeInfo in ipairs(defaultThemes) do
+  for _, themeInfo in defaultThemes do
 
     if viewportWidth >= themeInfo.minimumViewportWidth and viewportHeight >= themeInfo.minimumViewportHeight then
 
@@ -74,7 +74,7 @@ function DialogueModule.goToDirectory(DialogueContainerFolder: Folder, targetPat
 
   local currentPath = "";
   local CurrentDirectoryScript: ModuleScript | Folder = DialogueContainerFolder;
-  for index, directory in ipairs(targetPath) do
+  for index, directory in targetPath do
 
     currentPath = currentPath .. (if currentPath ~= "" then "." else "") .. directory;
     local PossibleDirectory = CurrentDirectoryScript:FindFirstChild(directory);
@@ -100,7 +100,7 @@ end;
 -- @since v1.0.0
 function DialogueModule.clearResponses(responseContainer: ScrollingFrame): ()
 
-  for _, response in ipairs(responseContainer:GetChildren()) do
+  for _, response in responseContainer:GetChildren() do
 
     if not response:IsA("UIListLayout") then
 
@@ -114,7 +114,7 @@ end;
 
 function deleteNonTextWrapperChildren(TextContainer: Instance) 
   
-  for _, child in ipairs(TextContainer:GetChildren()) do
+  for _, child in TextContainer:GetChildren() do
 
     if child.Name ~= "TextWrapper" then
 
@@ -162,7 +162,7 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
   end
   
   
-  for contentArrayIndex, contentArrayItem in ipairs(contentArray) do
+  for contentArrayIndex, contentArrayItem in contentArray do
     
     local contentArrayItemType = typeof(contentArrayItem);
     
@@ -233,7 +233,7 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
                 local name = tagText:sub(1, (firstSpaceIndex and firstSpaceIndex - 1) or tagTextLength);
                 if name:sub(1, 1) == "/" then
 
-                  for _, index in ipairs(openTagIndices) do
+                  for _, index in openTagIndices do
 
                     if richTextTagIndices[index].name == name:sub(2) then
 
@@ -293,7 +293,7 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
             local lastSpaceIndex: number = 1;
             local skipCounter = 0;
             local remainingRichTextTags = getRichTextIndices(text);
-            for index, character in ipairs(text:split("")) do
+            for index, character in text:split("") do
 
               -- Check if this is an offset.
               if skipCounter ~= 0 then
@@ -305,7 +305,7 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
 
               if isRichText then
 
-                for _, richTextTagIndex in ipairs(remainingRichTextTags) do
+                for _, richTextTagIndex in remainingRichTextTags do
 
                   if richTextTagIndex.startOffset == index then
 
@@ -343,7 +343,7 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
               TextLabel.Text = TextLabel.ContentText .. character;
               if isRichText then
 
-                for _, richTextTagInfo in ipairs(remainingRichTextTags) do
+                for _, richTextTagInfo in remainingRichTextTags do
                   
                   local startOffset = richTextTagInfo.startOffset;
                   local endOffset = richTextTagInfo.endOffset :: number;
@@ -649,7 +649,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
       local function doesPlayerPassCondition(ContentScript: ModuleScript): boolean
 
         -- Search for condition
-        for _, PossibleCondition in ipairs(DialogueClientScript.Conditions:GetChildren()) do
+        for _, PossibleCondition in DialogueClientScript.Conditions:GetChildren() do
 
           if PossibleCondition.ContentScript.Value == ContentScript then
 
@@ -687,7 +687,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
         -- Get a list of responses from the dialogue.
         local responses: {{ModuleScript: ModuleScript; properties: any}} = {};
-        for _, PossibleResponse in ipairs(CurrentContentScript:GetChildren()) do
+        for _, PossibleResponse in CurrentContentScript:GetChildren() do
 
           if PossibleResponse:IsA("ModuleScript") and tonumber(PossibleResponse.Name) and PossibleResponse:GetAttribute("DialogueType") == "Response" then
 
@@ -810,15 +810,15 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
         TextContainerLine.Visible = false;
         DialogueGUI.Enabled = true;
         local componentsToDelete = {};
-        for pageIndex, page in ipairs(pages) do
+        for pageIndex, page in pages do
           
-          for _, child in ipairs(componentsToDelete) do
+          for _, child in componentsToDelete do
             
             child:Destroy();
             
           end
           
-          for dialogueContentItemIndex, dialogueContentItem in ipairs(page) do
+          for dialogueContentItemIndex, dialogueContentItem in page do
             
             if dialogueContentItem.type == "effect" then
 
@@ -918,7 +918,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
           end);
 
           -- Add response buttons
-          for _, response in ipairs(responses) do
+          for _, response in responses do
 
             if doesPlayerPassCondition(response.ModuleScript) then
 
@@ -979,7 +979,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
         -- Run action
         if DialogueModule.isPlayerTakingWithNPC then
 
-          for _, PossibleAction in ipairs(DialogueClientScript.Actions:GetChildren()) do
+          for _, PossibleAction in DialogueClientScript.Actions:GetChildren() do
 
             if PossibleAction.ContentScript.Value == CurrentContentScript then
 
@@ -995,7 +995,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
         -- Check if there is more dialogue.
         local hasPossibleDialogue = false;
         local NextScript = if chosenResponse then chosenResponse.ModuleScript else CurrentContentScript;
-        for _, PossibleDialogue in ipairs(NextScript:GetChildren()) do
+        for _, PossibleDialogue in NextScript:GetChildren() do
 
           local DialogueType = PossibleDialogue:GetAttribute("DialogueType");
           if PossibleDialogue:IsA("ModuleScript") and tonumber(PossibleDialogue.Name) and (DialogueType == "Message" or DialogueType == "Redirect") then
