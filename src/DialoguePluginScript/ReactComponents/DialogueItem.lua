@@ -1,7 +1,6 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
 local Dropdown = require(script.Parent.Dropdown);
-local StarterPlayerScripts = game:GetService("StarterPlayerScripts");
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
@@ -11,41 +10,31 @@ export type DialogueItemProperties = {
   layoutOrder: number;
   zIndex: number;
   priority: string;
+  dialogueContainer: Folder;
 }
 
 local function DialogueItem(props: DialogueItemProperties)
 
   local showDeletionConfirmation, setShowDeletionConfirmation = React.useState(false);
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
+  local dialogueContainer = props.dialogueContainer;
   local contentScript = props.contentScript;
 
-  local function openSpecialScript(Folder: Folder, Template: ModuleScript): ()
+  local function openSpecialScript(scriptType: "Action" | "Condition"): ()
 
-    -- Search through the script list
-    local specialScript;
-    for _, possibleSpecialScript in Folder:GetChildren() do
-
-      if possibleSpecialScript:IsA("ModuleScript") and (possibleSpecialScript:FindFirstChild("ContentScript") :: ObjectValue).Value == contentScript then
-
-        specialScript = possibleSpecialScript;
-        break;
-
-      end;
-
-    end;
+    -- Create a special script if necessary.
+    local specialScript = contentScript:FindFirstChild(scriptType) :: ModuleScript?;
 
     if not specialScript then
 
-      local TempSpecialScript = Template:Clone();
-      TempSpecialScript.Name = table.concat(splitPriority, ".");
-      (TempSpecialScript:FindFirstChild("ContentScript") :: ObjectValue).Value = contentScript;
-      TempSpecialScript.Parent = Folder;
-      specialScript = TempSpecialScript;
+      local newSpecialScript = script.Parent.Parent.Templates[`{scriptType}Template`]:Clone();
+      newSpecialScript.Parent = contentScript;
+      specialScript = newSpecialScript;
 
     end;
 
     -- Open the condition script
-    plugin:OpenScript(specialScript);
+    plugin:OpenScript(specialScript :: ModuleScript);
 
   end;
 
@@ -122,7 +111,7 @@ local function DialogueItem(props: DialogueItemProperties)
           LayoutOrder = 1;
           [React.Event.Activated] = function()
 
-            openSpecialScript(StarterPlayerScripts.DialogueClientScript.Actions, script.ActionTemplate);
+            openSpecialScript("Action");
 
           end;
         }, {});
@@ -130,7 +119,7 @@ local function DialogueItem(props: DialogueItemProperties)
           LayoutOrder = 2;
           [React.Event.Activated] = function()
 
-            openSpecialScript(StarterPlayerScripts.DialogueClientScript.Conditions, script.ConditionTemplate);
+            openSpecialScript("Condition");
 
           end;
         }, {});
@@ -149,7 +138,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
           end;
 
-          local CurrentDirectory = CurrentDialogueContainer;
+          local currentDirectory: Folder | ModuleScript = dialogueContainer;
           local splitPriority = userText:split(".");
           if not isUserTextInvalid then
 
@@ -165,7 +154,7 @@ local function DialogueItem(props: DialogueItemProperties)
               end;
 
               -- Make sure the folder exists
-              local TargetDirectory = CurrentDirectory:FindFirstChild(priority);
+              local TargetDirectory = currentDirectory:FindFirstChild(priority);
               if not TargetDirectory and index ~= #splitPriority then
 
                 warn("[Dialogue Maker] " .. userText .. " is not a valid priority. Make sure all parent directories exist.");
@@ -183,14 +172,14 @@ local function DialogueItem(props: DialogueItemProperties)
                   
                   local UserSplitPriority = userText:split(".");
                   props.contentScript.Name = UserSplitPriority[#UserSplitPriority];
-                  ContentScript.Parent = CurrentDirectory;
+                  contentScript.Parent = currentDirectory;
 
                 end;
                 break;
 
               end;
 
-              CurrentDirectory = CurrentDirectory:FindFirstChild(priority) :: ModuleScript;
+              currentDirectory = currentDirectory:FindFirstChild(priority) :: ModuleScript;
 
             end;
 
