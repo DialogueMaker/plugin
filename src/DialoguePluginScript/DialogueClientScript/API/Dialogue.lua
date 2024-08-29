@@ -1,7 +1,6 @@
 --!strict
 local UserInputService = game:GetService("UserInputService");
 local ContextActionService = game:GetService("ContextActionService");
-local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local TweenService = game:GetService("TweenService");
 local Players = game:GetService("Players");
 local Player = Players.LocalPlayer;
@@ -137,9 +136,10 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
   TextContainerClone.Visible = false;
   TextContainerClone.Parent = TextContainer.Parent;
   
-  if TextContainerClone:FindFirstChild("Segment") then
+  local segment = TextContainerClone:FindFirstChild("Segment");
+  if segment then
     
-    TextContainerClone:FindFirstChild("Segment"):Destroy();
+    segment:Destroy();
     
   end
 
@@ -256,7 +256,6 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
                 else
 
                   -- Get the tag start offset.
-                  local startOffset = pointer;
                   local attributes = firstSpaceIndex and tagText:sub(firstSpaceIndex + 1) or "";
                   table.insert(richTextTagIndices, {
                     name = name;
@@ -345,14 +344,14 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
 
                 for _, richTextTagInfo in remainingRichTextTags do
                   
-                  local startOffset = richTextTagInfo.startOffset;
-                  local endOffset = richTextTagInfo.endOffset :: number;
-                  if index >= startOffset and endOffset > (breakpoints[#breakpoints] or 0) then
+                  local tagStartOffset = richTextTagInfo.startOffset;
+                  local tagEndOffset = richTextTagInfo.endOffset :: number;
+                  if index >= tagStartOffset and tagEndOffset > (breakpoints[#breakpoints] or 0) then
 
                     local prefix = "<" .. richTextTagInfo.name .. (if richTextTagInfo.attributes and richTextTagInfo.attributes ~= "" then " " .. richTextTagInfo.attributes else "") .. ">";
                     local suffix = "</" .. richTextTagInfo.name .. ">";
-                    local startOffset = startOffset - (breakpoints[#breakpoints] or 0);
-                    local endOffset = (endOffset - (breakpoints[#breakpoints] or 0)) - prefix:len() - suffix:len();
+                    local startOffset = tagStartOffset - (breakpoints[#breakpoints] or 0);
+                    local endOffset = (tagEndOffset - (breakpoints[#breakpoints] or 0)) - prefix:len() - suffix:len();
                     TextLabel.Text = TextLabel.ContentText:sub(1, startOffset - 1) .. prefix .. TextLabel.ContentText:sub(startOffset, endOffset - 1) .. suffix .. TextLabel.ContentText:sub(endOffset);
 
                   end
@@ -468,8 +467,6 @@ function DialogueModule.getPages(contentArray: Types.ContentArray, TextContainer
 
 end;
 
-local isPlayerTakingWithNPC = false;
-
 -- @since v1.0.0
 function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings): ()
 
@@ -537,24 +534,20 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
   -- Set the theme and prepare the response template
   local DialogueGUI: ScreenGui = DialogueModule.createNewDialogueGui(npcSettings.general.themeName);
-  local ResponseContainer, ResponseTemplate, ClickSound: Sound?, ClickSoundEnabled, OldDialogueGui;
-  local GUIDialogueContainer = DialogueGUI:FindFirstChild("DialogueContainer");
+  local GUIDialogueContainer = DialogueGUI:FindFirstChild("DialogueContainer") :: Instance;
+  local ResponseContainer = GUIDialogueContainer:FindFirstChild("ResponseContainer") :: Instance;
+  local ResponseTemplate = ResponseContainer:FindFirstChild("ResponseTemplate") :: Instance;
+  local ClickSound: Sound?, ClickSoundEnabled;
   local npcName = npcSettings.general.npcName;
   local function setupDialogueGui(): ()
 
-    -- Set up responses
-    DialogueGUI.Parent = Player:WaitForChild("PlayerGui");
-    GUIDialogueContainer = DialogueGUI:FindFirstChild("DialogueContainer");
-    ResponseContainer = GUIDialogueContainer:FindFirstChild("ResponseContainer");
-    assert(ResponseContainer and ResponseContainer:IsA("ScrollingFrame"), "[Dialogue Maker] ResponseContainer is not a ScrollingFrame");
-    ResponseTemplate = ResponseContainer:FindFirstChild("ResponseTemplate"):Clone();
-
     -- Set NPC name
+    DialogueGUI.Parent = Player:WaitForChild("PlayerGui");
     local NPCNameContainer = GUIDialogueContainer:FindFirstChild("NPCNameContainer");
-    if NPCNameContainer:IsA("GuiObject") then
+    if NPCNameContainer and NPCNameContainer:IsA("GuiObject") then
 
       local NPCNameTextClass = NPCNameContainer:FindFirstChild("NPCName");
-      if NPCNameTextClass:IsA("TextLabel") then
+      if NPCNameTextClass and NPCNameTextClass:IsA("TextLabel") then
 
         NPCNameTextClass.Text = npcName;
         if npcSettings.general.fitName then
@@ -600,6 +593,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
   setupDialogueGui();
 
+  assert(ResponseTemplate and ResponseContainer);
   if GUIDialogueContainer:IsA("GuiObject") and ResponseContainer:IsA("ScrollingFrame") and ResponseTemplate:IsA("TextButton") then
 
     -- Initialize the theme, then listen for changes
@@ -779,8 +773,6 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
         if clientSettings.keybindsEnabled then
 
-          local KEYS_PRESSED = UserInputService:GetKeysPressed();
-          local KeybindPressed = false;
           if UserInputService:IsKeyDown(defaultChatContinueKey) or UserInputService:IsKeyDown(defaultChatContinueKeyGamepad) then
 
             coroutine.wrap(function()
@@ -809,7 +801,7 @@ function DialogueModule.readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
         TextContainerLine.Text = "";
         TextContainerLine.Visible = false;
         DialogueGUI.Enabled = true;
-        local componentsToDelete = {};
+        local componentsToDelete: {Instance} = {};
         for pageIndex, page in pages do
           
           for _, child in componentsToDelete do

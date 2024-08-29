@@ -80,7 +80,7 @@ function TriggerModule.enableAllClickDetectors(): ()
   for _, clickDetector in pairs(ClickDetectors) do
     
     local OriginalParent = clickDetector:FindFirstChild("OriginalParent");
-    if OriginalParent:IsA("ObjectValue") and OriginalParent.Value then
+    if OriginalParent and OriginalParent:IsA("ObjectValue") and OriginalParent.Value then
 
       clickDetector.Parent = OriginalParent.Value;
       OriginalParent:Destroy();
@@ -111,7 +111,7 @@ function TriggerModule.enableAllProximityPrompts(): ()
   for _, proximityDetector in pairs(ProximityPrompts) do
     
     local OriginalParent = proximityDetector:FindFirstChild("OriginalParent");
-    if OriginalParent:IsA("ObjectValue") and OriginalParent.Value then
+    if OriginalParent and OriginalParent:IsA("ObjectValue") and OriginalParent.Value then
 
       proximityDetector.Parent = OriginalParent.Value;
       OriginalParent:Destroy();

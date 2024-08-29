@@ -1,12 +1,10 @@
 --!strict
 local Players = game:GetService("Players");
-local ControllerService = game:GetService("ControllerService");
 local RunService = game:GetService("RunService");
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
 local Player = game:GetService("Players").LocalPlayer;
 local PlayerGui = Player:WaitForChild("PlayerGui");
-local ReplicatedStorage = game:GetService("ReplicatedStorage");
 local APIFolder = script.API;
 local api = {
   dialogue = require(APIFolder.Dialogue);
@@ -76,7 +74,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
     local dialogueSettings = require(NPC:FindFirstChild("NPCDialogueSettings")) :: Types.NPCSettings;
     if dialogueSettings.speechBubble.enabled then
 
-      local SpeechBubblePart = dialogueSettings.speechBubble.BasePart;
+      local SpeechBubblePart = dialogueSettings.speechBubble.location;
       if SpeechBubblePart and SpeechBubblePart:IsA("BasePart") then
 
         -- Listen if the player clicks the speech bubble
@@ -99,7 +97,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
     -- Next, the prompt regions.
     if dialogueSettings.promptRegion.enabled then
 
-      local PromptRegionPart = dialogueSettings.promptRegion.BasePart;
+      local PromptRegionPart = dialogueSettings.promptRegion.location;
       if PromptRegionPart and PromptRegionPart:IsA("BasePart") then
 
         PromptRegionPart.Touched:Connect(function(part)
@@ -125,7 +123,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
     -- Now, the proximity prompts.
     if dialogueSettings.proximityPrompt.enabled then
 
-      local ProximityPrompt = dialogueSettings.proximityPrompt.Instance;
+      local ProximityPrompt = dialogueSettings.proximityPrompt.location;
       if dialogueSettings.proximityPrompt.autoCreate then
 
         local ProximityPromptTemp = Instance.new("ProximityPrompt");
@@ -155,7 +153,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
     -- Almost there: it's time for the click detectors.
     if dialogueSettings.clickDetector.enabled then
 
-      local ClickDetector = dialogueSettings.clickDetector.Instance;
+      local ClickDetector = dialogueSettings.clickDetector.location;
       if dialogueSettings.clickDetector.autoCreate then
 
         local ClickDetectorTemp = Instance.new("ClickDetector");
