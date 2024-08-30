@@ -17,7 +17,7 @@ local clientSettings = require(DialogueClientScript.Settings);
 function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotFound: boolean?): ModuleScript
 
   -- Check if we have the theme
-  local ThemeFolder = DialogueClientScript.Themes;
+  local ThemeFolder = DialogueClientScript.ReactComponents.Themes;
   local themeModuleScript = ThemeFolder:FindFirstChild(themeName);
   if themeName and not themeModuleScript and useDefaultIfNotFound then
 
