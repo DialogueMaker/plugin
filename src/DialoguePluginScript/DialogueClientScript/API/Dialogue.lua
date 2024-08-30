@@ -14,6 +14,7 @@ type Page = Types.Page;
 
 local clientSettings = require(DialogueClientScript.Settings);
 
+-- @since v5.0.0
 function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotFound: boolean?): ModuleScript
 
   -- Check if we have the theme
@@ -38,7 +39,7 @@ function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotF
 end;
 
 -- Searches for a ModuleScript based on a given directory. Errors if it doesn't exist. 
--- @since v1.0.0
+-- @since v5.0.0
 -- @returns A module script of a given directory.
 function DialogueModule:getContentScriptFromPriority(dialogueContainer: Folder, targetPath: {string}): ModuleScript
 
@@ -67,20 +68,7 @@ function DialogueModule:getContentScriptFromPriority(dialogueContainer: Folder, 
 
 end;
 
-function deleteNonTextWrapperChildren(textContainer: Instance) 
-  
-  for _, child in textContainer:GetChildren() do
-
-    if child.Name ~= "TextWrapper" then
-
-      child:Destroy();
-
-    end;
-
-  end
-  
-end
-
+-- Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
 -- @since v5.0.0
 function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer: GuiObject, textLabel: TextLabel): {Page}
   
@@ -105,18 +93,23 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer
     
     table.insert(pages, currentPage);
     currentPage = {};
-    
     TextLabelClone = TextLabelClone:Clone();
     
-    deleteNonTextWrapperChildren(TextContainerClone);
+    for _, child in TextContainerClone:GetChildren() do
+  
+      if child.Name ~= "TextWrapper" then
+  
+        child:Destroy();
+  
+      end;
+  
+    end
     
     TextLabelClone.Parent = TextContainerClone;
     TextLabelClone.Size = UDim2.new(1, 0, 1, 0);
-    
     xSizeOffset = 0;
     
   end
-  
   
   for contentArrayIndex, contentArrayItem in contentArray do
     
@@ -423,6 +416,8 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer
 
 end;
 
+-- Checks if the local player passes a condition.
+-- @since v5.0.0
 function DialogueModule:doesPlayerPassCondition(contentScript: ModuleScript): boolean
 
   local conditionScript = contentScript:FindFirstChild("Condition") :: ModuleScript?;
@@ -431,7 +426,7 @@ function DialogueModule:doesPlayerPassCondition(contentScript: ModuleScript): bo
 
 end;
 
--- @since v1.0.0
+-- @since v5.0.0
 function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings): ()
 
   -- Make sure we aren't already talking to an NPC
@@ -444,16 +439,10 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
   -- Initialize the theme, then listen for changes
   local themeModuleScript = DialogueModule:getThemeModuleScript(npcSettings.general.themeName, true);
-  script.CurrentTheme.Value = themeModuleScript;
-
   local dialogueGUI = Instance.new("ScreenGui");
+  dialogueGUI.Parent = Player.PlayerGui;
   local root = ReactRoblox.createRoot(dialogueGUI);
-
-  local themeChangedEvent = script.CurrentTheme.Changed:Connect(function(newThemeModuleScript)
-
-    
-
-  end);
+  script.CurrentTheme.Value = themeModuleScript;
 
   -- If necessary, end conversation if player or NPC goes out of distance
   local NPCPrimaryPart = NPC.PrimaryPart;
@@ -487,8 +476,6 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
     currentContentScript = DialogueModule:getContentScriptFromPriority(NPCDialogueContainer, currentDialoguePriority:split("."));
     local dialogueType = currentContentScript:GetAttribute("DialogueType");
 
-    -- Checks if the local player passes a condition.
-    -- @since v5.0.0
     if DialogueModule:doesPlayerPassCondition(currentContentScript) then
       
       local function useDialogueEffect(effectName: string, ...: any): Types.Effect
@@ -530,62 +517,75 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
       end);
 
       local onCompletionEvent = Instance.new("BindableEvent");
-      root:render(React.createElement(require(themeModuleScript) :: any, {
-        responseContentScripts = responses;
-        dialogueContentArray = dialogueContentArray;
-        getPages = function(textContainer: Frame, textLabel: TextLabel)
+      local function renderRoot()
 
-          return DialogueModule:getPages(dialogueContentArray, textContainer, textLabel);
-
-        end;
-        onComplete = function(selectedResponseContentScript: ModuleScript?)
-    
-          -- Run action.
-          local actionScript = currentContentScript:FindFirstChild("Action") :: ModuleScript?;
-          if actionScript then 
+        root:render(React.createElement(require(themeModuleScript) :: any, {
+          responseContentScripts = responses;
+          dialogueContentArray = dialogueContentArray;
+          getPages = function(textContainer: Frame, textLabel: TextLabel)
+  
+            return DialogueModule:getPages(dialogueContentArray, textContainer, textLabel);
+  
+          end;
+          onComplete = function(selectedResponseContentScript: ModuleScript?)
+      
+            -- Run action.
+            local actionScript = currentContentScript:FindFirstChild("Action") :: ModuleScript?;
+            if actionScript then 
+              
+              (require(actionScript) :: () -> ())(); 
             
-            (require(actionScript) :: () -> ())(); 
-          
-          end;
-
-          -- Check if there is more dialogue.
-          local hasPossibleDialogue = false;
-          local nextScript = if selectedResponseContentScript then selectedResponseContentScript else currentContentScript;
-          for _, possibleContentScript in nextScript:GetChildren() do
-
-            local possibleDialogueType = possibleContentScript:GetAttribute("DialogueType");
-            if possibleContentScript:IsA("ModuleScript") and tonumber(possibleContentScript.Name) and (possibleDialogueType == "Message" or possibleDialogueType == "Redirect") then
-
-              hasPossibleDialogue = true;
-              break;
-
+            end;
+  
+            -- Check if there is more dialogue.
+            local hasPossibleDialogue = false;
+            local nextScript = if selectedResponseContentScript then selectedResponseContentScript else currentContentScript;
+            for _, possibleContentScript in nextScript:GetChildren() do
+  
+              local possibleDialogueType = possibleContentScript:GetAttribute("DialogueType");
+              if possibleContentScript:IsA("ModuleScript") and tonumber(possibleContentScript.Name) and (possibleDialogueType == "Message" or possibleDialogueType == "Redirect") then
+  
+                hasPossibleDialogue = true;
+                break;
+  
+              end
+  
             end
-
-          end
-
-          if DialogueModule.isPlayerTalkingWithNPC and hasPossibleDialogue then
-
-            currentDialoguePriority = `{if selectedResponseContentScript then `{currentDialoguePriority}.{selectedResponseContentScript.Name}` else currentDialoguePriority}.1`;
-
-          else
-
-            dialogueGUI:Destroy();
-            DialogueModule.isPlayerTakingWithNPC = false;
-
+  
+            if DialogueModule.isPlayerTalkingWithNPC and hasPossibleDialogue then
+  
+              currentDialoguePriority = `{if selectedResponseContentScript then `{currentDialoguePriority}.{selectedResponseContentScript.Name}` else currentDialoguePriority}.1`;
+  
+            else
+  
+              dialogueGUI:Destroy();
+              DialogueModule.isPlayerTakingWithNPC = false;
+  
+            end;
+  
+            onCompletionEvent:Fire();
+      
           end;
+          onTimeout = function()
+  
+            DialogueModule.isPlayerTalkingWithNPC = false;
+            onCompletionEvent:Fire();
+  
+          end;
+        }));
 
-          onCompletionEvent:Fire();
+      end;
+
+      local themeChangedEvent = script.CurrentTheme.Changed:Connect(function(newThemeModuleScript)
+
+        script.CurrentTheme.Value = newThemeModuleScript;
+        renderRoot();
     
-        end;
-        onTimeout = function()
+      end);      
 
-          DialogueModule.isPlayerTalkingWithNPC = false;
-          onCompletionEvent:Fire();
-
-        end;
-      }));
-
+      renderRoot();
       onCompletionEvent.Event:Wait();
+      themeChangedEvent:Disconnect();
 
     elseif DialogueModule.isPlayerTalkingWithNPC then
 
@@ -600,8 +600,8 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   end;
 
   -- Free the player :)
-  themeChangedEvent:Disconnect();
-
+  root:unmount();
+  dialogueGUI:Destroy();
   DialogueModule.isPlayerTalkingWithNPC = false;
 
 end;
