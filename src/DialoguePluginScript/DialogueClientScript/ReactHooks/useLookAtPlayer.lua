@@ -8,13 +8,13 @@ type NPCSettings = Types.NPCSettings;
 
 local function useLookAtPlayer(npc: Model, npcSettings: NPCSettings)
 
-  React.useEffect(function()
+  React.useEffect(function(): ()
   
     -- Check if the NPC needs to look at the player.
     if npcSettings.general.npcLooksAtPlayerDuringDialogue and npcSettings.general.npcNeckRotationMaxY then
 
       -- Handle this in a coroutine because the look shouldn't stop the dialogue.
-      coroutine.wrap(function()
+      local lookTask = task.spawn(function()
 
         local NPCHead: BasePart? = npc:FindFirstChild("Head") :: BasePart;
         local NPCPrimaryPart: BasePart? = npc.PrimaryPart :: BasePart;
@@ -32,7 +32,7 @@ local function useLookAtPlayer(npc: Model, npcSettings: NPCSettings)
           local OriginalC0 = NPCNeck.C0;
           local OriginalC1 = NPCNeck.C1;
     
-          while DialogueModule.isPlayerTalkingWithNPC and NPCPrimaryPart and NPCHead and NPCNeck and PlayerHead and task.wait() do
+          while NPCPrimaryPart and NPCHead and NPCNeck and PlayerHead and task.wait() do
     
             local maxRotationX = npcSettings.general.npcNeckRotationMaxX;
             local maxRotationY = npcSettings.general.npcNeckRotationMaxY;
@@ -58,7 +58,13 @@ local function useLookAtPlayer(npc: Model, npcSettings: NPCSettings)
     
         end
     
-      end)();
+      end);
+
+      return function()
+
+        task.cancel(lookTask);
+
+      end;
 
     end
 
