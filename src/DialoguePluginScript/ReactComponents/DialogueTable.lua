@@ -1,14 +1,15 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
+local DialogueTableHeader = require(script.Parent.DialogueTableHeader);
+local DialogueTableBody = require(script.Parent.DialogueTableBody);
 
-local function StatusSection()
+local function DialogueTable()
 
   return React.createElement("Frame", {}, {
-    UIListLayout = React.createElement("UIListLayout");
-    ModelLocationTextLabel = React.createElement("TextLabel");
-    DialoguePriorityTextLabel = React.createElement("TextLabel");
+    DialogueTableHeader = React.createElement(DialogueTableHeader);
+    DialogueTableBody = React.createElement(DialogueTableBody);
   })
 
 end;
 
-return StatusSection;
+return DialogueTable;

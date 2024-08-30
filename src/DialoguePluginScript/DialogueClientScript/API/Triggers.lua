@@ -4,7 +4,7 @@ local ProximityPrompts = {};
 local SpeechBubbles = {};
 local ClickDetectors = {};
 
-function TriggerModule.createSpeechBubble(npc: Model, properties: {[string]: any}): BillboardGui
+function TriggerModule:createSpeechBubble(npc: Model, properties: {[string]: any}): BillboardGui
 
   SpeechBubbles[npc] = Instance.new("BillboardGui");
   SpeechBubbles[npc].Name = "SpeechBubble";
@@ -27,7 +27,7 @@ function TriggerModule.createSpeechBubble(npc: Model, properties: {[string]: any
 
 end;
 
-function TriggerModule.disableAllSpeechBubbles(): ()
+function TriggerModule:disableAllSpeechBubbles(): ()
 
   for _, speechBubble in pairs(SpeechBubbles) do
 
@@ -37,7 +37,7 @@ function TriggerModule.disableAllSpeechBubbles(): ()
 
 end;
 
-function TriggerModule.enableAllSpeechBubbles(): ()
+function TriggerModule:enableAllSpeechBubbles(): ()
 
   for _, speechBubble in pairs(SpeechBubbles) do
 
@@ -47,19 +47,19 @@ function TriggerModule.enableAllSpeechBubbles(): ()
 
 end;
 
-function TriggerModule.addClickDetector(npc: Model, clickDetector: ClickDetector): ()
+function TriggerModule:addClickDetector(npc: Model, clickDetector: ClickDetector): ()
 
   ClickDetectors[npc] = clickDetector;
 
 end;
 
-function TriggerModule.addProximityPrompt(npc: Model, proximityPrompt: ProximityPrompt): ()
+function TriggerModule:addProximityPrompt(npc: Model, proximityPrompt: ProximityPrompt): ()
 
   ProximityPrompts[npc] = proximityPrompt
 
 end
 
-function TriggerModule.disableAllClickDetectors(): ()
+function TriggerModule:disableAllClickDetectors(): ()
 
   for _, clickDetector in pairs(ClickDetectors) do
 
@@ -75,7 +75,7 @@ function TriggerModule.disableAllClickDetectors(): ()
 
 end;
 
-function TriggerModule.enableAllClickDetectors(): ()
+function TriggerModule:enableAllClickDetectors(): ()
 
   for _, clickDetector in pairs(ClickDetectors) do
     
@@ -91,7 +91,7 @@ function TriggerModule.enableAllClickDetectors(): ()
 
 end;
 
-function TriggerModule.disableAllProximityPrompts(): ()
+function TriggerModule:disableAllProximityPrompts(): ()
 
   for _, proximityPrompt in pairs(ProximityPrompts) do
 
@@ -106,7 +106,7 @@ function TriggerModule.disableAllProximityPrompts(): ()
   end;
 end;
 
-function TriggerModule.enableAllProximityPrompts(): ()
+function TriggerModule:enableAllProximityPrompts(): ()
 
   for _, proximityDetector in pairs(ProximityPrompts) do
     

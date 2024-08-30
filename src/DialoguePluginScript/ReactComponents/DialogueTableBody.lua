@@ -5,6 +5,7 @@ local DialogueItem = require(script.Parent.DialogueItem);
 export type DialogueTableBodyProperties = {
   viewingPriority: string;
   dialogueParent: ModuleScript | Folder;
+  dialogueContainer: Folder;
   isDeleteModeEnabled: boolean;
 }
 
@@ -72,6 +73,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             contentScript = childContentScript;
             isDeleteModeEnabled = isDeleteModeEnabled;
             priority = childContentScript.Name;
+            dialogueContainer = props.dialogueContainer;
           });
 
           table.insert(dialogueItems, dialogueItem);
@@ -101,7 +103,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {dialogueParent :: any, isDeleteModeEnabled});
 
-  return React.createElement("Frame", {}, {
+  return React.createElement("ScrollingFrame", {}, {
     React.createElement("UIListLayout", {
       Name = "UIListLayout"
     });

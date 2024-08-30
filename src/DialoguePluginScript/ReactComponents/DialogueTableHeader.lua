@@ -1,14 +1,21 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
 
-local function StatusSection()
+local function DialogueTableHeader()
 
   return React.createElement("Frame", {}, {
     UIListLayout = React.createElement("UIListLayout");
-    ModelLocationTextLabel = React.createElement("TextLabel");
-    DialoguePriorityTextLabel = React.createElement("TextLabel");
+    PriorityTextLabel = React.createElement("TextLabel");
+    TypeTextLabel = React.createElement("TextLabel");
+    ScriptsTextLabel = React.createElement("TextLabel", {}, {
+      ImageLabel = React.createElement("ImageLabel", {
+        Image = "rbxassetid://14098739279";
+      })
+    });
+    ContentTextLabel = React.createElement("TextLabel");
+    ChildrenTextLabel = React.createElement("TextLabel");
   })
 
 end;
 
-return StatusSection;
+return DialogueTableHeader;

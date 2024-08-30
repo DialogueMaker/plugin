@@ -17,27 +17,27 @@ local Types = require(script.Types);
 local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   
   -- Make sure we can't talk to another NPC
-  api.triggers.disableAllSpeechBubbles();
-  api.triggers.disableAllClickDetectors();
-  api.triggers.disableAllProximityPrompts();
+  api.triggers:disableAllSpeechBubbles();
+  api.triggers:disableAllClickDetectors();
+  api.triggers:disableAllProximityPrompts();
   
   local freezePlayer = npcSettings.general.freezePlayer;
   if freezePlayer then 
 
-    api.player.freezePlayer(); 
+    api.player:freezePlayer(); 
 
   end;
   
   -- Let the Dialogue module handle it.
-  api.dialogue.readDialogue(NPC, npcSettings);
+  api.dialogue:readDialogue(NPC, npcSettings);
   
   -- Clean up.
-  api.triggers.enableAllSpeechBubbles();
-  api.triggers.enableAllClickDetectors();
-  api.triggers.enableAllProximityPrompts();
+  api.triggers:enableAllSpeechBubbles();
+  api.triggers:enableAllClickDetectors();
+  api.triggers:enableAllProximityPrompts();
   if freezePlayer then 
 
-    api.player.unfreezePlayer(); 
+    api.player:unfreezePlayer(); 
 
   end;
   
@@ -78,7 +78,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
       if SpeechBubblePart and SpeechBubblePart:IsA("BasePart") then
 
         -- Listen if the player clicks the speech bubble
-        local SpeechBubble = api.triggers.createSpeechBubble(NPC, dialogueSettings);
+        local SpeechBubble = api.triggers:createSpeechBubble(NPC, dialogueSettings);
         (SpeechBubble:FindFirstChild("SpeechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
 
           readDialogue(NPC, dialogueSettings);
@@ -106,7 +106,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
           local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
           if PlayerFromCharacter == Player then
 
-            api.dialogue.readDialogue(NPC, dialogueSettings);
+            api.dialogue:readDialogue(NPC, dialogueSettings);
 
           end;
 
@@ -134,7 +134,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
 
       if ProximityPrompt and ProximityPrompt:IsA("ProximityPrompt") then
 
-        api.triggers.addProximityPrompt(NPC, ProximityPrompt);
+        api.triggers:addProximityPrompt(NPC, ProximityPrompt);
 
         ProximityPrompt.Triggered:Connect(function()
           
@@ -164,7 +164,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
 
       if ClickDetector and ClickDetector:IsA("ClickDetector") then
 
-        api.triggers.addClickDetector(NPC, ClickDetector);
+        api.triggers:addClickDetector(NPC, ClickDetector);
 
         ClickDetector.MouseClick:Connect(function()
           
