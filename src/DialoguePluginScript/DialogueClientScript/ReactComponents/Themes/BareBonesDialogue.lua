@@ -99,21 +99,36 @@ local function BareBonesDialogue(props: ThemeProperties)
 
     end;
   }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      SortOrder = Enum.SortOrder.LayoutOrder;
+    });
     NPCNameTextLabel = if npcSettings.general.showName then React.createElement("TextLabel", {
       AutomaticSize = if npcSettings.general.fitName then Enum.AutomaticSize.X else Enum.AutomaticSize.None;
       Size = if npcSettings.general.fitName then UDim2.new(0, 0, 0, 0) else UDim2.new();
       Text = npcName;
+      LayoutOrder = 1;
     }) else nil;
     NPCTextContainer = React.createElement("Frame", {
       ref = textContainerRef;
       Size = UDim2.new(0, 0, 0, 0);
       AutomaticSize = Enum.AutomaticSize.XY;
+      LayoutOrder = 2;
     }, {
+      React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        Wraps = true;
+        Name = "UIListLayout";
+      });
       messageComponents;
     });
     ResponseContainer = if responseContentScripts then React.createElement("ScrollingFrame", {
 
     }, {
+      React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        Name = "UIListLayout";
+      });
       responseComponents;
     }) else nil;
     ContinueButton = React.createElement("ImageButton", {

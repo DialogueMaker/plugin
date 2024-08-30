@@ -80,7 +80,8 @@ local function useMessageComponents(props: useMessageComponentsProps)
           -- Determine new offset.
           setMessageComponents({table.unpack(messageComponents), React.createElement(TextSegment, {
             text = dialogueContentItem.text;
-            skipPageEvent = skipPageEventRef.current
+            skipPageEvent = skipPageEventRef.current;
+            layoutOrder = dialogueContentItemIndex;
           })});
 
         end;

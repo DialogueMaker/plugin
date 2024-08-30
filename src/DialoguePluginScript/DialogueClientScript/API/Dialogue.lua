@@ -478,16 +478,7 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
     if DialogueModule:doesPlayerPassCondition(currentContentScript) then
       
-      local function useDialogueEffect(effectName: string, ...: any): Types.Effect
-        
-        -- Try to find the effect script based on the name.
-        local EffectScript = DialogueClientScript.Effects:FindFirstChild(effectName);
-        assert(EffectScript and EffectScript:IsA("ModuleScript"), "[Dialogue Maker] " .. effectName .. " is not a valid effect. Check your Effects folder to make sure there's a ModuleScript with that name.");
-        return require(EffectScript)(...) :: Types.Effect;
-        
-      end;
-      
-      local dialogueContentArray = (require(currentContentScript) :: (useEffect: typeof(useDialogueEffect)) -> Types.ContentArray)(useDialogueEffect);
+      local dialogueContentArray = (require(currentContentScript) :: () -> Types.ContentArray)();
       if dialogueType == "Redirect" then
 
         -- A redirect is available, so let's switch priorities.
@@ -510,9 +501,9 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
       end
 
       -- Sort responses because :GetChildren() doesn't guarantee it
-      table.sort(responses, function(folder1, folder2)
+      table.sort(responses, function(responseScript1, responseScript2)
 
-        return folder1.Name < folder2.Name;
+        return responseScript1.Name < responseScript2.Name;
   
       end);
 

@@ -5,6 +5,7 @@ export type TextSegmentProperties = {
   text: string;
   skipEvent: RBXScriptSignal;
   letterDelay: number;
+  layoutOrder: number;
 }
 
 local function TextSegment(props: TextSegmentProperties)
@@ -46,6 +47,7 @@ local function TextSegment(props: TextSegmentProperties)
     Text = text;
     MaxVisibleGraphemes = maxVisibleGraphemes;
     ref = textLabelRef;
+    layoutOrder = props.layoutOrder;
   })
 
 end;
