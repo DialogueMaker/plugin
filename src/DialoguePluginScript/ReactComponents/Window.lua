@@ -6,6 +6,7 @@ local DialogueTable = require(script.Parent.DialogueTable);
 
 export type WindowProperties = {
   model: Model;
+  repairNPC: () -> ();
   plugin: Plugin;
 }
 
@@ -28,6 +29,8 @@ local function Window(props: WindowProperties)
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
       plugin = props.plugin;
+      repairNPC = props.repairNPC;
+      model = props.model;
     });
     DialogueTable = React.createElement(DialogueTable, {
       isDeleteModeEnabled = isDeleteModeEnabled;

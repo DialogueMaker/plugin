@@ -5,8 +5,8 @@ local ToolbarButton = require(script.Parent.ToolbarButton);
 type ToolbarProps = {
   dialogueParent: ModuleScript | Folder;
   setDialogueParent: (ModuleScript | Folder) -> ();
-  selectedNPCModel: Model;
-  repairSelectedNPC: () -> ();
+  model: Model;
+  repairNPC: () -> ();
   isDeleteModeEnabled: boolean;
   setIsDeleteModeEnabled: (boolean) -> ();
   plugin: Plugin;
@@ -70,9 +70,9 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.repairSelectedNPC();
+        props.repairNPC();
 
-        local npcDialogueSettingsScript = props.selectedNPCModel:FindFirstChild("NPCDialogueSettings") :: Script;
+        local npcDialogueSettingsScript = props.model:FindFirstChild("NPCDialogueSettings") :: Script;
         props.plugin:OpenScript(npcDialogueSettingsScript);
 
       end;

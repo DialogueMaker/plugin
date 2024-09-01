@@ -22,6 +22,54 @@ local function closeDialogueEditor(): ()
 
 end;
 
+local function repairNPC(model: Model): ()
+
+  if not model:FindFirstChild("DialogueContainer") then
+
+    -- Add the dialogue container to the NPC
+    local DialogueContainer = Instance.new("Folder");
+    DialogueContainer.Name = "DialogueContainer";
+
+    -- Add the dialogue folder to the model
+    DialogueContainer.Parent = model;
+    return;
+
+  end;
+  
+  if not model:FindFirstChild("NPCDialogueSettings") then
+
+    print(`[Dialogue Maker] Adding settings script to {model.Name}`);
+
+    local SettingsScript = script.NPCSettingsTemplate:Clone();
+    SettingsScript.Name = "NPCDialogueSettings";
+    SettingsScript.Parent = model;
+
+    print(`[Dialogue Maker] Added settings script to {model.Name}`)
+
+  end;
+
+  -- Initialize DialogueLocations for indexing.
+  local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
+
+  assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
+
+  for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
+    
+    if dialogueLocation.Value == model then
+      
+      return;
+      
+    end
+    
+  end;
+
+  local DialogueLocation = Instance.new("ObjectValue");
+  DialogueLocation.Value = model;
+  DialogueLocation.Name = "DialogueLocation";
+  DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
+
+end;
+
 -- Open the editor when called.
 -- @since v1.0.0
 local function openDialogueEditor(model: Model): ()
@@ -37,6 +85,11 @@ local function openDialogueEditor(model: Model): ()
     pluginGUIRoot:render(React.createElement(Window, {
       plugin = plugin;
       model = model;
+      repairNPC = function()
+
+        repairNPC(model);
+
+      end;
     }));
     
   end;
@@ -90,55 +143,7 @@ EditDialogueButton.Click:Connect(function()
   end
 
   -- Verify NPC dialogue folder
-  local function repairNPC(): ()
-
-    if not model:FindFirstChild("DialogueContainer") then
-  
-      -- Add the dialogue container to the NPC
-      local DialogueContainer = Instance.new("Folder");
-      DialogueContainer.Name = "DialogueContainer";
-  
-      -- Add the dialogue folder to the model
-      DialogueContainer.Parent = model;
-      return;
-  
-    end;
-    
-    if not model:FindFirstChild("NPCDialogueSettings") then
-  
-      print(`[Dialogue Maker] Adding settings script to {model.Name}`);
-  
-      local SettingsScript = script.NPCSettingsTemplate:Clone();
-      SettingsScript.Name = "NPCDialogueSettings";
-      SettingsScript.Parent = model;
-  
-      print(`[Dialogue Maker] Added settings script to {model.Name}`)
-  
-    end;
-  
-    -- Initialize DialogueLocations for indexing.
-    local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
-  
-    assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
-  
-    for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
-      
-      if dialogueLocation.Value == model then
-        
-        return;
-        
-      end
-      
-    end;
-  
-    local DialogueLocation = Instance.new("ObjectValue");
-    DialogueLocation.Value = model;
-    DialogueLocation.Name = "DialogueLocation";
-    DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
-  
-  end;
-
-  repairNPC();
+  repairNPC(model);
 
   -- Add the chat receiver script in the StarterPlayerScripts.
   if not StarterPlayerScripts:FindFirstChild("DialogueClientScript") then
