@@ -6,13 +6,10 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
-
 local Window = require(script.ReactComponents.Window);
 
-local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
-local EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", "rbxassetid://14109181603");
+local EditDialogueButton: PluginToolbarButton;
 local isDialogueEditorOpen = false;
-
 local PluginGui: DockWidgetPluginGui?;
 
 -- Closes the editor when called
@@ -45,7 +42,8 @@ local function openDialogueEditor(model: Model): ()
 
 end;
 
--- Catch the button click event
+local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
+EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", "rbxassetid://14109181603");
 EditDialogueButton.Click:Connect(function()
 
   if isDialogueEditorOpen then
