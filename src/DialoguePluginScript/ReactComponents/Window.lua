@@ -19,6 +19,7 @@ local function Window(props: WindowProperties)
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 0);
     });
     Toolbar = React.createElement(Toolbar, {
       isDeleteModeEnabled = isDeleteModeEnabled;
@@ -26,12 +27,11 @@ local function Window(props: WindowProperties)
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
     });
-    StatusSection = React.createElement(StatusSection, {
-      model = props.model;
-      dialogueParent = dialogueParent;
-    });
     DialogueTable = React.createElement(DialogueTable, {
       isDeleteModeEnabled = isDeleteModeEnabled;
+      dialogueParent = dialogueParent;
+    });
+    StatusSection = React.createElement(StatusSection, {
       dialogueParent = dialogueParent;
     });
   });

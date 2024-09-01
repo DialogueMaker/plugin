@@ -5,7 +5,7 @@ local Colors = require(script.Parent.Parent.Colors);
 export type DropdownOptionProperties = {
   layoutOrder: number;
   onClick: () -> ();
-  iconImage: string;
+  iconImage: string?;
   text: string;
 }
 
@@ -13,7 +13,7 @@ local function DropdownOption(props: DropdownOptionProperties)
 
   return React.createElement("TextButton", {
     LayoutOrder = 1;
-    Size = UDim2.new(1, 0, 1, 0);
+    Size = UDim2.new(1, 0, 0, 25);
     BackgroundColor3 = Color3.fromRGB(70, 70, 70);
     Text = "";
     [React.Event.Activated] = function()
@@ -29,13 +29,15 @@ local function DropdownOption(props: DropdownOptionProperties)
       VerticalAlignment = Enum.VerticalAlignment.Center;
       Padding = UDim.new(0, 5);
     });
-    IconLabel = React.createElement("ImageLabel", {
+    IconLabel = if props.iconImage then React.createElement("ImageLabel", {
       LayoutOrder = 1;
       Image = props.iconImage;
       Size = UDim2.new(0, 20, 0, 20);
       BackgroundTransparency = 1;
-      -- ImageRectSize = Vector2.new(0, 24);
-      -- ScaleType = Enum.ScaleType.Crop;
+    }) else nil;
+    UIPadding = React.createElement("UIPadding", {
+      PaddingLeft = UDim.new(0, 5);
+      PaddingRight = UDim.new(0, 5);
     });
     TextLabel = React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;

@@ -12,13 +12,15 @@ local function DialogueTable(props: DialogueTableProperties)
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 1, 0);
-    LayoutOrder = 3;
+    BackgroundTransparency = 1;
+    LayoutOrder = 2;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 2);
     });
     UIFlexItem = React.createElement("UIFlexItem", {
-      FlexMode = Enum.UIFlexMode.Grow;
+      FlexMode = Enum.UIFlexMode.Shrink;
     });
     DialogueTableHeader = React.createElement(DialogueTableHeader);
     DialogueTableBody = React.createElement(DialogueTableBody, {

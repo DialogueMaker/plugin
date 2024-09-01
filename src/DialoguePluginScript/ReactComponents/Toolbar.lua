@@ -24,7 +24,6 @@ local function Toolbar(props: ToolbarProps)
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
       FillDirection = Enum.FillDirection.Horizontal;
-      Padding = UDim.new(0, 5);
     });
     ViewParentButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14098871159";

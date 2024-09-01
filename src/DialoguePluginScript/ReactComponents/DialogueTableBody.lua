@@ -108,13 +108,16 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
     BackgroundColor3 = Colors.backgroundTableRow;
     BorderSizePixel = 0;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
-    CanvasSize = UDim2.new(1, 0, 1, 0);
+    CanvasSize = UDim2.new(0, 0, 0, 0);
+    ScrollingDirection = Enum.ScrollingDirection.Y;
   }, {
-    React.createElement("UIListLayout", {
-      Name = "UIListLayout";
+    UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
     });
-    dialogueItems;
+    UIFlexItem = React.createElement("UIFlexItem", {
+      FlexMode = Enum.UIFlexMode.Shrink;
+    });
+    Children = React.createElement(React.Fragment, {}, {dialogueItems});
   })
 
 end;

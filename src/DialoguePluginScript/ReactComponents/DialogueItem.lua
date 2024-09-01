@@ -20,6 +20,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local showDeletionConfirmation, setShowDeletionConfirmation = React.useState(false);
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
+  local isConnectionsDropdownOpen, setIsConnectionsDropdownOpen = React.useState(false);
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
   local dialogueContainer = useDialogueContainer(props.dialogueParent);
   local contentScript = props.contentScript;
@@ -229,57 +230,63 @@ local function DialogueItem(props: DialogueItemProperties)
           iconImage = "rbxassetid://14099769224";
         });
       });
-      OpenScriptsDropdown = React.createElement(Dropdown, {
+      ConnectionsDropDown = React.createElement(Dropdown, {
+        text = "View";
         layoutOrder = 3;
+        size = UDim2.new(0, 90, 1, 0);
+        isDisabled = showDeletionConfirmation;
+        isOpen = isConnectionsDropdownOpen;
+        setIsOpen = setIsConnectionsDropdownOpen;
       }, {
-        ActionButton = if isRedirect or isResponse then nil else React.createElement("TextButton", {
-          LayoutOrder = 1;
-          [React.Event.Activated] = function()
-
-            openSpecialScript("Action");
-
+        ViewContentButton = React.createElement(DropdownOption, {
+          layoutOrder = 1;
+          text = "Content";
+          onClick = function()
+  
+            plugin:OpenScript(props.contentScript);
+            setIsConnectionsDropdownOpen(false);
+  
           end;
-        }, {});
-        ConditionButton = React.createElement("TextButton", {
-          LayoutOrder = 2;
-          [React.Event.Activated] = function()
+        });
+        ViewChildrenButton = if isRedirect then nil else React.createElement(DropdownOption, {
+          layoutOrder = 2;
+          text = "Children";
+          onClick = function()
+  
+            if isDeleteModeEnabled then
+  
+              setShowDeletionConfirmation(true);
+  
+            else
+  
+              props.setDialogueParent(props.contentScript);
+  
+            end;
+            
+            setIsConnectionsDropdownOpen(false);
+  
+          end;
+        });
+        ConditionButton = React.createElement(DropdownOption, {
+          layoutOrder = 3;
+          text = "Condition";
+          onClick = function()
 
             openSpecialScript("Condition");
+            setIsConnectionsDropdownOpen(false);
 
           end;
         }, {});
-      });
-      ViewChildrenButton = if isRedirect then nil else React.createElement(if showDeletionConfirmation then "TextLabel" else "TextButton", {
-        LayoutOrder = 4;
-        Text = "View";
-        Size = UDim2.new(0, 70, 1, 0);
-        FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
-        TextColor3 = Colors.text;
-        [React.Event.Activated] = if showDeletionConfirmation then nil else function()
+        ActionButton = if isRedirect or isResponse then nil else React.createElement(DropdownOption, {
+          layoutOrder = 4;
+          text = "Action";
+          onClick = function()
 
-          if isDeleteModeEnabled then
-
-            setShowDeletionConfirmation(true);
-
-          else
-
-            props.setDialogueParent(props.contentScript);
+            openSpecialScript("Action");
+            setIsConnectionsDropdownOpen(false);
 
           end;
-
-        end;
-      });
-      ViewContentButton = React.createElement(if showDeletionConfirmation then "TextLabel" else "TextButton", {
-        LayoutOrder = 5;
-        Text = "View";
-        TextColor3 = Colors.text;
-        Size = UDim2.new(0, 70, 1, 0);
-        FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
-        [React.Event.Activated] = if showDeletionConfirmation then nil else function()
-
-          plugin:OpenScript(props.contentScript);
-
-        end;
+        }, {});
       });
     });
   })

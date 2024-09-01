@@ -9,6 +9,7 @@ export type DropdownProps = {
   layoutOrder: number?;
   automaticSize: Enum.AutomaticSize?;
   toggleButtonChildren: any;
+  isDisabled: boolean?;
   isOpen: boolean;
   setIsOpen: (boolean) -> ();
 }
@@ -16,6 +17,7 @@ export type DropdownProps = {
 local function Dropdown(props: DropdownProps)
 
   return React.createElement("Frame", {
+    BackgroundTransparency = 1;
     Size = props.size;
     LayoutOrder = props.layoutOrder;
     AutomaticSize = props.automaticSize;
@@ -23,12 +25,13 @@ local function Dropdown(props: DropdownProps)
     Children = React.createElement(React.Fragment, {}, {props.toggleButtonChildren});
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 5);
     });
-    ToggleButton = React.createElement("TextButton", {
+    ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundColor3 = Color3.fromRGB(70, 70, 70);
-      [React.Event.Activated] = function()
+      [React.Event.Activated] = if props.isDisabled then nil else function()
 
         props.setIsOpen(not props.isOpen);
 
@@ -60,10 +63,16 @@ local function Dropdown(props: DropdownProps)
         Size = UDim2.new(0, 20, 0, 20);
         BackgroundTransparency = 1;
       });
+      UICorner = React.createElement("UICorner", {
+        CornerRadius = UDim.new(0, 15);
+      });
     });
-    OptionsFrame = if props.isOpen then React.createElement("Frame", {
+    OptionsFrame = if props.isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
       LayoutOrder = 2;
-      Size = UDim2.new(1, 0, 1, 0);
+      Size = UDim2.new(1, 0, 0, 0);
+      AutomaticCanvasSize = Enum.AutomaticSize.Y;
+      AutomaticSize = Enum.AutomaticSize.Y;
+      CanvasSize = UDim2.new(1, 0, 1, 0);
       [React.Event.InputEnded] = function(self, input)
 
         if input == Enum.UserInputType.MouseButton1 then
@@ -74,8 +83,8 @@ local function Dropdown(props: DropdownProps)
 
       end;
     }, {
-      UIStroke = React.createElement("UIStroke", {
-        Transparency = 0.53;
+      UICorner = React.createElement("UICorner", {
+        CornerRadius = UDim.new(0, 15);
       });
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
