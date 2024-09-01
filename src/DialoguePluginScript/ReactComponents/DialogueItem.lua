@@ -75,6 +75,9 @@ local function DialogueItem(props: DialogueItemProperties)
       UIListLayout = React.createElement("UIListLayout", {
         FillDirection = Enum.FillDirection.Horizontal;
         SortOrder = Enum.SortOrder.LayoutOrder;
+        HorizontalAlignment = Enum.HorizontalAlignment.Center;
+        VerticalAlignment = Enum.VerticalAlignment.Center;
+        Padding = UDim.new(0, 5);
       });
       QuestionTextLabel = React.createElement("TextLabel", {
         BackgroundTransparency = 1;
@@ -83,11 +86,15 @@ local function DialogueItem(props: DialogueItemProperties)
         TextColor3 = Colors.text;
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
         AutomaticSize = Enum.AutomaticSize.XY;
+        TextSize = 16;
       });
       ConfirmButton = React.createElement("TextButton", {
         LayoutOrder = 2;
         BackgroundColor3 = Colors.backgroundWarning;
         Text = "Yes";
+        TextSize = 16;
+        TextColor3 = Colors.text;
+        FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
         BorderSizePixel = 0;
         AutomaticSize = Enum.AutomaticSize.XY;
         [React.Event.Activated] = function()
@@ -96,11 +103,19 @@ local function DialogueItem(props: DialogueItemProperties)
           setShowDeletionConfirmation(false);
 
         end;
+      }, {
+        UIPadding = React.createElement("UIPadding", {
+          PaddingLeft = UDim.new(0, 5);
+          PaddingRight = UDim.new(0, 5);
+        });
       });
       CancelButton = React.createElement("TextButton", {
         BackgroundTransparency = 1;
         LayoutOrder = 3;
         Text = "No";
+        TextColor3 = Colors.text;
+        TextSize = 16;
+        FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
         AutomaticSize = Enum.AutomaticSize.XY;
         BorderSizePixel = 0;
         [React.Event.Activated] = function()
@@ -108,6 +123,11 @@ local function DialogueItem(props: DialogueItemProperties)
           setShowDeletionConfirmation(false);
 
         end;
+      }, {
+        UIPadding = React.createElement("UIPadding", {
+          PaddingLeft = UDim.new(0, 5);
+          PaddingRight = UDim.new(0, 5);
+        });
       });
     }) else nil;
     Content = React.createElement("Frame", {
