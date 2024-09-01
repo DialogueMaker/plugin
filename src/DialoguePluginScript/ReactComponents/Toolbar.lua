@@ -32,7 +32,7 @@ local function Toolbar(props: ToolbarProps)
       isDisabled = dialogueParent:IsA("Folder");
       onClick = function()
 
-        props.setDialogueParent(props.dialogueParent);
+        props.setDialogueParent(props.dialogueParent.Parent :: ModuleScript | Folder);
 
       end;
     });
