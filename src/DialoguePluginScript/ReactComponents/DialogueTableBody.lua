@@ -5,6 +5,7 @@ local Colors = require(script.Parent.Parent.Colors);
 
 export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;
+  setDialogueParent: (ModuleScript | Folder) -> ();
   isDeleteModeEnabled: boolean;
 }
 
@@ -72,6 +73,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             isDeleteModeEnabled = isDeleteModeEnabled;
             priority = childContentScript.Name;
             dialogueParent = dialogueParent;
+            setDialogueParent = props.setDialogueParent;
           });
 
           table.insert(dialogueItems, dialogueItem);

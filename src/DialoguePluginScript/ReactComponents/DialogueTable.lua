@@ -6,6 +6,7 @@ local DialogueTableBody = require(script.Parent.DialogueTableBody);
 export type DialogueTableProperties = {
   isDeleteModeEnabled: boolean;
   dialogueParent: ModuleScript | Folder;
+  setDialogueParent: (ModuleScript | Folder) -> ();
 }
 
 local function DialogueTable(props: DialogueTableProperties)
@@ -26,6 +27,7 @@ local function DialogueTable(props: DialogueTableProperties)
     DialogueTableBody = React.createElement(DialogueTableBody, {
       dialogueParent = props.dialogueParent;
       isDeleteModeEnabled = props.isDeleteModeEnabled;
+      setDialogueParent = props.setDialogueParent;
     });
   })
 

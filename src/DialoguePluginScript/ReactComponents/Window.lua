@@ -30,6 +30,7 @@ local function Window(props: WindowProperties)
     DialogueTable = React.createElement(DialogueTable, {
       isDeleteModeEnabled = isDeleteModeEnabled;
       dialogueParent = dialogueParent;
+      setDialogueParent = setDialogueParent;
     });
     StatusSection = React.createElement(StatusSection, {
       dialogueParent = dialogueParent;
