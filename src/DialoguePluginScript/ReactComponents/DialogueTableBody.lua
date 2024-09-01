@@ -4,9 +4,7 @@ local DialogueItem = require(script.Parent.DialogueItem);
 local Colors = require(script.Parent.Parent.Colors);
 
 export type DialogueTableBodyProperties = {
-  viewingPriority: string;
   dialogueParent: ModuleScript | Folder;
-  dialogueContainer: Folder;
   isDeleteModeEnabled: boolean;
 }
 
@@ -14,7 +12,6 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   local dialogueParent = props.dialogueParent;
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
-
   local dialogueItems, setDialogueItems = React.useState({});
   React.useEffect(function()
   
@@ -74,7 +71,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             contentScript = childContentScript;
             isDeleteModeEnabled = isDeleteModeEnabled;
             priority = childContentScript.Name;
-            dialogueContainer = props.dialogueContainer;
+            dialogueParent = dialogueParent;
           });
 
           table.insert(dialogueItems, dialogueItem);
@@ -110,6 +107,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
     BackgroundColor3 = Colors.backgroundTableRow;
     BorderSizePixel = 0;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
+    CanvasSize = UDim2.new(0, 0, 0, 0);
   }, {
     React.createElement("UIListLayout", {
       Name = "UIListLayout";

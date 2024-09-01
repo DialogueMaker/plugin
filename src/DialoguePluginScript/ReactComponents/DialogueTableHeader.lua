@@ -6,32 +6,42 @@ local function DialogueTableHeader()
 
   return React.createElement("Frame", {
     LayoutOrder = 1;
-    BackgroundColor3 = Colors.backgroundTableHeader;
+    BackgroundColor3 = Color3.fromRGB(57, 57, 57);
     Size = UDim2.new(1, -12, 0, 22);
     BorderSizePixel = 0;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
       FillDirection = Enum.FillDirection.Horizontal;
+      Padding = UDim.new(0, 3);
     });
     PriorityTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 1;
       Text = "Priority";
-      BackgroundTransparency = 1;
-      FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
+      BorderSizePixel = 0;
+      BackgroundColor3 = Colors.backgroundTableHeader;
+      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0.17, 0, 1, 0);
+      TextSize = 14;
+      TextColor3 = Colors.text;
+      TextXAlignment = Enum.TextXAlignment.Center;
     });
     TypeTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 2;
-      BackgroundTransparency = 1;
+      BorderSizePixel = 0;
+      BackgroundColor3 = Colors.backgroundTableHeader;
       Text = "Type";
-      FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
+      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0.286, 0, 1, 0);
+      TextSize = 14;
+      TextColor3 = Colors.text;
+      TextXAlignment = Enum.TextXAlignment.Center;
     });
     ScriptsTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 3;
       Text = "";
-      BackgroundTransparency = 1;
+      BorderSizePixel = 0;
+      BackgroundColor3 = Colors.backgroundTableHeader;
       Size = UDim2.new(0.075, 0, 1, 0);
     }, {
       ImageLabel = React.createElement("ImageLabel", {
@@ -45,16 +55,24 @@ local function DialogueTableHeader()
     ContentTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 4;
       Text = "Content";
-      BackgroundTransparency = 1;
-      FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
+      BorderSizePixel = 0;
+      BackgroundColor3 = Colors.backgroundTableHeader;
+      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0.191, 0, 1, 0);
+      TextSize = 14;
+      TextColor3 = Colors.text;
+      TextXAlignment = Enum.TextXAlignment.Center;
     });
     ChildrenTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 5;
       Text = "Children";
-      BackgroundTransparency = 1;
-      FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
-      Size = UDim2.new(0.254, -12, 1, 0);
+      BorderSizePixel = 0;
+      BackgroundColor3 = Colors.backgroundTableHeader;
+      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
+      Size = UDim2.new(0.254, 0, 1, 0);
+      TextSize = 14;
+      TextColor3 = Colors.text;
+      TextXAlignment = Enum.TextXAlignment.Center;
     });
   })
 

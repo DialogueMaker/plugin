@@ -2,6 +2,7 @@
 local React = require(script.Parent.Parent.Packages.react);
 local Colors = require(script.Parent.Parent.Colors);
 local Dropdown = require(script.Parent.Dropdown);
+local useDialogueContainer = require(script.Parent.Parent.ReactHooks.useDialogueContainer);
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
@@ -11,14 +12,14 @@ export type DialogueItemProperties = {
   layoutOrder: number;
   zIndex: number;
   priority: string;
-  dialogueContainer: Folder;
+  dialogueParent: ModuleScript | Folder;
 }
 
 local function DialogueItem(props: DialogueItemProperties)
 
   local showDeletionConfirmation, setShowDeletionConfirmation = React.useState(false);
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
-  local dialogueContainer = props.dialogueContainer;
+  local dialogueContainer = useDialogueContainer(props.dialogueParent);
   local contentScript = props.contentScript;
 
   local function openSpecialScript(scriptType: "Action" | "Condition"): ()
@@ -91,7 +92,7 @@ local function DialogueItem(props: DialogueItemProperties)
         LayoutOrder = 1;
         Text = "Delete?";
         TextColor3 = Colors.text;
-        FontFace = Font.fromId(0, Enum.FontWeight.Bold);
+        FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
       });
       ConfirmButton = React.createElement("TextButton", {
         LayoutOrder = 2;

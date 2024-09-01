@@ -168,56 +168,22 @@ ResetScriptsButton.Click:Connect(function()
   ResetScriptsButton.Enabled = false;
 
   local Success, Msg = pcall(function()
-    -- Set an undo point
+
+    -- Set an undo point just in case the user wants to revert this.
     ChangeHistoryService:SetWaypoint("Resetting Dialogue Maker scripts");
 
-    -- Make copies
-    local NewDialogueClientScript = script.DialogueClientScript:Clone();
-    local ClientAPI = NewDialogueClientScript.API:Clone();
-    local NewThemes = NewDialogueClientScript.Themes:Clone();
+    -- Delete the old script
+    local oldDialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
+    if oldDialogueClientScript then
 
-    -- Save the old copies
-    local OldDialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript") or NewDialogueClientScript:Clone();
+      oldDialogueClientScript:Destroy();
 
-    -- Remove the children from the new copies
-    for _, child in OldDialogueClientScript:GetChildren() do
-      
-      child.Parent = nil;
-      
     end;
-
-    -- Enable the scripts
-    OldDialogueClientScript.Disabled = false;
-
-    -- Check for themes
-    local OldThemes = OldDialogueClientScript:FindFirstChild("Themes");
-    if not OldThemes then
-      
-      NewThemes.Parent = OldDialogueClientScript;
-      
-    end;
-
-    -- Check for API
-    local OldAPI = OldDialogueClientScript:FindFirstChild("API");
-    if OldAPI then
-      
-      OldAPI.Parent = nil;
-      
-    end
-
-    -- Take the children from the old scripts
-    for _, Child in OldDialogueClientScript:GetChildren() do
-      
-      Child.Parent = NewDialogueClientScript;
-      
-    end;
-
-    -- Delete the old scripts
-    OldDialogueClientScript.Parent = nil;
 
     -- Put the new instances in their places
-    NewDialogueClientScript.Parent = StarterPlayerScripts;
-    ClientAPI.Parent = NewDialogueClientScript;
+    local newDialogueClientScript = script.DialogueClientScript:Clone();
+    newDialogueClientScript.Enabled = true;
+    newDialogueClientScript.Parent = StarterPlayerScripts;
 
     -- Finalize the undo point
     ChangeHistoryService:SetWaypoint("Reset Dialogue Maker scripts");
@@ -260,7 +226,7 @@ RemoveUnusedInstancesButton.Click:Connect(function()
             if not NPC or not NPC.Value or not NPC.Value.Parent then
 
               count += 1;
-              module.Parent = nil;
+              module:Destroy();
 
             end
 
@@ -272,14 +238,14 @@ RemoveUnusedInstancesButton.Click:Connect(function()
           if not NPC or not NPC.Value or not NPC.Value.Parent then
 
             count += 1;
-            child.Parent = nil;
+            child:Destroy();
 
           end
 
         elseif not child.Value or not child.Value.Parent then
 
           count += 1;
-          child.Parent = nil;
+          child:Destroy();
 
         end;
 

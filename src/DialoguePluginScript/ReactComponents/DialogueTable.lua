@@ -3,14 +3,28 @@ local React = require(script.Parent.Parent.Packages.react);
 local DialogueTableHeader = require(script.Parent.DialogueTableHeader);
 local DialogueTableBody = require(script.Parent.DialogueTableBody);
 
-local function DialogueTable()
+export type DialogueTableProperties = {
+  isDeleteModeEnabled: boolean;
+  dialogueParent: ModuleScript | Folder;
+}
 
-  return React.createElement("Frame", {}, {
+local function DialogueTable(props: DialogueTableProperties)
+
+  return React.createElement("Frame", {
+    Size = UDim2.new(1, 0, 1, 0);
+    LayoutOrder = 3;
+  }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
     });
+    UIFlexItem = React.createElement("UIFlexItem", {
+      FlexMode = Enum.UIFlexMode.Grow;
+    });
     DialogueTableHeader = React.createElement(DialogueTableHeader);
-    DialogueTableBody = React.createElement(DialogueTableBody);
+    DialogueTableBody = React.createElement(DialogueTableBody, {
+      dialogueParent = props.dialogueParent;
+      isDeleteModeEnabled = props.isDeleteModeEnabled;
+    });
   })
 
 end;

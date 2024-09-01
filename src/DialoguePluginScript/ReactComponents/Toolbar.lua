@@ -7,7 +7,6 @@ type ToolbarProps = {
   setDialogueParent: (ModuleScript | Folder) -> ();
   selectedNPCModel: Model;
   repairSelectedNPC: () -> ();
-  viewingPriority: string;
   isDeleteModeEnabled: boolean;
   setIsDeleteModeEnabled: (boolean) -> ();
 }
@@ -18,20 +17,20 @@ local function Toolbar(props: ToolbarProps)
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
+    LayoutOrder = 1;
     BackgroundColor3 = Color3.fromRGB(74, 74, 74);
     BorderSizePixel = 0;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
-    });
-    UIPadding = React.createElement("UIPadding", {
-      PaddingLeft = UDim.new(0, 10);
-      PaddingRight = UDim.new(0, 10);
+      FillDirection = Enum.FillDirection.Horizontal;
+      Padding = UDim.new(0, 5);
     });
     ViewParentButton = React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14099284898";
+      iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
+      isDisabled = dialogueParent:IsA("Folder");
       onClick = function()
 
         props.setDialogueParent(props.dialogueParent);
@@ -83,9 +82,12 @@ local function Toolbar(props: ToolbarProps)
       text = "Toggle delete mode";
       layoutOrder = 4;
       BackgroundColor3 = if props.isDeleteModeEnabled then Color3.fromRGB(217, 39, 39) else nil;
+      isHighlighted = props.isDeleteModeEnabled;
       onClick = function()
     
-        props.setIsDeleteModeEnabled(not props.isDeleteModeEnabled);
+        local isDeleteModeEnabled = not props.isDeleteModeEnabled;
+        props.setIsDeleteModeEnabled(isDeleteModeEnabled);
+        print("[Dialogue Maker] " .. if isDeleteModeEnabled then "Warning: Delete Mode has been enabled!" else "Whew. Delete Mode has been disabled.");
 
       end;
     });

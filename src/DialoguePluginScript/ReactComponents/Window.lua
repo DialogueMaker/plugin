@@ -11,14 +11,15 @@ export type WindowProperties = {
 local function Window(props: WindowProperties)
 
   local isDeleteModeEnabled, setIsDeleteModeEnabled = React.useState(false);
-  local dialogueParent, setDialogueParent = React.useState(nil);
-  React.useEffect(function()
-  
-    print("[Dialogue Maker] " .. if isDeleteModeEnabled then "Warning: Delete Mode has been enabled!" else "Whew. Delete Mode has been disabled.");
+  local dialogueParent, setDialogueParent = React.useState(props.model:FindFirstChild("DialogueContainer") :: (ModuleScript | Folder));
 
-  end, {isDeleteModeEnabled});
-
-  return React.createElement("Frame", {}, {
+  return React.createElement("Frame", {
+    Size = UDim2.new(1, 0, 1, 0);
+    BackgroundTransparency = 1;
+  }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      SortOrder = Enum.SortOrder.LayoutOrder;
+    });
     Toolbar = React.createElement(Toolbar, {
       isDeleteModeEnabled = isDeleteModeEnabled;
       setIsDeleteModeEnabled = setIsDeleteModeEnabled;
@@ -27,11 +28,11 @@ local function Window(props: WindowProperties)
     });
     StatusSection = React.createElement(StatusSection, {
       model = props.model;
+      dialogueParent = dialogueParent;
     });
     DialogueTable = React.createElement(DialogueTable, {
       isDeleteModeEnabled = isDeleteModeEnabled;
       dialogueParent = dialogueParent;
-      setDialogueParent = setDialogueParent;
     });
   });
 

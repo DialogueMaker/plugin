@@ -12,9 +12,13 @@ local function Dropdown(props: DropdownProps)
 
   return React.createElement("TextButton", {}, {
     OptionsFrame = React.createElement("Frame", {
-      [React.Event.MouseButton1Click] = function()
+      [React.Event.InputEnded] = function(self, input)
 
-        setIsOpen(not isOpen)
+        if input == Enum.UserInputType.MouseButton1 then
+
+          setIsOpen(not isOpen)
+
+        end;
 
       end;
       Visible = isOpen;
