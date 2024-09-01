@@ -35,6 +35,7 @@ local function openDialogueEditor(model: Model): ()
     
     local pluginGUIRoot = ReactRoblox.createRoot(PluginGui);
     pluginGUIRoot:render(React.createElement(Window, {
+      plugin = plugin;
       model = model;
     }));
     

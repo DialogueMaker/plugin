@@ -7,6 +7,7 @@ export type DialogueTableProperties = {
   isDeleteModeEnabled: boolean;
   dialogueParent: ModuleScript | Folder;
   setDialogueParent: (ModuleScript | Folder) -> ();
+  plugin: Plugin;
 }
 
 local function DialogueTable(props: DialogueTableProperties)
@@ -28,6 +29,7 @@ local function DialogueTable(props: DialogueTableProperties)
       dialogueParent = props.dialogueParent;
       isDeleteModeEnabled = props.isDeleteModeEnabled;
       setDialogueParent = props.setDialogueParent;
+      plugin = props.plugin;
     });
   })
 

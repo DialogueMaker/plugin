@@ -6,6 +6,7 @@ local DialogueTable = require(script.Parent.DialogueTable);
 
 export type WindowProperties = {
   model: Model;
+  plugin: Plugin;
 }
 
 local function Window(props: WindowProperties)
@@ -31,6 +32,7 @@ local function Window(props: WindowProperties)
       isDeleteModeEnabled = isDeleteModeEnabled;
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
+      plugin = props.plugin;
     });
     StatusSection = React.createElement(StatusSection, {
       dialogueParent = dialogueParent;

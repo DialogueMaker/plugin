@@ -14,6 +14,7 @@ export type DialogueItemProperties = {
   zIndex: number;
   priority: string;
   dialogueParent: ModuleScript | Folder;
+  plugin: Plugin;
 }
 
 local function DialogueItem(props: DialogueItemProperties)
@@ -33,13 +34,14 @@ local function DialogueItem(props: DialogueItemProperties)
     if not specialScript then
 
       local newSpecialScript = script.Parent.Parent.Templates[`{scriptType}Template`]:Clone();
+      newSpecialScript.Name = scriptType;
       newSpecialScript.Parent = contentScript;
       specialScript = newSpecialScript;
 
     end;
 
     -- Open the condition script
-    plugin:OpenScript(specialScript :: ModuleScript);
+    props.plugin:OpenScript(specialScript :: ModuleScript);
 
   end;
 

@@ -7,6 +7,7 @@ export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;
   setDialogueParent: (ModuleScript | Folder) -> ();
   isDeleteModeEnabled: boolean;
+  plugin: Plugin;
 }
 
 local function DialogueTableBody(props: DialogueTableBodyProperties)
@@ -74,6 +75,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             priority = childContentScript.Name;
             dialogueParent = dialogueParent;
             setDialogueParent = props.setDialogueParent;
+            plugin = props.plugin;
           });
 
           table.insert(dialogueItems, dialogueItem);
