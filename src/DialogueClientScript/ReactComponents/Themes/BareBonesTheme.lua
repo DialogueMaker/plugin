@@ -22,7 +22,7 @@ local function BareBonesTheme(props: ThemeProperties)
   -- Props
   local npc = props.npc;
   local clientSettings = props.clientSettings;
-  local npcSettings = props.npcDialogueSettings;
+  local npcSettings = props.npcSettings;
   local npcName = npcSettings.general.npcName;
   local responseContentScripts = props.responseContentScripts;
 

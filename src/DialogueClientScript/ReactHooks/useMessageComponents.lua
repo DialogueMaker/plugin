@@ -1,5 +1,5 @@
 --!strict
-local React = require(script.Parent.Parent.Parent.Packages.react);
+local React = require(script.Parent.Parent.Packages.react);
 local Types = require(script.Parent.Parent.Types);
 type Page = Types.Page;
 type NPCSettings = Types.NPCSettings;

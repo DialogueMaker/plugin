@@ -38,7 +38,7 @@ function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotF
 
   -- Return the theme module script.
   assert(themeModuleScript, "There isn't an available theme.");
-  return themeModuleScript:Clone();
+  return themeModuleScript;
 
 end;
 
@@ -438,14 +438,14 @@ function DialogueModule:setTheme(theme: ModuleScript): ()
 end;
 
 -- @since v5.0.0
-function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings): ()
+function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings): ()
 
   -- Make sure we aren't already talking to an NPC
   assert(not DialogueModule.isPlayerTalkingWithNPC, "[Dialogue Maker] Cannot read dialogue because player is currently talking with another NPC.");
   DialogueModule.isPlayerTalkingWithNPC = true;
 
   -- Make sure we have a DialogueContainer.
-  local NPCDialogueContainer: Folder? = NPC:FindFirstChild("DialogueContainer") :: Folder;
+  local NPCDialogueContainer: Folder? = npc:FindFirstChild("DialogueContainer") :: Folder;
   assert(NPCDialogueContainer, "DialogueContainer not found in NPC.");
 
   -- Initialize the theme, then listen for changes
@@ -456,7 +456,7 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   self:setTheme(themeModuleScript);
 
   -- If necessary, end conversation if player or NPC goes out of distance
-  local NPCPrimaryPart = NPC.PrimaryPart;
+  local NPCPrimaryPart = npc.PrimaryPart;
   local MaxConversationDistance = npcSettings.general.maxConversationDistance;
   local EndConversationIfOutOfDistance = npcSettings.general.endConversationIfOutOfDistance;
   if EndConversationIfOutOfDistance and MaxConversationDistance and NPCPrimaryPart then
@@ -574,6 +574,9 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
             onCompletionEvent:Fire();
   
           end;
+          clientSettings = clientSettings;
+          npcSettings = npcSettings;
+          npc = npc;
         }));
 
       end;

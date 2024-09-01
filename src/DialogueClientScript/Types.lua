@@ -143,7 +143,7 @@ export type ThemeProperties = {
   getPages: (textContainer: Frame, textLabel: TextLabel) -> {Page};
   responseContentScripts: {ModuleScript};
   clientSettings: ClientSettings;
-  npcDialogueSettings: NPCSettings;
+  npcSettings: NPCSettings;
   dialogueContentArray: any;
   npc: Model;
   onComplete: (selectedResponseContentScript: ModuleScript?) -> ();

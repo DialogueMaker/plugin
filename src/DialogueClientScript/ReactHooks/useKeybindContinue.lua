@@ -1,5 +1,5 @@
 --!strict
-local React = require(script.Parent.Parent.Parent.Packages.react);
+local React = require(script.Parent.Parent.Packages.react);
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
 local Types = require(script.Parent.Parent.Types);

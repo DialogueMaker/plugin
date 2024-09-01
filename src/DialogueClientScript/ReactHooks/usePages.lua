@@ -1,5 +1,5 @@
 --!strict
-local React = require(script.Parent.Parent.Parent.Packages.react);
+local React = require(script.Parent.Parent.Packages.react);
 local DialogueAPI = require(script.Parent.Parent.API.Dialogue);
 local Types = require(script.Parent.Parent.Types);
 type Page = Types.Page;
@@ -11,6 +11,7 @@ local function usePages(dialogueContentArray, textContainerRef, TextSegment)
 
   React.useState(React.createElement(TextSegment, {
     ref = textSegmentRef;
+    text = "";
   }));
 
   React.useEffect(function()
