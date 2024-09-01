@@ -1,6 +1,6 @@
 --!strict
-local ReactRoblox = require(script.Parent.Parent.Parent.Packages["react-roblox"]);
-local React = require(script.Parent.Parent.Parent.Packages.react);
+local ReactRoblox = require(script.Parent.Parent.Packages["react-roblox"]);
+local React = require(script.Parent.Parent.Packages.react);
 local Players = game:GetService("Players");
 local Player = Players.LocalPlayer;
 

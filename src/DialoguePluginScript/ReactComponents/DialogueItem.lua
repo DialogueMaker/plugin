@@ -41,7 +41,31 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local isResponse = props.type == "Response";
   local isRedirect = props.type == "Redirect";
+
+  local selectedDialogueTypeIndex, setSelectedDialogueTypeIndex = React.useState(1);
+  React.useEffect(function()
   
+    local dialogueTypeChangedConnection = props.contentScript:GetAttributeChangedSignal("DialogueType"):Connect(function()
+    
+      local dropdownIndices = {
+        Message = 1;
+        Redirect = 2;
+        Response = 3;
+      };
+      local dialogueType = props.contentScript:GetAttribute("DialogueType");
+
+      setSelectedDialogueTypeIndex(dropdownIndices[dialogueType]);
+
+    end);
+
+    return function()
+
+      dialogueTypeChangedConnection:Disconnect();
+
+    end;
+
+  end, {props.contentScript});
+
   return React.createElement("Frame", {
     BackgroundColor3 = if isResponse then Colors.backgroundResponse else Colors.backgroundRedirect;
     BackgroundTransparency = if isResponse or isRedirect then 0.4 else 1;
@@ -177,6 +201,7 @@ local function DialogueItem(props: DialogueItemProperties)
       });
       DialogueTypeDropdown = React.createElement(Dropdown, {
         layoutOrder = 2;
+        selectedIndex = selectedDialogueTypeIndex;
       }, {
         MessageButton = React.createElement("TextButton", {
           LayoutOrder = 1;

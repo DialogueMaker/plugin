@@ -3,11 +3,17 @@
   "tree": {
     "$className": "DataModel",
     "ServerStorage": {
-      "$path": "src",
+      "$className": "ServerStorage",
       "DialoguePluginScript": {
         "$path": "src/DialoguePluginScript",
         "Packages": {
           "$path": "Packages"
+        },
+        "DialogueClientScript": {
+          "$path": "src/DialogueClientScript",
+          "Packages": {
+            "$path": "Packages"
+          }
         }
       }
     }

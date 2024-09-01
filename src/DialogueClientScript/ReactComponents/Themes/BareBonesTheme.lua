@@ -13,7 +13,7 @@ local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
 local useMessageComponents = require(ReactHooks.useMessageComponents);
 local useResponseComponents = require(ReactHooks.useResponseComponents);
-local React = require(DialogueClientScript.Parent.Packages.react);
+local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
 type ThemeProperties = Types.ThemeProperties;
 

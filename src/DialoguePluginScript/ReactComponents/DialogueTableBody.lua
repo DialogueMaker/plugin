@@ -1,6 +1,7 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
 local DialogueItem = require(script.Parent.DialogueItem);
+local Colors = require(script.Parent.Parent.Colors);
 
 export type DialogueTableBodyProperties = {
   viewingPriority: string;
@@ -103,9 +104,16 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {dialogueParent :: any, isDeleteModeEnabled});
 
-  return React.createElement("ScrollingFrame", {}, {
+  return React.createElement("ScrollingFrame", {
+    LayoutOrder = 2;
+    Size = UDim2.new(1, 0, 1, -22);
+    BackgroundColor3 = Colors.backgroundTableRow;
+    BorderSizePixel = 0;
+    AutomaticCanvasSize = Enum.AutomaticSize.Y;
+  }, {
     React.createElement("UIListLayout", {
-      Name = "UIListLayout"
+      Name = "UIListLayout";
+      SortOrder = Enum.SortOrder.LayoutOrder;
     });
     dialogueItems;
   })
