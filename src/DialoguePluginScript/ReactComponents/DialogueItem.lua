@@ -49,6 +49,15 @@ local function DialogueItem(props: DialogueItemProperties)
   local isRedirect = props.type == "Redirect";
 
   return React.createElement("Frame", {
+    [React.Event.InputEnded] = function(self: Frame, input: InputObject)
+
+      if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+        setShowDeletionConfirmation(true);
+
+      end
+
+    end;
     BackgroundColor3 = if isResponse then Colors.backgroundResponse else Colors.backgroundRedirect;
     BackgroundTransparency = if isResponse or isRedirect then 0.4 else 1;
     BorderSizePixel = 0;
@@ -190,6 +199,7 @@ local function DialogueItem(props: DialogueItemProperties)
         layoutOrder = 2;
         size = UDim2.new(0, 0, 1, 0);
         text = props.type;
+        isDisabled = isDeleteModeEnabled;
         toggleButtonChildren = {
           UIFlexItem = React.createElement("UIFlexItem", {
             FlexMode = Enum.UIFlexMode.Fill;
@@ -236,7 +246,7 @@ local function DialogueItem(props: DialogueItemProperties)
         text = "View";
         layoutOrder = 3;
         size = UDim2.new(0, 90, 1, 0);
-        isDisabled = showDeletionConfirmation;
+        isDisabled = isDeleteModeEnabled;
         isOpen = isConnectionsDropdownOpen;
         setIsOpen = setIsConnectionsDropdownOpen;
       }, {
@@ -255,16 +265,7 @@ local function DialogueItem(props: DialogueItemProperties)
           text = "Children";
           onClick = function()
   
-            if isDeleteModeEnabled then
-  
-              setShowDeletionConfirmation(true);
-  
-            else
-  
-              props.setDialogueParent(props.contentScript);
-  
-            end;
-            
+            props.setDialogueParent(props.contentScript);
             setIsConnectionsDropdownOpen(false);
   
           end;
