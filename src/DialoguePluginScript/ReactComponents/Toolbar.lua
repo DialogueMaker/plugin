@@ -91,11 +91,6 @@ local function Toolbar(props: ToolbarProps)
 
       end;
     });
-    ManualButton = React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14103671946";
-      text = "View manual";
-      layoutOrder = 5;
-    });
   });
 
 end;
