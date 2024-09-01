@@ -51,21 +51,21 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
         
       end;
       
+      table.sort(redirects, sortByMessagePriority);
       table.sort(responses, sortByMessagePriority);
       table.sort(messages, sortByMessagePriority);
-      table.sort(redirects, sortByMessagePriority);
 
       -- Create new status
-      local currentZIndex = #responses + #messages + #redirects;
+      local currentZIndex = #redirects + #responses + #messages;
       local dialogueItems = {};
       local currentLayoutOrder = 1;
-      for categoryIndex, category in {responses, messages, redirects} do
+      for categoryIndex, category in {redirects, responses, messages} do
 
         for _, childContentScript in category do
 
           -- Make sure the message container is completely visible, even when dropdowns are open.
           local dialogueItem = React.createElement(DialogueItem, {
-            type = ({"Response", "Message", "Redirect"})[categoryIndex];
+            type = ({"Redirect", "Response", "Message"})[categoryIndex];
             layoutOrder = currentLayoutOrder;
             zIndex = currentZIndex;
             contentScript = childContentScript;
@@ -80,6 +80,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
           currentLayoutOrder += 1;
 
           table.insert(contentScriptConnections, childContentScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
+          table.insert(contentScriptConnections, childContentScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
 
         end;
 
@@ -103,11 +104,11 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   return React.createElement("ScrollingFrame", {
     LayoutOrder = 2;
-    Size = UDim2.new(1, 0, 1, -22);
+    Size = UDim2.new(1, 0, 1, 0);
     BackgroundColor3 = Colors.backgroundTableRow;
     BorderSizePixel = 0;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
-    CanvasSize = UDim2.new(0, 0, 0, 0);
+    CanvasSize = UDim2.new(1, 0, 1, 0);
   }, {
     React.createElement("UIListLayout", {
       Name = "UIListLayout";

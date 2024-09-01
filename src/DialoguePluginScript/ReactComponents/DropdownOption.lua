@@ -1,0 +1,54 @@
+--!strict
+local React = require(script.Parent.Parent.Packages.react);
+local Colors = require(script.Parent.Parent.Colors);
+
+export type DropdownOptionProperties = {
+  layoutOrder: number;
+  onClick: () -> ();
+  iconImage: string;
+  text: string;
+}
+
+local function DropdownOption(props: DropdownOptionProperties)
+
+  return React.createElement("TextButton", {
+    LayoutOrder = 1;
+    Size = UDim2.new(1, 0, 1, 0);
+    BackgroundColor3 = Color3.fromRGB(70, 70, 70);
+    Text = "";
+    [React.Event.Activated] = function()
+
+      props.onClick();
+
+    end;
+    BorderSizePixel = 0;
+  }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      SortOrder = Enum.SortOrder.LayoutOrder;
+      FillDirection = Enum.FillDirection.Horizontal;
+      VerticalAlignment = Enum.VerticalAlignment.Center;
+      Padding = UDim.new(0, 5);
+    });
+    IconLabel = React.createElement("ImageLabel", {
+      LayoutOrder = 1;
+      Image = props.iconImage;
+      Size = UDim2.new(0, 20, 0, 20);
+      BackgroundTransparency = 1;
+      -- ImageRectSize = Vector2.new(0, 24);
+      -- ScaleType = Enum.ScaleType.Crop;
+    });
+    TextLabel = React.createElement("TextLabel", {
+      AutomaticSize = Enum.AutomaticSize.XY;
+      Size = UDim2.new(0, 0, 0, 0);
+      LayoutOrder = 2;
+      Text = props.text;
+      FontFace = Font.fromId(11702779517);
+      BackgroundTransparency = 1;
+      TextSize = 14;
+      TextColor3 = Colors.text;
+    });
+  });
+
+end;
+
+return DropdownOption;

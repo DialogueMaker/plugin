@@ -3,6 +3,7 @@ local React = require(script.Parent.Parent.Packages.react);
 local Colors = require(script.Parent.Parent.Colors);
 local Dropdown = require(script.Parent.Dropdown);
 local useDialogueContainer = require(script.Parent.Parent.ReactHooks.useDialogueContainer);
+local DropdownOption = require(script.Parent.DropdownOption)
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
@@ -18,6 +19,7 @@ export type DialogueItemProperties = {
 local function DialogueItem(props: DialogueItemProperties)
 
   local showDeletionConfirmation, setShowDeletionConfirmation = React.useState(false);
+  local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
   local dialogueContainer = useDialogueContainer(props.dialogueParent);
   local contentScript = props.contentScript;
@@ -43,30 +45,6 @@ local function DialogueItem(props: DialogueItemProperties)
   local isResponse = props.type == "Response";
   local isRedirect = props.type == "Redirect";
 
-  local selectedDialogueTypeIndex, setSelectedDialogueTypeIndex = React.useState(1);
-  React.useEffect(function()
-  
-    local dialogueTypeChangedConnection = props.contentScript:GetAttributeChangedSignal("DialogueType"):Connect(function()
-    
-      local dropdownIndices = {
-        Message = 1;
-        Redirect = 2;
-        Response = 3;
-      };
-      local dialogueType = props.contentScript:GetAttribute("DialogueType");
-
-      setSelectedDialogueTypeIndex(dropdownIndices[dialogueType]);
-
-    end);
-
-    return function()
-
-      dialogueTypeChangedConnection:Disconnect();
-
-    end;
-
-  end, {props.contentScript});
-
   return React.createElement("Frame", {
     BackgroundColor3 = if isResponse then Colors.backgroundResponse else Colors.backgroundRedirect;
     BackgroundTransparency = if isResponse or isRedirect then 0.4 else 1;
@@ -77,7 +55,6 @@ local function DialogueItem(props: DialogueItemProperties)
   }, {
     DeletionConfirmationFrame = if showDeletionConfirmation then React.createElement("Frame", {
       ZIndex = 2;
-      Visible = showDeletionConfirmation;
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 0.5;
       BackgroundColor3 = Colors.backgroundDeletionFrame;
@@ -93,12 +70,14 @@ local function DialogueItem(props: DialogueItemProperties)
         Text = "Delete?";
         TextColor3 = Colors.text;
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
+        AutomaticSize = Enum.AutomaticSize.XY;
       });
       ConfirmButton = React.createElement("TextButton", {
         LayoutOrder = 2;
         BackgroundColor3 = Colors.backgroundWarning;
         Text = "Yes";
         BorderSizePixel = 0;
+        AutomaticSize = Enum.AutomaticSize.XY;
         [React.Event.Activated] = function()
 
           contentScript:Destroy();
@@ -110,6 +89,7 @@ local function DialogueItem(props: DialogueItemProperties)
         BackgroundTransparency = 1;
         LayoutOrder = 3;
         Text = "No";
+        AutomaticSize = Enum.AutomaticSize.XY;
         BorderSizePixel = 0;
         [React.Event.Activated] = function()
 
@@ -125,15 +105,18 @@ local function DialogueItem(props: DialogueItemProperties)
     }, {
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        Padding = UDim.new(0, 3);
       });
-      PriorityTextBox = React.createElement("TextBox", {
+      PriorityTextBox = React.createElement(if showDeletionConfirmation then "TextLabel" else "TextBox", {
         Text = props.priority;
-        PlaceholderText = props.priority;
+        PlaceholderText = if showDeletionConfirmation then nil else props.priority;
         TextColor3 = Colors.text;
-        PlaceholderColor3 = Colors.textPlaceholder;
+        PlaceholderColor3 = if showDeletionConfirmation then nil else Colors.textPlaceholder;
         LayoutOrder = 1;
+        Size = UDim2.new(0, 60, 1, 0);
         BackgroundTransparency = 1;
-        [React.Event.FocusLost] = function(self)
+        [React.Event.FocusLost] = if showDeletionConfirmation then nil else function(self)
 
           -- Make sure the priority is valid
           local isUserTextInvalid = false;
@@ -202,32 +185,49 @@ local function DialogueItem(props: DialogueItemProperties)
       });
       DialogueTypeDropdown = React.createElement(Dropdown, {
         layoutOrder = 2;
-        selectedIndex = selectedDialogueTypeIndex;
+        size = UDim2.new(0, 0, 1, 0);
+        text = props.type;
+        toggleButtonChildren = {
+          UIFlexItem = React.createElement("UIFlexItem", {
+            FlexMode = Enum.UIFlexMode.Fill;
+          });
+        };
+        isOpen = isDialogueTypeDropdownOpen;
+        setIsOpen = setIsDialogueTypeDropdownOpen;
       }, {
-        MessageButton = React.createElement("TextButton", {
-          LayoutOrder = 1;
-          [React.Event.Activated] = function()
+        MessageButton = React.createElement(DropdownOption, {
+          onClick = function()
 
             props.contentScript:SetAttribute("DialogueType", "Message");
+            setIsDialogueTypeDropdownOpen(false);
 
           end;
-        }, {});
-        RedirectButton = React.createElement("TextButton", {
-          LayoutOrder = 2;
-          [React.Event.Activated] = function()
+          layoutOrder = 1;
+          text = "Message";
+          iconImage = "rbxassetid://14099768265";
+        });
+        RedirectButton = React.createElement(DropdownOption, {
+          onClick = function()
 
             props.contentScript:SetAttribute("DialogueType", "Redirect");
+            setIsDialogueTypeDropdownOpen(false);
 
           end;
-        }, {});
-        ResponseButton = React.createElement("TextButton", {
-          LayoutOrder = 3;
-          [React.Event.Activated] = function()
+          layoutOrder = 2;
+          text = "Redirect";
+          iconImage = "rbxassetid://14099768484";
+        });
+        ResponseButton = React.createElement(DropdownOption, {
+          onClick = function()
 
             props.contentScript:SetAttribute("DialogueType", "Response");
+            setIsDialogueTypeDropdownOpen(false);
 
           end;
-        }, {});
+          layoutOrder = 1;
+          text = "Response";
+          iconImage = "rbxassetid://14099769224";
+        });
       });
       OpenScriptsDropdown = React.createElement(Dropdown, {
         layoutOrder = 3;
@@ -249,13 +249,13 @@ local function DialogueItem(props: DialogueItemProperties)
           end;
         }, {});
       });
-      ViewChildrenButton = if isRedirect then nil else React.createElement("TextButton", {
+      ViewChildrenButton = if isRedirect then nil else React.createElement(if showDeletionConfirmation then "TextLabel" else "TextButton", {
         LayoutOrder = 4;
         Text = "View";
-        BackgroundTransparency = 1;
+        Size = UDim2.new(0, 70, 1, 0);
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
         TextColor3 = Colors.text;
-        [React.Event.Activated] = function()
+        [React.Event.Activated] = if showDeletionConfirmation then nil else function()
 
           if isDeleteModeEnabled then
 
@@ -269,12 +269,13 @@ local function DialogueItem(props: DialogueItemProperties)
 
         end;
       });
-      ViewContentButton = React.createElement("TextButton", {
+      ViewContentButton = React.createElement(if showDeletionConfirmation then "TextLabel" else "TextButton", {
         LayoutOrder = 5;
         Text = "View";
         TextColor3 = Colors.text;
+        Size = UDim2.new(0, 70, 1, 0);
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
-        [React.Event.Activated] = function()
+        [React.Event.Activated] = if showDeletionConfirmation then nil else function()
 
           plugin:OpenScript(props.contentScript);
 

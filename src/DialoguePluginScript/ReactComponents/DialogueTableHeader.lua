@@ -21,16 +21,10 @@ local function DialogueTableHeader()
       BorderSizePixel = 0;
       BackgroundColor3 = Colors.backgroundTableHeader;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
-      Size = UDim2.new(0, 25, 1, 0);
+      Size = UDim2.new(0, 60, 1, 0);
       TextSize = 14;
-      AutomaticSize = Enum.AutomaticSize.X;
       TextColor3 = Colors.text;
       TextXAlignment = Enum.TextXAlignment.Center;
-    }, {
-      UIPadding = React.createElement("UIPadding", {
-        PaddingLeft = UDim.new(0, 5);
-        PaddingRight = UDim.new(0, 5);
-      })
     });
     TypeTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 2;
@@ -50,7 +44,7 @@ local function DialogueTableHeader()
       UIPadding = React.createElement("UIPadding", {
         PaddingLeft = UDim.new(0, 5);
         PaddingRight = UDim.new(0, 5);
-      })
+      });
     });
     ScriptsImageLabel = React.createElement("ImageLabel", {
       LayoutOrder = 3;
@@ -60,8 +54,8 @@ local function DialogueTableHeader()
       Image = "rbxassetid://14098739279";
     }, {
       UIPadding = React.createElement("UIPadding", {
-        PaddingLeft = UDim.new(0, 5);
-        PaddingRight = UDim.new(0, 5);
+        PaddingLeft = UDim.new(0, 10);
+        PaddingRight = UDim.new(0, 10);
       })
     });
     ContentTextLabel = React.createElement("TextLabel", {
@@ -70,16 +64,10 @@ local function DialogueTableHeader()
       BorderSizePixel = 0;
       BackgroundColor3 = Colors.backgroundTableHeader;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
-      Size = UDim2.new(0, 0, 1, 0);
+      Size = UDim2.new(0, 70, 1, 0);
       TextSize = 14;
       TextColor3 = Colors.text;
-      AutomaticSize = Enum.AutomaticSize.X;
       TextXAlignment = Enum.TextXAlignment.Center;
-    }, {
-      UIPadding = React.createElement("UIPadding", {
-        PaddingLeft = UDim.new(0, 5);
-        PaddingRight = UDim.new(0, 5);
-      })
     });
     ChildrenTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 5;
@@ -87,16 +75,10 @@ local function DialogueTableHeader()
       BorderSizePixel = 0;
       BackgroundColor3 = Colors.backgroundTableHeader;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
-      Size = UDim2.new(0, 0, 1, 0);
-      AutomaticSize = Enum.AutomaticSize.X;
+      Size = UDim2.new(0, 70, 1, 0);
       TextSize = 14;
       TextColor3 = Colors.text;
       TextXAlignment = Enum.TextXAlignment.Center;
-    }, {
-      UIPadding = React.createElement("UIPadding", {
-        PaddingLeft = UDim.new(0, 5);
-        PaddingRight = UDim.new(0, 5);
-      })
     });
   })
 

@@ -1,6 +1,6 @@
 return {
-  backgroundRedirect = Color3.fromRGB(30, 103, 19);
-  backgroundResponse = Color3.fromRGB(21, 44, 126);
+  backgroundResponse = Color3.fromRGB(30, 103, 19);
+  backgroundRedirect = Color3.fromRGB(21, 44, 126);
   backgroundWarning = Color3.fromRGB(207, 57, 51);
   backgroundDeletionFrame = Color3.new(0, 0, 0);
   backgroundTableHeader = Color3.fromRGB(72, 72, 72);
