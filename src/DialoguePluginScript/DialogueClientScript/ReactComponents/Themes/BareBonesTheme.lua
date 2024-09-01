@@ -17,7 +17,7 @@ local React = require(DialogueClientScript.Parent.Packages.react);
 local Types = require(DialogueClientScript.Types);
 type ThemeProperties = Types.ThemeProperties;
 
-local function BareBonesDialogue(props: ThemeProperties)
+local function BareBonesTheme(props: ThemeProperties)
 
   -- Props
   local npc = props.npc;
@@ -142,4 +142,4 @@ local function BareBonesDialogue(props: ThemeProperties)
 
 end;
 
-return BareBonesDialogue;
+return BareBonesTheme;
