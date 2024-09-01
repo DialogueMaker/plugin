@@ -43,6 +43,9 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 2;
       onClick = function()
 
+        -- Ensure the NPC is properly configured.
+        props.repairNPC();
+
         -- Find a name for the content script.
         local targetPriority = 1;
         for _, instance in dialogueParent:GetChildren() do

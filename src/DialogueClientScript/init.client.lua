@@ -3,6 +3,7 @@ local Players = game:GetService("Players");
 local RunService = game:GetService("RunService");
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
+local CollectionService = game:GetService("CollectionService");
 local Player = game:GetService("Players").LocalPlayer;
 local PlayerGui = Player:WaitForChild("PlayerGui");
 local APIFolder = script.API;
@@ -45,50 +46,30 @@ end
 
 -- Iterate through every NPC
 print("[Dialogue Maker]: Preparing dialogue received from the server...");
-for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
+for _, npc in CollectionService:GetTagged("DialogueMakerNPC") do
   
   -- Make sure all NPCs aren't affected if this one doesn't load properly
-  if not NPCLocation:IsA("ObjectValue") then
-    
-    warn("[Dialogue Maker] " .. NPCLocation.Name .. " is not an ObjectValue. Skipping...");
-    continue;
-    
-  end;
-  
-  local NPC: Model = NPCLocation.Value :: Model;
-  if not NPC then
-    
-    warn("[Dialogue Maker] " .. NPCLocation.Name .. " does not have a Value. Skipping...");
-    continue;
-    
-  elseif not NPC:IsA("Model") then
-    
-    warn("[Dialogue Maker] " .. NPC.Name .. "'s Value is not a Model. Skipping...");
-    continue;
-    
-  end
-    
   local success, msg = pcall(function()
     
     -- Set up speech bubbles.
-    local dialogueSettings = require(NPC:FindFirstChild("NPCDialogueSettings")) :: Types.NPCSettings;
+    local dialogueSettings = require(npc:FindFirstChild("NPCDialogueSettings")) :: Types.NPCSettings;
     if dialogueSettings.speechBubble.enabled then
 
       local SpeechBubblePart = dialogueSettings.speechBubble.location;
       if SpeechBubblePart and SpeechBubblePart:IsA("BasePart") then
 
         -- Listen if the player clicks the speech bubble
-        local SpeechBubble = api.triggers:createSpeechBubble(NPC, dialogueSettings);
+        local SpeechBubble = api.triggers:createSpeechBubble(npc, dialogueSettings);
         (SpeechBubble:FindFirstChild("SpeechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
 
-          readDialogue(NPC, dialogueSettings);
+          readDialogue(npc, dialogueSettings);
 
         end);
         SpeechBubble.Parent = PlayerGui;
 
       else
 
-        warn("[Dialogue Maker]: The SpeechBubblePart for " .. NPC.Name .. " is not a Part.");
+        warn("[Dialogue Maker]: The SpeechBubblePart for " .. npc.Name .. " is not a Part.");
 
       end;
 
@@ -106,7 +87,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
           local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
           if PlayerFromCharacter == Player then
 
-            api.dialogue:readDialogue(NPC, dialogueSettings);
+            api.dialogue:readDialogue(npc, dialogueSettings);
 
           end;
 
@@ -114,7 +95,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
 
       else
 
-        warn("[Dialogue Maker]: The PromptRegionPart for " .. NPC.Name .. " is not a Part.");
+        warn("[Dialogue Maker]: The PromptRegionPart for " .. npc.Name .. " is not a Part.");
 
       end;
 
@@ -127,24 +108,24 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
       if dialogueSettings.proximityPrompt.autoCreate then
 
         local ProximityPromptTemp = Instance.new("ProximityPrompt");
-        ProximityPromptTemp.Parent = NPC;
+        ProximityPromptTemp.Parent = npc;
         ProximityPrompt = ProximityPromptTemp;
 
       end;
 
       if ProximityPrompt and ProximityPrompt:IsA("ProximityPrompt") then
 
-        api.triggers:addProximityPrompt(NPC, ProximityPrompt);
+        api.triggers:addProximityPrompt(npc, ProximityPrompt);
 
         ProximityPrompt.Triggered:Connect(function()
           
-          readDialogue(NPC, dialogueSettings);
+          readDialogue(npc, dialogueSettings);
           
         end);
 
       else
 
-        warn("[Dialogue Maker]: The proximity prompt location for " .. NPC.Name .. " is not a ProximityPrompt.");
+        warn("[Dialogue Maker]: The proximity prompt location for " .. npc.Name .. " is not a ProximityPrompt.");
 
       end;
 
@@ -157,24 +138,24 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
       if dialogueSettings.clickDetector.autoCreate then
 
         local ClickDetectorTemp = Instance.new("ClickDetector");
-        ClickDetectorTemp.Parent = NPC;
+        ClickDetectorTemp.Parent = npc;
         ClickDetector = ClickDetectorTemp;
 
       end;
 
       if ClickDetector and ClickDetector:IsA("ClickDetector") then
 
-        api.triggers:addClickDetector(NPC, ClickDetector);
+        api.triggers:addClickDetector(npc, ClickDetector);
 
         ClickDetector.MouseClick:Connect(function()
           
-          readDialogue(NPC, dialogueSettings);
+          readDialogue(npc, dialogueSettings);
           
         end);
 
       else
 
-        warn("[Dialogue Maker]: The ClickDetectorLocation for " .. NPC.Name .. " is not a ClickDetector.");
+        warn("[Dialogue Maker]: The ClickDetectorLocation for " .. npc.Name .. " is not a ClickDetector.");
 
       end;
 
@@ -191,7 +172,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
 
         if CanPressButton and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
             
-          readDialogue(NPC, dialogueSettings);
+          readDialogue(npc, dialogueSettings);
 
         end;
 
@@ -201,7 +182,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
       -- Check if the player is in range
       RunService.Heartbeat:Connect(function()
 
-        CanPressButton = Player:DistanceFromCharacter(NPC:GetPivot().Position) < clientSettings.minimumDistanceFromCharacter;
+        CanPressButton = Player:DistanceFromCharacter(npc:GetPivot().Position) < clientSettings.minimumDistanceFromCharacter;
 
       end);
 
@@ -212,7 +193,7 @@ for _, NPCLocation: ObjectValue in script.NPCLocations:GetChildren() do
   -- One NPC doesn't stop the show, but it's important for you to know which ones didn't load properly.
   if not success then
 
-    warn("[Dialogue Maker]: Couldn't load NPC " .. NPC.Name .. ": " .. msg);
+    warn("[Dialogue Maker]: Couldn't load NPC " .. npc.Name .. ": " .. msg);
 
   end;
 

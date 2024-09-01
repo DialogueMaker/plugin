@@ -48,25 +48,8 @@ local function repairNPC(model: Model): ()
 
   end;
 
-  -- Initialize DialogueLocations for indexing.
-  local DialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
-
-  assert(DialogueClientScript, "[Dialogue Maker] DialogueClientScript wasn't found in the StarterPlayerScripts! \nPlease replace the script by pressing the \"Fix Scripts\" button.");
-
-  for _, dialogueLocation in DialogueClientScript.DialogueLocations:GetChildren() do
-    
-    if dialogueLocation.Value == model then
-      
-      return;
-      
-    end
-    
-  end;
-
-  local DialogueLocation = Instance.new("ObjectValue");
-  DialogueLocation.Value = model;
-  DialogueLocation.Name = "DialogueLocation";
-  DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
+  -- Initialize dialogue locations for indexing.
+  model:AddTag("DialogueMakerNPC");
 
 end;
 
@@ -153,12 +136,6 @@ EditDialogueButton.Click:Connect(function()
     DialogueClientScript.Parent = StarterPlayerScripts;
     DialogueClientScript.Disabled = false;
     print("[Dialogue Maker] Added DialogueClientScript to the StarterPlayerScripts.");
-    
-    -- Add this model to the DialogueManager
-    local DialogueLocation = Instance.new("ObjectValue");
-    DialogueLocation.Value = model;
-    DialogueLocation.Name = "DialogueLocation";
-    DialogueLocation.Parent = DialogueClientScript.DialogueLocations;
 
   end;
 
@@ -235,16 +212,6 @@ RemoveUnusedInstancesButton.Click:Connect(function()
               module:Destroy();
 
             end
-
-          end
-
-        elseif folder.Name ~= "DialogueLocations" then
-
-          local NPC = child:FindFirstChild("NPC");
-          if not NPC or not NPC.Value or not NPC.Value.Parent then
-
-            count += 1;
-            child:Destroy();
 
           end
 
