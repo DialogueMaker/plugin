@@ -4,8 +4,12 @@ local React = require(script.Parent.Parent.Packages.react);
 local Players = game:GetService("Players");
 local Player = Players.LocalPlayer;
 
+local themeChangedEvent = Instance.new("BindableEvent");
+
 local DialogueModule = {
   isPlayerTalkingWithNPC = false;  
+  currentTheme = nil;
+  onThemeChanged = themeChangedEvent.Event;
 };
 
 local DialogueClientScript = script.Parent.Parent;
@@ -426,6 +430,13 @@ function DialogueModule:doesPlayerPassCondition(contentScript: ModuleScript): bo
 
 end;
 
+function DialogueModule:setTheme(theme: ModuleScript): ()
+
+  self.currentTheme = theme;
+  themeChangedEvent:Fire(theme);
+
+end;
+
 -- @since v5.0.0
 function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings): ()
 
@@ -442,7 +453,7 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   local dialogueGUI = Instance.new("ScreenGui");
   dialogueGUI.Parent = Player.PlayerGui;
   local root = ReactRoblox.createRoot(dialogueGUI);
-  script.CurrentTheme.Value = themeModuleScript;
+  self:setTheme(themeModuleScript);
 
   -- If necessary, end conversation if player or NPC goes out of distance
   local NPCPrimaryPart = NPC.PrimaryPart;
@@ -567,9 +578,8 @@ function DialogueModule:readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
 
       end;
 
-      local themeChangedEvent = script.CurrentTheme.Changed:Connect(function(newThemeModuleScript)
+      local themeChangedEvent = DialogueModule.onThemeChanged:Connect(function()
 
-        script.CurrentTheme.Value = newThemeModuleScript;
         renderRoot();
     
       end);      

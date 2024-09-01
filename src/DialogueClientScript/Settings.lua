@@ -5,7 +5,7 @@ type ClientSettings = Types.ClientSettings;
 local Settings: ClientSettings = {
 
   -- [ Theme Settings ] --
-  defaultTheme = "BigAndBoldDialogue";
+  defaultTheme = "BigAndBoldTheme";
 
   -- [ Response Settings ] --
   showResponsesAfterMessageFinished = true; 
