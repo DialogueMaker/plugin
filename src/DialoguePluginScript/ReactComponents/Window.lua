@@ -27,6 +27,7 @@ local function Window(props: WindowProperties)
       setIsDeleteModeEnabled = setIsDeleteModeEnabled;
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
+      plugin = props.plugin;
     });
     DialogueTable = React.createElement(DialogueTable, {
       isDeleteModeEnabled = isDeleteModeEnabled;

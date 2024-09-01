@@ -245,7 +245,7 @@ local function DialogueItem(props: DialogueItemProperties)
           text = "Content";
           onClick = function()
   
-            plugin:OpenScript(props.contentScript);
+            props.plugin:OpenScript(props.contentScript);
             setIsConnectionsDropdownOpen(false);
   
           end;

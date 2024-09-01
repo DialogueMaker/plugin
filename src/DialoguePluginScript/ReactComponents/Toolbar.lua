@@ -9,6 +9,7 @@ type ToolbarProps = {
   repairSelectedNPC: () -> ();
   isDeleteModeEnabled: boolean;
   setIsDeleteModeEnabled: (boolean) -> ();
+  plugin: Plugin;
 }
 
 local function Toolbar(props: ToolbarProps)
@@ -72,7 +73,7 @@ local function Toolbar(props: ToolbarProps)
         props.repairSelectedNPC();
 
         local npcDialogueSettingsScript = props.selectedNPCModel:FindFirstChild("NPCDialogueSettings") :: Script;
-        plugin:OpenScript(npcDialogueSettingsScript);
+        props.plugin:OpenScript(npcDialogueSettingsScript);
 
       end;
     });
