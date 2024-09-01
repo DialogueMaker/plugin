@@ -8,10 +8,9 @@ export type TextSegmentProperties = {
   layoutOrder: number;
 }
 
-local function TextSegment(props: TextSegmentProperties)
+local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
 
   local text = props.text;
-  local textLabelRef = React.useRef(nil :: TextLabel?);
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
 
   React.useEffect(function(): ()
@@ -56,4 +55,4 @@ local function TextSegment(props: TextSegmentProperties)
 
 end;
 
-return TextSegment;
+return React.forwardRef(TextSegment);

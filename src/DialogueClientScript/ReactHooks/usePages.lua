@@ -4,19 +4,13 @@ local DialogueAPI = require(script.Parent.Parent.API.Dialogue);
 local Types = require(script.Parent.Parent.Types);
 type Page = Types.Page;
 
-local function usePages(dialogueContentArray, textContainerRef, TextSegment)
+local function usePages(dialogueContentArray, textSegmentRef)
 
-  local textSegmentRef = React.useRef(nil :: TextLabel?);
   local pages, setPages = React.useState({} :: {Page});
-
-  React.useState(React.createElement(TextSegment, {
-    ref = textSegmentRef;
-    text = "";
-  }));
-
+  
   React.useEffect(function()
   
-    local pages = DialogueAPI:getPages(dialogueContentArray, textContainerRef.current :: Frame, textSegmentRef.current :: TextLabel);
+    local pages = DialogueAPI:getPages(dialogueContentArray, textSegmentRef.current :: TextLabel);
     setPages(pages);
 
   end, {dialogueContentArray});

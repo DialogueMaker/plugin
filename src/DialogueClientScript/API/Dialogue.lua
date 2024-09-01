@@ -74,10 +74,13 @@ end;
 
 -- Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
 -- @since v5.0.0
-function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer: GuiObject, textLabel: TextLabel): {Page}
+function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: TextLabel): {Page}
   
   local pages: {Types.Page} = {};
   local currentPage: Types.Page = {};
+  local textContainer = textLabel.Parent;
+  assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
+
   local TextContainerClone = textContainer:Clone();
   local TextLabelClone = textLabel:Clone();
   
@@ -122,8 +125,8 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer
     if contentArrayItemType == "string" then
       
       -- Calculate the X size offset.
-      local TextWrapper = TextContainerClone:FindFirstChild("TextWrapper");
-      assert(TextWrapper and TextWrapper:IsA("UIListLayout"), "[Dialogue Maker] TextWrapper not found");
+      local uiListLayout = TextContainerClone:FindFirstChild("UIListLayout");
+      assert(uiListLayout and uiListLayout:IsA("UIListLayout"), "[Dialogue Maker] UIListLayout not found");
       
       local lastSpaceIndex: number? = nil;
       
@@ -151,13 +154,13 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textContainer
           
         end
         
-        TextLabelClone.Size = UDim2.new(1, -xSizeOffset, if xSizeOffset > 0 then 0 else 1, if xSizeOffset > 0 then TextLabelClone.TextSize * TextLabelClone.LineHeight else -TextWrapper.AbsoluteContentSize.Y);
+        TextLabelClone.Size = UDim2.new(1, -xSizeOffset, if xSizeOffset > 0 then 0 else 1, if xSizeOffset > 0 then TextLabelClone.TextSize * TextLabelClone.LineHeight else -uiListLayout.AbsoluteContentSize.Y);
         TextLabelClone.Parent = TextContainerClone;
         
         if not TextLabelClone.TextFits then
           
           -- Check if we should add a new page.
-          if TextWrapper.AbsoluteContentSize.Y > TextContainerClone.AbsoluteSize.Y then
+          if uiListLayout.AbsoluteContentSize.Y > TextContainerClone.AbsoluteSize.Y then
 
             -- Add the current page to the page list.
             newPage();
@@ -524,11 +527,6 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
         root:render(React.createElement(require(themeModuleScript) :: any, {
           responseContentScripts = responses;
           dialogueContentArray = dialogueContentArray;
-          getPages = function(textContainer: Frame, textLabel: TextLabel)
-  
-            return DialogueModule:getPages(dialogueContentArray, textContainer, textLabel);
-  
-          end;
           onComplete = function(selectedResponseContentScript: ModuleScript?)
       
             -- Run action.

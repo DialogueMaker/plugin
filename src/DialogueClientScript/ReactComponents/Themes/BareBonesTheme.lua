@@ -28,8 +28,8 @@ local function BareBonesTheme(props: ThemeProperties)
 
   -- Refs
   local skipPageEventRef = React.useRef(nil :: BindableEvent?);
-  local textContainerRef = React.useRef(nil :: Frame?);
   local clickSoundRef = React.useRef(nil :: Sound?);
+  local textSegmentRef = React.useRef(nil :: TextLabel?);
 
   -- States
   local currentPageIndex, setCurrentPageIndex = React.useState(1);
@@ -39,7 +39,7 @@ local function BareBonesTheme(props: ThemeProperties)
   }));
 
   -- Hooks
-  local pages = usePages(props.dialogueContentArray, textContainerRef, TextSegment);
+  local pages = usePages(props.dialogueContentArray, textSegmentRef);
   local messageComponents, isNPCTalking = useMessageComponents({
     pages = pages, 
     currentPageIndex = currentPageIndex, 
@@ -109,18 +109,19 @@ local function BareBonesTheme(props: ThemeProperties)
       LayoutOrder = 1;
     }) else nil;
     NPCTextContainer = React.createElement("Frame", {
-      ref = textContainerRef;
       Size = UDim2.new(0, 0, 0, 0);
       AutomaticSize = Enum.AutomaticSize.XY;
       LayoutOrder = 2;
     }, {
-      React.createElement("UIListLayout", {
+      UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
         FillDirection = Enum.FillDirection.Horizontal;
         Wraps = true;
-        Name = "UIListLayout";
       });
-      messageComponents;
+      TextSegment = if pages[1] then nil else React.createElement(TextSegment, {
+        ref = textSegmentRef;
+      });
+      MessageComponents = React.createElement(React.Fragment, {}, {messageComponents});
     });
     ResponseContainer = if responseContentScripts then React.createElement("ScrollingFrame", {
 

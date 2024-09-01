@@ -140,7 +140,6 @@ export type ClientSettings = {
 };
 
 export type ThemeProperties = {
-  getPages: (textContainer: Frame, textLabel: TextLabel) -> {Page};
   responseContentScripts: {ModuleScript};
   clientSettings: ClientSettings;
   npcSettings: NPCSettings;
