@@ -563,6 +563,7 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
   
             end;
   
+            print("good!");
             onCompletionEvent:Fire();
       
           end;

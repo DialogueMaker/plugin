@@ -89,7 +89,10 @@ local function BareBonesTheme(props: ThemeProperties)
   useLookAtPlayer(npc, npcSettings);
 
   return React.createElement("Frame", {
-    [React.Event.InputBegan] = function(input)
+    Position = UDim2.new(0.03, 0, 0.599, 0);
+    Size = UDim2.new(0.938, 0, 0.356, 0);
+    BackgroundColor3 = Color3.new(1, 1, 1);
+    [React.Event.InputBegan] = function(self: Frame, input: InputObject)
 
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
           
@@ -109,7 +112,7 @@ local function BareBonesTheme(props: ThemeProperties)
       LayoutOrder = 1;
     }) else nil;
     NPCTextContainer = React.createElement("Frame", {
-      Size = UDim2.new(0, 0, 0, 0);
+      Size = UDim2.new(0.945, 0, 0.713, 0);
       AutomaticSize = Enum.AutomaticSize.XY;
       LayoutOrder = 2;
     }, {

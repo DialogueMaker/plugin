@@ -65,7 +65,7 @@ local function useMessageComponents(props: useMessageComponentsProps)
         
         -- Iterate through the page, run events, and show message text.
         local dialogueContentItemIndex = #messageComponents + 1;
-        if #page > dialogueContentItemIndex then
+        if #page >= dialogueContentItemIndex then
 
           local dialogueContentItem = page[dialogueContentItemIndex];
           if dialogueContentItem.type == "effect" then

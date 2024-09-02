@@ -12,12 +12,13 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
 
   local text = props.text;
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
+  local textLabelRefFallback = React.useRef(nil :: TextLabel?)
 
   React.useEffect(function(): ()
 
     local typewriterTask = task.delay(props.letterDelay, function()
 
-      local textLabel = textLabelRef.current;
+      local textLabel = (textLabelRef or textLabelRefFallback).current;
       if textLabel and maxVisibleGraphemes < #textLabel.ContentText then
 
         setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
@@ -49,8 +50,8 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
     AutomaticSize = Enum.AutomaticSize.XY;
     Text = text;
     MaxVisibleGraphemes = maxVisibleGraphemes;
-    ref = textLabelRef;
-    layoutOrder = props.layoutOrder;
+    ref = textLabelRef or textLabelRefFallback;
+    LayoutOrder = props.layoutOrder;
   })
 
 end;
