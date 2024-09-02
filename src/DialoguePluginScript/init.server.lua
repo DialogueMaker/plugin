@@ -40,7 +40,7 @@ local function repairNPC(model: Model): ()
 
     print(`[Dialogue Maker] Adding settings script to {model.Name}`);
 
-    local SettingsScript = script.NPCSettingsTemplate:Clone();
+    local SettingsScript = script.Templates.NPCSettingsTemplate:Clone();
     SettingsScript.Name = "NPCDialogueSettings";
     SettingsScript.Parent = model;
 
