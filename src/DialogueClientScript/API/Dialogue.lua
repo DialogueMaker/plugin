@@ -558,12 +558,10 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
   
             else
   
-              dialogueGUI:Destroy();
-              DialogueModule.isPlayerTakingWithNPC = false;
+              DialogueModule.isPlayerTalkingWithNPC = false;
   
             end;
   
-            print("good!");
             onCompletionEvent:Fire();
       
           end;
@@ -584,7 +582,7 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
 
         renderRoot();
     
-      end);      
+      end);
 
       renderRoot();
       onCompletionEvent.Event:Wait();
