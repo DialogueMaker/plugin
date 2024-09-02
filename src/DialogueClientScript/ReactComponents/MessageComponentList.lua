@@ -80,7 +80,6 @@ local function MessageComponentList(props: useMessageComponentsProps)
 
               if index == #page then 
                 
-                print("stopp")
                 props.setIsNPCTalking(false);
 
               end;

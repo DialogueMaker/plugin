@@ -16,6 +16,12 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
   local textLabelRefFallback = React.useRef(nil :: TextLabel?);
 
+  React.useEffect(function()
+  
+    setMaxVisibleGraphemes(0);
+
+  end, {text});
+
   React.useEffect(function(): ()
 
     if not props.isTest then

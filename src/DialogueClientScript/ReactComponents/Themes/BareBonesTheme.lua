@@ -48,7 +48,6 @@ local function BareBonesTheme(props: ThemeProperties)
 
     if isNPCTalking then
 
-      print(1);
       local clickSound = clickSoundRef.current;
       if clickSound then
 
@@ -64,12 +63,10 @@ local function BareBonesTheme(props: ThemeProperties)
 
     elseif pages and #pages > currentPageIndex then
 
-      print(2)
       setCurrentPageIndex(currentPageIndex + 1);
 
     elseif #responseContentScripts == 0 then	
 
-      print(3)
       props.onComplete();
 
     end;
