@@ -21,6 +21,9 @@ You can either get [the version Beastslash updates at the Roblox Library](https:
 ## How do I use it?
 Check out [How to use the Dialogue Maker](https://github.com/beastslash/roblox-dialogue-maker/wiki/How-to-use-the-Dialogue-Maker) on the wiki!
 
+## Development
+Use `client.project.json` to develop with only the DialogueClientScript. Use `plugin.project.json` to develop both.
+
 ## Can I contribute?
 Sure! If you feel like that the Dialogue Maker can be improved for everyone, just send a feature request in the issues. You could also submit a pull request if you already added it yourself. Beastslash will sync changes made between the plugin and repository.
 

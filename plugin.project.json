@@ -1,5 +1,5 @@
 {
-  "name": "Dialogue Maker Testing Place",
+  "name": "Dialogue Maker",
   "tree": {
     "$className": "DataModel",
     "ServerStorage": {
