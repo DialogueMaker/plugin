@@ -52,6 +52,9 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
     MaxVisibleGraphemes = maxVisibleGraphemes;
     ref = textLabelRef or textLabelRefFallback;
     LayoutOrder = props.layoutOrder;
+    FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
+    TextSize = 16;
+    BackgroundTransparency = 1;
   })
 
 end;
