@@ -3,16 +3,15 @@
 -- As the name describes, it is a barebones theme that priorities function over form.
 -- Developers can use this theme as a template for creating their own.
 -- Programmer: Christian Toney (Christian_Toney)
-local ReactComponents = script.Parent.Parent;
-local TextSegment = require(ReactComponents.TextSegment);
-local ResponseButton = require(ReactComponents.ResponseButton);
-local MessageComponentList = require(ReactComponents.MessageComponentList)
-local DialogueClientScript = ReactComponents.Parent;
+local TextSegment = require(script.TextSegment);
+local ResponseButton = require(script.ResponseButton);
+local MessageComponentList = require(script.MessageComponentList);
+local ResponseComponentList = require(script.ResponseComponentList);
+local DialogueClientScript = script.Parent.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
-local useResponseComponents = require(ReactHooks.useResponseComponents);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
@@ -40,7 +39,6 @@ local function BareBonesTheme(props: ThemeProperties)
 
   -- Hooks
   local pages = usePages(props.dialogueContentArray, textContainerRef);
-  local responseComponents = useResponseComponents(ResponseButton, props.responseContentScripts, props.onComplete);
 
   local function continueDialogue()
 
@@ -130,11 +128,14 @@ local function BareBonesTheme(props: ThemeProperties)
     ResponseContainer = if responseContentScripts then React.createElement("ScrollingFrame", {
 
     }, {
-      React.createElement("UIListLayout", {
+      UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
-        Name = "UIListLayout";
       });
-      responseComponents;
+      ResponseComponentList = React.createElement(ResponseComponentList, {
+        responseButtonComponent = ResponseButton; 
+        responseContentScripts = props.responseContentScripts;
+        onComplete = props.onComplete;
+      });
     }) else nil;
     ContinueButton = React.createElement("ImageButton", {
       Visible = isClickToContinueButtonVisible;

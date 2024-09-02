@@ -1,9 +1,9 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
+local React = require(script.Parent.Parent.Parent.Parent.Packages.react);
 
 export type TextSegmentProperties = {
   text: string;
-  skipEvent: RBXScriptSignal?;
+  skipPageEvent: RBXScriptSignal?;
   letterDelay: number;
   layoutOrder: number;
   onComplete: () -> ();
@@ -29,7 +29,7 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
       local typewriterTask = task.delay(props.letterDelay, function()
 
         local textLabel = (textLabelRef or textLabelRefFallback).current;
-        if textLabel and maxVisibleGraphemes < #textLabel.ContentText then
+        if maxVisibleGraphemes ~= -1 and textLabel and maxVisibleGraphemes < #textLabel.ContentText then
 
           setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
 
@@ -41,9 +41,9 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
 
       end);
 
-      if props.skipEvent then
+      if props.skipPageEvent then
 
-        local skipConnection = props.skipEvent:Once(function()
+        local skipConnection = props.skipPageEvent:Once(function()
         
           task.cancel(typewriterTask);
           setMaxVisibleGraphemes(-1);

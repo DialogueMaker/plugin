@@ -4,7 +4,7 @@ export type Effect = {
   
   type: "effect";
   
-  run: (isPlayerSkipping: boolean) -> any;
+  run: (skipPageEvent: BindableEvent?) -> any;
 
   getMaxDimensions: () -> {x: number, y: number};
 

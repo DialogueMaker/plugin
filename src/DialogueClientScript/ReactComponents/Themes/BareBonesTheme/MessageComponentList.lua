@@ -1,6 +1,6 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local Types = require(script.Parent.Parent.Types);
+local React = require(script.Parent.Parent.Parent.Parent.Packages.react);
+local Types = require(script.Parent.Parent.Parent.Parent.Types);
 type Page = Types.Page;
 type NPCSettings = Types.NPCSettings;
 
@@ -26,28 +26,8 @@ local function MessageComponentList(props: useMessageComponentsProps)
   local npcName = props.npcName;
   local TextSegment = props.textSegmentComponent;
 
-  -- States
-  local isSkippingPage, setIsSkippingPage = React.useState(false);
-
   React.useEffect(function(): ()
-    
-    if skipPageEvent then
 
-      local skipPageConnection = skipPageEvent.Event:Once(function()
-      
-        setIsSkippingPage(true)
-
-      end);
-
-      return function()
-
-        skipPageConnection:Disconnect();
-
-      end;
-
-    end;
-
-    setIsSkippingPage(false);
     props.setIsNPCTalking(true);
 
   end, {pages :: any, currentPageIndex});
@@ -63,7 +43,7 @@ local function MessageComponentList(props: useMessageComponentsProps)
         if dialogueContentItem.type == "effect" then
 
           print(`[Dialogue Maker] [Effect] {npcName or "Unknown NPC"}: {dialogueContentItem.name}`);
-          dialogueContentItem.run(isSkippingPage);
+          dialogueContentItem.run(skipPageEvent);
           table.insert(messageComponentList, React.createElement(React.Fragment));
 
         elseif dialogueContentItem.type == "text" then
@@ -74,7 +54,7 @@ local function MessageComponentList(props: useMessageComponentsProps)
           -- Determine new offset.
           table.insert(messageComponentList, React.createElement(TextSegment, {
             text = dialogueContentItem.text;
-            skipPageEvent = skipPageEvent;
+            skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
             onComplete = function()
 
@@ -90,7 +70,7 @@ local function MessageComponentList(props: useMessageComponentsProps)
         end;
 
       end;
-
+ 
     end;
 
   end;
