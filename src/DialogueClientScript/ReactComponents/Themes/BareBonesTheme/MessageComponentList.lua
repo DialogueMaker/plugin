@@ -13,7 +13,6 @@ export type useMessageComponentsProps = {
   responseContentScripts: {ModuleScript};
   npcSettings: NPCSettings;
   onTimeout: () -> ();
-  setIsClickToContinueButtonVisible: (boolean) -> ();
   setIsNPCTalking: (boolean) -> ();
 }
 

@@ -13,6 +13,7 @@ local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
+local useContinueDialogue = require(ReactHooks.useContinueDialogue);
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
 type ThemeProperties = Types.ThemeProperties;
@@ -34,43 +35,21 @@ local function BareBonesTheme(props: ThemeProperties)
 
   -- States
   local currentPageIndex, setCurrentPageIndex = React.useState(1);
-  local isClickToContinueButtonVisible, setIsClickToContinueButtonVisible = React.useState(false);
   local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
   local pages = usePages(props.dialogueContentArray, textContainerRef);
-
-  local function continueDialogue()
-
-    setIsClickToContinueButtonVisible(false);
-
-    if isNPCTalking then
-
-      local clickSound = clickSoundRef.current;
-      if clickSound then
-
-        clickSound:Play();
-
-      end;
-
-      if npcSettings.general.allowPlayerToSkipDelay then
-        
-        skipPageEvent:Fire();
-
-      end;
-
-    elseif pages and #pages > currentPageIndex then
-
-      setCurrentPageIndex(currentPageIndex + 1);
-
-    elseif #responseContentScripts == 0 then	
-
-      props.onComplete();
-
-    end;
-
-  end;
-
+  local continueDialogue = useContinueDialogue({
+    pages = pages;
+    clickSoundRef = clickSoundRef;
+    allowPlayerToSkipDelay = npcSettings.general.allowPlayerToSkipDelay;
+    currentPageIndex = currentPageIndex;
+    setCurrentPageIndex = setCurrentPageIndex;
+    onComplete = props.onComplete;
+    skipPageEvent = skipPageEvent;
+    isNPCTalking = isNPCTalking;
+    responseContentScripts = responseContentScripts;
+  });
   useKeybindContinue(clientSettings, continueDialogue);
   useLookAtPlayer(npc, npcSettings);
   useOutOfDistanceDetection(npc, npcSettings, props.onTimeout);
@@ -121,7 +100,6 @@ local function BareBonesTheme(props: ThemeProperties)
         npcSettings = npcSettings;
         responseContentScripts = responseContentScripts;
         onTimeout = props.onTimeout;
-        setIsClickToContinueButtonVisible = setIsClickToContinueButtonVisible;
         setIsNPCTalking = setIsNPCTalking;
       });
     });
@@ -138,7 +116,7 @@ local function BareBonesTheme(props: ThemeProperties)
       });
     }) else nil;
     ContinueButton = React.createElement("ImageButton", {
-      Visible = isClickToContinueButtonVisible;
+      Visible = not isNPCTalking;
     });
     ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
       SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
