@@ -6,39 +6,49 @@ export type TextSegmentProperties = {
   skipEvent: RBXScriptSignal?;
   letterDelay: number;
   layoutOrder: number;
+  onComplete: () -> ();
+  isTest: boolean?;
 }
 
 local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
 
   local text = props.text;
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
-  local textLabelRefFallback = React.useRef(nil :: TextLabel?)
+  local textLabelRefFallback = React.useRef(nil :: TextLabel?);
 
   React.useEffect(function(): ()
 
-    local typewriterTask = task.delay(props.letterDelay, function()
+    if not props.isTest then
 
-      local textLabel = (textLabelRef or textLabelRefFallback).current;
-      if textLabel and maxVisibleGraphemes < #textLabel.ContentText then
+      local typewriterTask = task.delay(props.letterDelay, function()
 
-        setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
+        local textLabel = (textLabelRef or textLabelRefFallback).current;
+        if textLabel and maxVisibleGraphemes < #textLabel.ContentText then
 
-      end;
+          setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
 
-    end);
+        else
 
-    if props.skipEvent then
+          props.onComplete();
 
-      local skipConnection = props.skipEvent:Once(function()
-      
-        task.cancel(typewriterTask);
-        setMaxVisibleGraphemes(-1);
+        end;
 
       end);
 
-      return function()
+      if props.skipEvent then
 
-        skipConnection:Disconnect();
+        local skipConnection = props.skipEvent:Once(function()
+        
+          task.cancel(typewriterTask);
+          setMaxVisibleGraphemes(-1);
+
+        end);
+
+        return function()
+
+          skipConnection:Disconnect();
+
+        end;
 
       end;
 
@@ -55,6 +65,7 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
     FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
     TextSize = 16;
     BackgroundTransparency = 1;
+    Visible = not props.isTest;
   })
 
 end;

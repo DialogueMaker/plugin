@@ -458,36 +458,24 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
   local root = ReactRoblox.createRoot(dialogueGUI);
   self:setTheme(themeModuleScript);
 
-  -- If necessary, end conversation if player or NPC goes out of distance
-  local NPCPrimaryPart = npc.PrimaryPart;
-  local MaxConversationDistance = npcSettings.general.maxConversationDistance;
-  local EndConversationIfOutOfDistance = npcSettings.general.endConversationIfOutOfDistance;
-  if EndConversationIfOutOfDistance and MaxConversationDistance and NPCPrimaryPart then
-
-    coroutine.wrap(function() 
-
-      while task.wait() and DialogueModule.isPlayerTalkingWithNPC do
-
-        if math.abs(NPCPrimaryPart.Position.Magnitude - Player.Character.PrimaryPart.Position.Magnitude) > MaxConversationDistance then
-
-          DialogueModule.isPlayerTalkingWithNPC = false;
-          break;
-
-        end;
-
-      end;
-
-    end)();
-
-  end;
-
   -- Show the dialogue to the player
   local currentDialoguePriority = "1";
   local currentContentScript: ModuleScript;
   while DialogueModule.isPlayerTalkingWithNPC and task.wait() do
 
     -- Get the current directory.
-    currentContentScript = DialogueModule:getContentScriptFromPriority(NPCDialogueContainer, currentDialoguePriority:split("."));
+    local isSuccess = pcall(function()
+    
+      currentContentScript = DialogueModule:getContentScriptFromPriority(NPCDialogueContainer, currentDialoguePriority:split("."));
+
+    end);
+
+    if not isSuccess then
+
+      break;
+
+    end;
+
     local dialogueType = currentContentScript:GetAttribute("DialogueType");
 
     if DialogueModule:doesPlayerPassCondition(currentContentScript) then

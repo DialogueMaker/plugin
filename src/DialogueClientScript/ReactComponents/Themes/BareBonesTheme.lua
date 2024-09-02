@@ -6,16 +6,19 @@
 local ReactComponents = script.Parent.Parent;
 local TextSegment = require(ReactComponents.TextSegment);
 local ResponseButton = require(ReactComponents.ResponseButton);
+local MessageComponentList = require(ReactComponents.MessageComponentList)
 local DialogueClientScript = ReactComponents.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
-local useMessageComponents = require(ReactHooks.useMessageComponents);
 local useResponseComponents = require(ReactHooks.useResponseComponents);
+local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
 type ThemeProperties = Types.ThemeProperties;
+
+local skipPageEvent = Instance.new("BindableEvent");
 
 local function BareBonesTheme(props: ThemeProperties)
 
@@ -27,30 +30,16 @@ local function BareBonesTheme(props: ThemeProperties)
   local responseContentScripts = props.responseContentScripts;
 
   -- Refs
-  local skipPageEventRef = React.useRef(nil :: BindableEvent?);
   local clickSoundRef = React.useRef(nil :: Sound?);
-  local textSegmentRef = React.useRef(nil :: TextLabel?);
+  local textContainerRef = React.useRef(nil :: GuiObject?);
 
   -- States
   local currentPageIndex, setCurrentPageIndex = React.useState(1);
   local isClickToContinueButtonVisible, setIsClickToContinueButtonVisible = React.useState(false);
-  React.useState(React.createElement("BindableEvent", {
-    ref = skipPageEventRef;
-  }));
+  local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
-  local pages = usePages(props.dialogueContentArray, textSegmentRef);
-  local messageComponents, isNPCTalking = useMessageComponents({
-    pages = pages, 
-    currentPageIndex = currentPageIndex, 
-    skipPageEventRef = skipPageEventRef;
-    npcName = npcName;
-    textSegmentComponent = TextSegment;
-    npcSettings = npcSettings;
-    responseContentScripts = responseContentScripts;
-    onTimeout = props.onTimeout;
-    setIsClickToContinueButtonVisible = setIsClickToContinueButtonVisible;
-  });
+  local pages = usePages(props.dialogueContentArray, textContainerRef);
   local responseComponents = useResponseComponents(ResponseButton, props.responseContentScripts, props.onComplete);
 
   local function continueDialogue()
@@ -59,6 +48,7 @@ local function BareBonesTheme(props: ThemeProperties)
 
     if isNPCTalking then
 
+      print(1);
       local clickSound = clickSoundRef.current;
       if clickSound then
 
@@ -66,8 +56,7 @@ local function BareBonesTheme(props: ThemeProperties)
 
       end;
 
-      local skipPageEvent = skipPageEventRef.current;
-      if npcSettings.general.allowPlayerToSkipDelay and skipPageEvent then
+      if npcSettings.general.allowPlayerToSkipDelay then
         
         skipPageEvent:Fire();
 
@@ -75,10 +64,12 @@ local function BareBonesTheme(props: ThemeProperties)
 
     elseif pages and #pages > currentPageIndex then
 
+      print(2)
       setCurrentPageIndex(currentPageIndex + 1);
 
     elseif #responseContentScripts == 0 then	
 
+      print(3)
       props.onComplete();
 
     end;
@@ -87,6 +78,7 @@ local function BareBonesTheme(props: ThemeProperties)
 
   useKeybindContinue(clientSettings, continueDialogue);
   useLookAtPlayer(npc, npcSettings);
+  useOutOfDistanceDetection(npc, npcSettings, props.onTimeout);
 
   return React.createElement("Frame", {
     Position = UDim2.new(0.03, 0, 0.599, 0);
@@ -114,6 +106,7 @@ local function BareBonesTheme(props: ThemeProperties)
     NPCTextContainer = React.createElement("Frame", {
       Size = UDim2.new(0.945, 0, 0.713, 0);
       AutomaticSize = Enum.AutomaticSize.XY;
+      ref = textContainerRef;
       LayoutOrder = 2;
     }, {
       UIListLayout = React.createElement("UIListLayout", {
@@ -121,10 +114,21 @@ local function BareBonesTheme(props: ThemeProperties)
         FillDirection = Enum.FillDirection.Horizontal;
         Wraps = true;
       });
-      TextSegment = if pages[1] then nil else React.createElement(TextSegment, {
-        ref = textSegmentRef;
+      TestSegment = React.createElement(TextSegment, {
+        isTest = true;
       });
-      MessageComponents = React.createElement(React.Fragment, {}, {messageComponents});
+      MessageComponentList = React.createElement(MessageComponentList, {
+        pages = pages, 
+        currentPageIndex = currentPageIndex, 
+        skipPageEvent = skipPageEvent;
+        npcName = npcName;
+        textSegmentComponent = TextSegment;
+        npcSettings = npcSettings;
+        responseContentScripts = responseContentScripts;
+        onTimeout = props.onTimeout;
+        setIsClickToContinueButtonVisible = setIsClickToContinueButtonVisible;
+        setIsNPCTalking = setIsNPCTalking;
+      });
     });
     ResponseContainer = if responseContentScripts then React.createElement("ScrollingFrame", {
 
