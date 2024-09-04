@@ -41,14 +41,10 @@ local function MessageComponentList(props: useMessageComponentsProps)
 
         if dialogueContentItem.type == "effect" then
 
-          print(`[Dialogue Maker] [Effect] {npcName or "Unknown NPC"}: {dialogueContentItem.name}`);
           dialogueContentItem.run(skipPageEvent);
           table.insert(messageComponentList, React.createElement(React.Fragment));
 
         elseif dialogueContentItem.type == "text" then
-          
-          -- Print to the debug console.
-          print(`[Dialogue Maker] [Message] {npcName or "Unknown NPC"}: {dialogueContentItem.text}`);
           
           -- Determine new offset.
           table.insert(messageComponentList, React.createElement(TextSegment, {

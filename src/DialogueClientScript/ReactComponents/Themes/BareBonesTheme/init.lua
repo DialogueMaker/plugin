@@ -1,5 +1,5 @@
 --!strict
--- BareBonesDialogue is the first theme that was created for Dialogue Maker.
+-- BareBonesTheme is the first theme that was created for Dialogue Maker.
 -- As the name describes, it is a barebones theme that priorities function over form.
 -- Developers can use this theme as a template for creating their own.
 -- Programmer: Christian Toney (Christian_Toney)
