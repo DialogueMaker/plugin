@@ -14,6 +14,7 @@ local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
+local useDynamicSize = require(ReactHooks.useDynamicSize);
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
 type ThemeProperties = Types.ThemeProperties;
@@ -50,14 +51,22 @@ local function BareBonesTheme(props: ThemeProperties)
     isNPCTalking = isNPCTalking;
     responseContentScripts = responseContentScripts;
   });
+  local sizeX, sizeY, textSize = useDynamicSize({
+    {
+      sizeX = 310;
+      sizeY = 117;
+      textSize = 14;
+    }
+  });
   useKeybindContinue(clientSettings, continueDialogue);
   useLookAtPlayer(npc, npcSettings);
   useOutOfDistanceDetection(npc, npcSettings, props.onTimeout);
 
   return React.createElement("Frame", {
-    Position = UDim2.new(0.03, 0, 0.599, 0);
-    Size = UDim2.new(0.938, 0, 0.356, 0);
-    BackgroundColor3 = Color3.new(1, 1, 1);
+    AnchorPoint = Vector2.new(0.5, 1);
+    Position = UDim2.new(0.5, 0, 1, -15);
+    AutomaticSize = Enum.AutomaticSize.XY;
+    BackgroundTransparency = 1;
     [React.Event.InputBegan] = function(self: Frame, input: InputObject)
 
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -72,56 +81,81 @@ local function BareBonesTheme(props: ThemeProperties)
       SortOrder = Enum.SortOrder.LayoutOrder;
     });
     NPCNameTextLabel = if npcSettings.general.showName then React.createElement("TextLabel", {
-      AutomaticSize = if npcSettings.general.fitName then Enum.AutomaticSize.X else Enum.AutomaticSize.None;
-      Size = if npcSettings.general.fitName then UDim2.new(0, 0, 0, 0) else UDim2.new();
+      AutomaticSize = Enum.AutomaticSize.XY;
       Text = npcName;
       LayoutOrder = 1;
     }) else nil;
-    NPCTextContainer = React.createElement("Frame", {
-      Size = UDim2.new(0.945, 0, 0.713, 0);
+    HorizontalContent = React.createElement("Frame", {
       AutomaticSize = Enum.AutomaticSize.XY;
-      ref = textContainerRef;
-      LayoutOrder = 2;
+      BackgroundTransparency = 1;
     }, {
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
         FillDirection = Enum.FillDirection.Horizontal;
-        Wraps = true;
+        Padding = UDim.new(0, 5);
+        VerticalAlignment = Enum.VerticalAlignment.Bottom;
       });
-      TestSegment = React.createElement(TextSegment, {
-        isTest = true;
+      NPCTextContainer = React.createElement("Frame", {
+        Size = UDim2.new(0, sizeX, 0, sizeY);
+        ref = textContainerRef;
+        BackgroundColor3 = Color3.new(1, 1, 1);
+      }, {
+        UIListLayout = React.createElement("UIListLayout", {
+          SortOrder = Enum.SortOrder.LayoutOrder;
+          FillDirection = Enum.FillDirection.Horizontal;
+          Wraps = true;
+        });
+        UIPadding = React.createElement("UIPadding", {
+          PaddingLeft = UDim.new(0, 5);
+          PaddingTop = UDim.new(0, 5);
+          PaddingRight = UDim.new(0, 5);
+          PaddingBottom = UDim.new(0, 5);
+        });
+        TestSegment = React.createElement(TextSegment, {
+          isTest = true;
+          textSize = textSize;
+        });
+        MessageComponentList = React.createElement(MessageComponentList, {
+          pages = pages, 
+          currentPageIndex = currentPageIndex, 
+          skipPageEvent = skipPageEvent;
+          textSegmentComponent = TextSegment;
+          npcSettings = npcSettings;
+          responseContentScripts = responseContentScripts;
+          onTimeout = props.onTimeout;
+          setIsNPCTalking = setIsNPCTalking;
+          textSize = textSize;
+        });
       });
-      MessageComponentList = React.createElement(MessageComponentList, {
-        pages = pages, 
-        currentPageIndex = currentPageIndex, 
-        skipPageEvent = skipPageEvent;
-        npcName = npcName;
-        textSegmentComponent = TextSegment;
-        npcSettings = npcSettings;
-        responseContentScripts = responseContentScripts;
-        onTimeout = props.onTimeout;
-        setIsNPCTalking = setIsNPCTalking;
-      });
-    });
-    ResponseContainer = if responseContentScripts then React.createElement("ScrollingFrame", {
+      ResponseContainer = if #responseContentScripts > 0 then React.createElement("ScrollingFrame", {
+        BackgroundTransparency = 1;
+      }, {
+        UIListLayout = React.createElement("UIListLayout", {
+          SortOrder = Enum.SortOrder.LayoutOrder;
+        });
+        ResponseComponentList = React.createElement(ResponseComponentList, {
+          responseButtonComponent = ResponseButton; 
+          responseContentScripts = props.responseContentScripts;
+          onComplete = props.onComplete;
+        });
+      }) else nil;
+      ContinueButton = React.createElement("ImageButton", {
+        Size = UDim2.new(0, 20, 0, 20);
+        LayoutOrder = 3;
+        Image = "rbxassetid://90966430453504";
+        BackgroundColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.705882, 0.705882, 0.705882) else Color3.new(1, 1, 1);
+        ImageColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.486275, 0.486275, 0.486275) else Color3.new(1, 1, 1);
+        [React.Event.Activated] = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then nil else function()
 
-    }, {
-      UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
+          continueDialogue()
+
+        end;
       });
-      ResponseComponentList = React.createElement(ResponseComponentList, {
-        responseButtonComponent = ResponseButton; 
-        responseContentScripts = props.responseContentScripts;
-        onComplete = props.onComplete;
-      });
-    }) else nil;
-    ContinueButton = React.createElement("ImageButton", {
-      Visible = not isNPCTalking;
+      ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
+        SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
+        ref = clickSoundRef;
+      }) else nil;
     });
-    ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
-      SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
-      ref = clickSoundRef;
-    }) else nil;
   })
 
 end;

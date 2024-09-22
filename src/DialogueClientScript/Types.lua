@@ -149,6 +149,12 @@ export type ThemeProperties = {
   onTimeout: () -> ();
 }
 
-export type Page = {{type: "text"; text: string; size: UDim2} | Effect};
+export type Page = {
+  {
+    type: "text"; 
+    text: string; 
+    size: Vector2;
+  } | Effect
+};
 
 return {};

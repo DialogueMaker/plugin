@@ -82,7 +82,8 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
   assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
 
   local TextContainerClone = textContainer:Clone();
-  local TextLabelClone = textLabel:Clone();
+  local textLabelClone = textLabel:Clone();
+  textLabelClone.MaxVisibleGraphemes = -1;
   
   TextContainerClone.Visible = false;
   TextContainerClone.Parent = textContainer.Parent;
@@ -100,7 +101,7 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
     
     table.insert(pages, currentPage);
     currentPage = {};
-    TextLabelClone = TextLabelClone:Clone();
+    textLabelClone = textLabelClone:Clone();
     
     for _, child in TextContainerClone:GetChildren() do
   
@@ -112,8 +113,7 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
   
     end
     
-    TextLabelClone.Parent = TextContainerClone;
-    TextLabelClone.Size = UDim2.new(1, 0, 1, 0);
+    textLabelClone.Parent = TextContainerClone;
     xSizeOffset = 0;
     
   end
@@ -137,27 +137,27 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
           table.insert(currentPage, {
             type = "text";
             text = TextLabel.Text;
-            size = TextLabel.Size;
+            size = TextLabel.AbsoluteSize;
           });
 
         end
         
-        TextLabelClone = TextLabelClone:Clone();
+        textLabelClone = textLabelClone:Clone();
+        textLabelClone.Visible = true;
         
         if lastSpaceIndex then
           
-          TextLabelClone.Text = (contentArrayItem :: string):sub(lastSpaceIndex + 1);
+          textLabelClone.Text = (contentArrayItem :: string):sub(lastSpaceIndex + 1);
           
         else 
           
-          TextLabelClone.Text = contentArrayItem :: string;
+          textLabelClone.Text = contentArrayItem :: string;
           
         end
         
-        TextLabelClone.Size = UDim2.new(1, -xSizeOffset, if xSizeOffset > 0 then 0 else 1, if xSizeOffset > 0 then TextLabelClone.TextSize * TextLabelClone.LineHeight else -uiListLayout.AbsoluteContentSize.Y);
-        TextLabelClone.Parent = TextContainerClone;
+        textLabelClone.Parent = TextContainerClone;
         
-        if not TextLabelClone.TextFits then
+        if not textLabelClone.TextFits then
           
           -- Check if we should add a new page.
           if uiListLayout.AbsoluteContentSize.Y > TextContainerClone.AbsoluteSize.Y then
@@ -169,7 +169,7 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
           
         end
         
-        if TextLabelClone.TextFits then
+        if textLabelClone.TextFits then
           
           local function getRichTextIndices(text: string)
 
@@ -316,7 +316,6 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
 
               end;
 
-
               if TextLabel.TextBounds.Y > originalTextBoundsY then
 
                 local currentTextBoundsY = TextLabel.TextBounds.Y;
@@ -342,8 +341,8 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
 
           end
 
-          local originalText = TextLabelClone.Text;
-          local breakpoints = getLineBreakPositions(originalText, TextLabelClone, TextLabelClone.RichText);
+          local originalText = textLabelClone.Text;
+          local breakpoints = getLineBreakPositions(originalText, textLabelClone, textLabelClone.RichText);
           local lastBreakpointIndex = breakpoints[#breakpoints];
           
           if lastBreakpointIndex then
@@ -351,23 +350,21 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
             -- Create another TextLabel to replace the last line of text.
             -- This will allow the TextWrapper to accurately calculate 
             -- how much space is available on the X-axis.
-            local ParagraphTextLabel = TextLabelClone:Clone();
+            local ParagraphTextLabel = textLabelClone:Clone();
             ParagraphTextLabel.Text = originalText:sub(1, lastBreakpointIndex);
-            ParagraphTextLabel.Parent = TextLabelClone.Parent;
-            ParagraphTextLabel.Size = UDim2.new(0, ParagraphTextLabel.TextBounds.X, 0, ParagraphTextLabel.TextBounds.Y + (ParagraphTextLabel.TextSize * ParagraphTextLabel.LineHeight - ParagraphTextLabel.TextSize));
+            ParagraphTextLabel.Parent = textLabelClone.Parent;
             addTextLabelToPage(ParagraphTextLabel);
             
-            -- Fix the TextLabelClone's text back.
-            TextLabelClone.Parent = nil;
-            TextLabelClone.Parent = ParagraphTextLabel.Parent;
-            TextLabelClone.Text = originalText:sub(lastBreakpointIndex + 1);
+            -- Fix the textLabelClone's text back.
+            textLabelClone.Parent = nil;
+            textLabelClone.Parent = ParagraphTextLabel.Parent;
+            textLabelClone.Text = originalText:sub(lastBreakpointIndex + 1);
             
           end;
+
+          addTextLabelToPage(textLabelClone);
           
-          TextLabelClone.Size = UDim2.new(0, TextLabelClone.TextBounds.X, 0, TextLabelClone.TextBounds.Y + (TextLabelClone.TextSize * TextLabelClone.LineHeight - TextLabelClone.TextSize));
-          addTextLabelToPage(TextLabelClone);
-          
-          xSizeOffset += TextLabelClone.TextBounds.X;
+          xSizeOffset += textLabelClone.TextBounds.X;
           
           lastSpaceIndex = nil;
           
@@ -377,24 +374,24 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
           lastSpaceIndex = 0;
           repeat
 
-            lastSpaceIndex = table.pack(TextLabelClone.Text:find(".* "))[2] :: number;
-            if not lastSpaceIndex and TextLabelClone.TextBounds.Y < TextLabelClone.TextSize * TextLabelClone.LineHeight then
+            lastSpaceIndex = table.pack(textLabelClone.Text:find(".* "))[2] :: number;
+            
+            if not lastSpaceIndex and textLabelClone.TextBounds.Y < textLabelClone.TextSize * textLabelClone.LineHeight then
               
               -- The given area is too small. Add this to a new page.
+              print("New page!");
               newPage();
               continue;              
               
             end
             
             assert(lastSpaceIndex, "[Dialogue Maker] Unable to fit text in text container even after removing the spaces. Is the text too big?");
-            TextLabelClone.Text = TextLabelClone.Text:sub(1, lastSpaceIndex - 1);
+            textLabelClone.Text = textLabelClone.Text:sub(1, lastSpaceIndex - 1);
             
-          until TextLabelClone.TextFits;
-          
-          TextLabelClone.Size = UDim2.new(0, TextLabelClone.TextBounds.X, 0, TextLabelClone.TextBounds.Y + (TextLabelClone.TextSize * TextLabelClone.LineHeight - TextLabelClone.TextSize));
+          until textLabelClone.TextFits;
           
           -- Add the remaining text to a new page.
-          addTextLabelToPage(TextLabelClone);
+          addTextLabelToPage(textLabelClone);
           
           xSizeOffset = 0;
           

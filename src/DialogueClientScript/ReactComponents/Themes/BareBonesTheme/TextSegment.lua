@@ -6,6 +6,7 @@ export type TextSegmentProperties = {
   skipPageEvent: RBXScriptSignal?;
   letterDelay: number;
   layoutOrder: number;
+  textSize: number;
   onComplete: () -> ();
   isTest: boolean?;
 }
@@ -69,9 +70,11 @@ local function TextSegment(props: TextSegmentProperties, textLabelRef: any)
     ref = textLabelRef or textLabelRefFallback;
     LayoutOrder = props.layoutOrder;
     FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
-    TextSize = 16;
+    TextSize = props.textSize;
     BackgroundTransparency = 1;
     Visible = not props.isTest;
+    TextXAlignment = Enum.TextXAlignment.Left;
+    TextWrapped = true;
   })
 
 end;

@@ -8,10 +8,10 @@ export type useMessageComponentsProps = {
   pages: {Page}?;
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
-  npcName: string;
   textSegmentComponent: any;
   responseContentScripts: {ModuleScript};
   npcSettings: NPCSettings;
+  textSize: number;
   onTimeout: () -> ();
   setIsNPCTalking: (boolean) -> ();
 }
@@ -22,7 +22,6 @@ local function MessageComponentList(props: useMessageComponentsProps)
   local pages = props.pages;
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
-  local npcName = props.npcName;
   local TextSegment = props.textSegmentComponent;
 
   React.useEffect(function(): ()
@@ -51,6 +50,7 @@ local function MessageComponentList(props: useMessageComponentsProps)
             text = dialogueContentItem.text;
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
+            textSize = props.textSize;
             onComplete = function()
 
               if index == #page then 
