@@ -1,6 +1,7 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local Colors = require(script.Parent.Parent.Colors);
+local root = script.Parent.Parent.Parent.Parent.Parent;
+local React = require(root.Packages.react);
+local Colors = require(root.Colors);
 
 export type DropdownProps = {
   text: string?;

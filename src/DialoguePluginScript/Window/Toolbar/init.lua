@@ -1,6 +1,6 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
-local ToolbarButton = require(script.Parent.ToolbarButton);
+local ToolbarButton = require(script.ToolbarButton);
 
 type ToolbarProps = {
   dialogueParent: ModuleScript | Folder;

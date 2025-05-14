@@ -1,7 +1,8 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local DialogueItem = require(script.Parent.DialogueItem);
-local Colors = require(script.Parent.Parent.Colors);
+local root = script.Parent.Parent.Parent;
+local React = require(root.Packages.react);
+local Colors = require(root.Colors);
+local DialogueItem = require(script.DialogueItem);
 
 export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;

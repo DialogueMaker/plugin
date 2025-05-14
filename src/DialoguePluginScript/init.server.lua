@@ -6,7 +6,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
-local Window = require(script.ReactComponents.Window);
+local Window = require(script.Window);
 
 local EditDialogueButton: PluginToolbarButton;
 local isDialogueEditorOpen = false;

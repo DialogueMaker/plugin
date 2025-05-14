@@ -1,9 +1,10 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local Colors = require(script.Parent.Parent.Colors);
-local Dropdown = require(script.Parent.Dropdown);
-local useDialogueContainer = require(script.Parent.Parent.ReactHooks.useDialogueContainer);
-local DropdownOption = require(script.Parent.DropdownOption)
+local root = script.Parent.Parent.Parent.Parent;
+local React = require(root.Packages.react);
+local Colors = require(root.Colors);
+local Dropdown = require(script.Dropdown);
+local useDialogueContainer = require(script.useDialogueContainer);
+local DropdownOption = require(script.DropdownOption);
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";

@@ -1,7 +1,8 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local useViewingPriority = require(script.Parent.Parent.ReactHooks.useViewingPriority);
-local Colors = require(script.Parent.Parent.Colors);
+local root = script.Parent.Parent;
+local React = require(root.Packages.react);
+local Colors = require(root.Colors);
+local useViewingPriority = require(script.useViewingPriority);
 
 export type StatusSectionProperties = {
   dialogueParent: ModuleScript | Folder;

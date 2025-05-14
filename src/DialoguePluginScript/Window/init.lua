@@ -1,8 +1,8 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local Toolbar = require(script.Parent.Toolbar);
-local StatusSection = require(script.Parent.StatusSection);
-local DialogueTable = require(script.Parent.DialogueTable);
+local React = require(script.Parent.Packages.react);
+local Toolbar = require(script.Toolbar);
+local StatusSection = require(script.StatusSection);
+local DialogueTable = require(script.DialogueTable);
 
 export type WindowProperties = {
   model: Model;

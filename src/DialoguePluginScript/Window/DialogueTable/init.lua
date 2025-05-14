@@ -1,7 +1,9 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local DialogueTableHeader = require(script.Parent.DialogueTableHeader);
-local DialogueTableBody = require(script.Parent.DialogueTableBody);
+local root = script.Parent.Parent;
+local React = require(root.Packages.react);
+local Colors = require(root.Colors);
+local DialogueTableHeader = require(script.DialogueTableHeader);
+local DialogueTableBody = require(script.DialogueTableBody);
 
 export type DialogueTableProperties = {
   isDeleteModeEnabled: boolean;
