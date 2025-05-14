@@ -1,6 +1,7 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
 local ToolbarButton = require(script.ToolbarButton);
+local useStudioColors = require(script.Parent.Parent.useStudioColors);
 
 type ToolbarProps = {
   dialogueParent: ModuleScript | Folder;
@@ -14,12 +15,13 @@ type ToolbarProps = {
 
 local function Toolbar(props: ToolbarProps)
 
+  local colors = useStudioColors();
   local dialogueParent = props.dialogueParent;
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
     LayoutOrder = 1;
-    BackgroundColor3 = Color3.fromRGB(74, 74, 74);
+    BackgroundColor3 = colors.toolbar;
     BorderSizePixel = 0;
   }, {
     UIListLayout = React.createElement("UIListLayout", {

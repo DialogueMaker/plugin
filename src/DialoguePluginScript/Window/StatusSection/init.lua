@@ -1,8 +1,8 @@
 --!strict
 local root = script.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
 local useViewingPriority = require(script.useViewingPriority);
+local useStudioColors = require(root.useStudioColors);
 
 export type StatusSectionProperties = {
   dialogueParent: ModuleScript | Folder;
@@ -10,12 +10,13 @@ export type StatusSectionProperties = {
 
 local function StatusSection(props: StatusSectionProperties)
 
+  local colors = useStudioColors();
   local viewingPriority = useViewingPriority(props.dialogueParent);
 
   return React.createElement("TextLabel", {
     LayoutOrder = 3;
     Text = `Viewing {if viewingPriority == "" then "the beginning of the conversation" else viewingPriority}`;
-    TextColor3 = Colors.text;
+    TextColor3 = colors.text;
     BorderSizePixel = 0;
     BackgroundTransparency = 1;
     TextSize = 14;

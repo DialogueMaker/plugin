@@ -1,10 +1,10 @@
 --!strict
 local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
 local Dropdown = require(script.Dropdown);
 local useDialogueContainer = require(script.useDialogueContainer);
 local DropdownOption = require(script.DropdownOption);
+local useStudioColors = require(root.useStudioColors);
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
@@ -19,6 +19,8 @@ export type DialogueItemProperties = {
 }
 
 local function DialogueItem(props: DialogueItemProperties)
+
+  local colors = useStudioColors();
 
   local showDeletionConfirmation, setShowDeletionConfirmation = React.useState(false);
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
@@ -59,7 +61,7 @@ local function DialogueItem(props: DialogueItemProperties)
       end
 
     end;
-    BackgroundColor3 = if isResponse then Colors.backgroundResponse else Colors.backgroundRedirect;
+    BackgroundColor3 = if isResponse then colors.backgroundResponse else colors.backgroundRedirect;
     BackgroundTransparency = if isResponse or isRedirect then 0.4 else 1;
     BorderSizePixel = 0;
     ZIndex = props.zIndex;
@@ -70,7 +72,7 @@ local function DialogueItem(props: DialogueItemProperties)
       ZIndex = 2;
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 0.5;
-      BackgroundColor3 = Colors.backgroundDeletionFrame;
+      BackgroundColor3 = colors.backgroundDeletionFrame;
       BorderSizePixel = 0;
     }, {
       UIListLayout = React.createElement("UIListLayout", {
@@ -84,17 +86,17 @@ local function DialogueItem(props: DialogueItemProperties)
         BackgroundTransparency = 1;
         LayoutOrder = 1;
         Text = "Delete?";
-        TextColor3 = Colors.text;
+        TextColor3 = colors.text;
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Bold);
         AutomaticSize = Enum.AutomaticSize.XY;
         TextSize = 16;
       });
       ConfirmButton = React.createElement("TextButton", {
         LayoutOrder = 2;
-        BackgroundColor3 = Colors.backgroundWarning;
+        BackgroundColor3 = colors.backgroundWarning;
         Text = "Yes";
         TextSize = 16;
-        TextColor3 = Colors.text;
+        TextColor3 = colors.text;
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
         BorderSizePixel = 0;
         AutomaticSize = Enum.AutomaticSize.XY;
@@ -114,7 +116,7 @@ local function DialogueItem(props: DialogueItemProperties)
         BackgroundTransparency = 1;
         LayoutOrder = 3;
         Text = "No";
-        TextColor3 = Colors.text;
+        TextColor3 = colors.text;
         TextSize = 16;
         FontFace = Font.fromId(11702779517, Enum.FontWeight.Regular);
         AutomaticSize = Enum.AutomaticSize.XY;
@@ -144,8 +146,8 @@ local function DialogueItem(props: DialogueItemProperties)
       PriorityTextBox = React.createElement(if showDeletionConfirmation then "TextLabel" else "TextBox", {
         Text = props.priority;
         PlaceholderText = if showDeletionConfirmation then nil else props.priority;
-        TextColor3 = Colors.text;
-        PlaceholderColor3 = if showDeletionConfirmation then nil else Colors.textPlaceholder;
+        TextColor3 = colors.text;
+        PlaceholderColor3 = if showDeletionConfirmation then nil else colors.textPlaceholder;
         LayoutOrder = 1;
         Size = UDim2.new(0, 60, 1, 0);
         BackgroundTransparency = 1;

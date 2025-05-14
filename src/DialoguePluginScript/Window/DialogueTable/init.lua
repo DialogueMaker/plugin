@@ -1,9 +1,9 @@
 --!strict
 local root = script.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
 local DialogueTableHeader = require(script.DialogueTableHeader);
 local DialogueTableBody = require(script.DialogueTableBody);
+local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableProperties = {
   isDeleteModeEnabled: boolean;
@@ -13,6 +13,8 @@ export type DialogueTableProperties = {
 }
 
 local function DialogueTable(props: DialogueTableProperties)
+
+  local colors = useStudioColors();
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 1, 0);
@@ -25,6 +27,12 @@ local function DialogueTable(props: DialogueTableProperties)
     });
     UIFlexItem = React.createElement("UIFlexItem", {
       FlexMode = Enum.UIFlexMode.Shrink;
+    });
+    TopBorder = React.createElement("Frame", {
+      LayoutOrder = 1;
+      Size = UDim2.new(1, 0, 0, 1);
+      BackgroundColor3 = colors.border;
+      BorderSizePixel = 0;
     });
     DialogueTableHeader = React.createElement(DialogueTableHeader);
     DialogueTableBody = React.createElement(DialogueTableBody, {

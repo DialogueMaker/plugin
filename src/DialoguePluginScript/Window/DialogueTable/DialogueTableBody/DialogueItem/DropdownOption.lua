@@ -2,6 +2,7 @@
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
 local Colors = require(root.Colors);
+local useStudioColors = require(root.useStudioColors);
 
 export type DropdownOptionProperties = {
   layoutOrder: number;
@@ -11,6 +12,8 @@ export type DropdownOptionProperties = {
 }
 
 local function DropdownOption(props: DropdownOptionProperties)
+
+  local colors = useStudioColors();
 
   return React.createElement("TextButton", {
     LayoutOrder = 1;
@@ -48,7 +51,7 @@ local function DropdownOption(props: DropdownOptionProperties)
       FontFace = Font.fromId(11702779517);
       BackgroundTransparency = 1;
       TextSize = 14;
-      TextColor3 = Colors.text;
+      TextColor3 = colors.text;
     });
   });
 

@@ -1,7 +1,7 @@
 --!strict
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
+local useStudioColors = require(root.useStudioColors);
 
 export type DropdownProps = {
   text: string?;
@@ -17,6 +17,8 @@ export type DropdownProps = {
 
 local function Dropdown(props: DropdownProps)
 
+  local colors = useStudioColors();
+
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
     Size = props.size;
@@ -31,7 +33,7 @@ local function Dropdown(props: DropdownProps)
     ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
       Size = UDim2.new(1, 0, 1, 0);
-      BackgroundColor3 = Color3.fromRGB(70, 70, 70);
+      BackgroundColor3 = colors.dropdownButton;
       [React.Event.Activated] = if props.isDisabled then nil else function()
 
         props.setIsOpen(not props.isOpen);
@@ -54,11 +56,11 @@ local function Dropdown(props: DropdownProps)
         LayoutOrder = 1;
         Text = props.text;
         TextXAlignment = if props.text == "" then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left;
-        TextColor3 = Colors.text;
+        TextColor3 = colors.text;
         FontFace = Font.fromId(11702779517);
         TextSize = 14;
       });
-      DropdownIconLabel = React.createElement("ImageLabel", {
+      DropdownArrowIconLabel = React.createElement("ImageLabel", {
         LayoutOrder = 2;
         Image = "rbxassetid://14098646461";
         Size = UDim2.new(0, 20, 0, 20);

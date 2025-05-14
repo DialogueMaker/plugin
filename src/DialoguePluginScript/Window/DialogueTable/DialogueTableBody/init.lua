@@ -1,8 +1,8 @@
 --!strict
 local root = script.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
 local DialogueItem = require(script.DialogueItem);
+local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;
@@ -12,6 +12,8 @@ export type DialogueTableBodyProperties = {
 }
 
 local function DialogueTableBody(props: DialogueTableBodyProperties)
+
+  local colors = useStudioColors();
 
   local dialogueParent = props.dialogueParent;
   local isDeleteModeEnabled = props.isDeleteModeEnabled;
@@ -108,9 +110,9 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
   end, {dialogueParent :: any, isDeleteModeEnabled});
 
   return React.createElement("ScrollingFrame", {
-    LayoutOrder = 2;
+    LayoutOrder = 3;
     Size = UDim2.new(1, 0, 1, 0);
-    BackgroundColor3 = Colors.backgroundTableRow;
+    BackgroundColor3 = colors.backgroundTableRow;
     BorderSizePixel = 0;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
     CanvasSize = UDim2.new(0, 0, 0, 0);

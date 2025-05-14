@@ -1,7 +1,8 @@
 --!strict
 local root = script.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
+local useStudioColors = require(root.useStudioColors);
+local TweenService = game:GetService("TweenService");
 
 export type ToolbarButtonProps = {
   iconImage: string;
@@ -14,11 +15,26 @@ export type ToolbarButtonProps = {
 
 local function ToolbarButton(props: ToolbarButtonProps)
 
+  local colors = useStudioColors();
+  local buttonRef = React.useRef(nil);
+  local isUserHovering, setIsUserHovering = React.useState(false);
+
+  React.useEffect(function()
+  
+    if buttonRef.current then
+      local tween = TweenService:Create(buttonRef.current, TweenInfo.new(0.2), {
+        BackgroundTransparency = if isUserHovering and not props.isDisabled then 0 elseif props.isHighlighted then 0.5 else 1;
+      });
+      tween:Play();
+    end
+
+  end, {isUserHovering :: unknown, props.isHighlighted, props.isDisabled});
+
   return React.createElement("TextButton", {
     LayoutOrder = props.layoutOrder;
-    BackgroundTransparency = 0;
-    BackgroundColor3 = if props.isHighlighted then Colors.backgroundWarning else Color3.fromRGB(74, 74, 74);
-    AutoButtonColor = not props.isDisabled;
+    BackgroundColor3 = if props.isHighlighted then colors.backgroundWarning else colors.toolbarButton;
+    AutoButtonColor = false;
+    ref = buttonRef;
     Text = "";
     Size = UDim2.new(0, 0, 0, 0);
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -30,6 +46,16 @@ local function ToolbarButton(props: ToolbarButtonProps)
         props.onClick();
 
       end;
+
+    end;
+    [React.Event.MouseEnter] = function()
+
+      setIsUserHovering(true);
+
+    end;
+    [React.Event.MouseLeave] = function()
+
+      setIsUserHovering(false);
 
     end;
   }, {
@@ -48,7 +74,7 @@ local function ToolbarButton(props: ToolbarButtonProps)
       BackgroundTransparency = 1;
       Image = props.iconImage;
       Size = UDim2.new(0, 24, 0, 24);
-      ImageColor3 = if props.isDisabled then Colors.textDisabled else Colors.text;
+      ImageColor3 = if props.isDisabled then colors.textDisabled else colors.text;
     });
     TextLabel = React.createElement("TextLabel", {
       LayoutOrder = 2;
@@ -57,8 +83,11 @@ local function ToolbarButton(props: ToolbarButtonProps)
       TextSize = 12;
       Size = UDim2.new(0, 0, 1, 0);
       AutomaticSize = Enum.AutomaticSize.X;
-      TextColor3 = if props.isDisabled then Colors.textDisabled else Colors.text;
+      TextColor3 = if props.isDisabled then colors.textDisabled else colors.text;
       FontFace = Font.fromId(11702779517);
+    });
+    UICorner = React.createElement("UICorner", {
+      CornerRadius = UDim.new(0, 5);
     });
   });
 

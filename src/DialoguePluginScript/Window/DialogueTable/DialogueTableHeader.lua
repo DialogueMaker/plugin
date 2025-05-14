@@ -1,13 +1,15 @@
 --!strict
 local root = script.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
+local useStudioColors = require(root.useStudioColors);
 
 local function DialogueTableHeader()
 
+  local colors = useStudioColors();
+
   return React.createElement("Frame", {
-    LayoutOrder = 1;
-    BackgroundColor3 = Color3.fromRGB(57, 57, 57);
+    LayoutOrder = 2;
+    BackgroundTransparency = 1;
     Size = UDim2.new(1, 0, 0, 22);
     BorderSizePixel = 0;
   }, {
@@ -20,23 +22,23 @@ local function DialogueTableHeader()
       LayoutOrder = 1;
       Text = "Priority";
       BorderSizePixel = 0;
-      BackgroundColor3 = Colors.backgroundTableHeader;
+      BackgroundTransparency = 1;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0, 60, 1, 0);
       TextSize = 14;
-      TextColor3 = Colors.text;
+      TextColor3 = colors.text;
       TextXAlignment = Enum.TextXAlignment.Center;
     });
     TypeTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 2;
       BorderSizePixel = 0;
-      BackgroundColor3 = Colors.backgroundTableHeader;
       Text = "Type";
+      BackgroundTransparency = 1;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0, 0, 1, 0);
       AutomaticSize = Enum.AutomaticSize.X;
       TextSize = 14;
-      TextColor3 = Colors.text;
+      TextColor3 = colors.text;
       TextXAlignment = Enum.TextXAlignment.Left;
     }, {
       UIFlexItem = React.createElement("UIFlexItem", {
@@ -51,11 +53,11 @@ local function DialogueTableHeader()
       LayoutOrder = 4;
       Text = "Connections";
       BorderSizePixel = 0;
-      BackgroundColor3 = Colors.backgroundTableHeader;
+      BackgroundTransparency = 1;
       FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
       Size = UDim2.new(0, 90, 1, 0);
       TextSize = 14;
-      TextColor3 = Colors.text;
+      TextColor3 = colors.text;
       TextXAlignment = Enum.TextXAlignment.Center;
     });
   })
