@@ -27,6 +27,7 @@ local colors: {[string]: ColorDictionary} = {
     toolbar = Color3.fromRGB(74, 74, 74);
     toolbarButton = Color3.fromRGB(74, 74, 74);
     border = Color3.fromRGB(34, 34, 34);
+    dropdownButton = Color3.fromRGB(201, 201, 201);
   };
   Light = {
     backgroundResponse = Color3.fromRGB(30, 103, 19);
@@ -37,10 +38,11 @@ local colors: {[string]: ColorDictionary} = {
     backgroundTableRow = Color3.fromRGB(255, 255, 255);
     text = Color3.new(0, 0, 0);
     textDisabled = Color3.fromRGB(145, 145, 145);
-    textPlaceholder = Color3.fromRGB(155, 155, 155);
+    textPlaceholder = Color3.fromRGB(85, 85, 85);
     toolbar = Color3.fromRGB(227, 227, 227);
     toolbarButton = Color3.fromRGB(201, 201, 201);
     border = Color3.fromRGB(227, 227, 227);
+    dropdownButton = Color3.fromRGB(201, 201, 201);
   };
 };
 

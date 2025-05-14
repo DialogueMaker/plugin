@@ -28,12 +28,11 @@ local function Dropdown(props: DropdownProps)
     Children = React.createElement(React.Fragment, {}, {props.toggleButtonChildren});
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
-      Padding = UDim.new(0, 5);
     });
     ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
       Size = UDim2.new(1, 0, 1, 0);
-      BackgroundColor3 = colors.dropdownButton;
+      BackgroundTransparency = 1;
       [React.Event.Activated] = if props.isDisabled then nil else function()
 
         props.setIsOpen(not props.isOpen);
@@ -60,14 +59,26 @@ local function Dropdown(props: DropdownProps)
         FontFace = Font.fromId(11702779517);
         TextSize = 14;
       });
-      DropdownArrowIconLabel = React.createElement("ImageLabel", {
-        LayoutOrder = 2;
-        Image = "rbxassetid://14098646461";
-        Size = UDim2.new(0, 20, 0, 20);
+      DropdownArrowIconContainer = React.createElement("Frame", {
         BackgroundTransparency = 1;
+        Size = UDim2.new();
+        AutomaticSize = Enum.AutomaticSize.XY;
+        LayoutOrder = 2;
+      }, {
+        DropdownArrowIconLabel = React.createElement("ImageLabel", {
+          LayoutOrder = 2;
+          Image = "rbxassetid://14098646461";
+          Size = UDim2.new(0, 20, 0, 20);
+          BackgroundTransparency = 1;
+          Rotation = if props.isOpen then 180 else 0;
+          ImageColor3 = colors.text;
+        });
       });
-      UICorner = React.createElement("UICorner", {
-        CornerRadius = UDim.new(0, 15);
+      UIStroke = React.createElement("UIStroke", {
+        Color = colors.border;
+        Thickness = 1;
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        Transparency = if props.isDisabled then 0.5 else 0;
       });
     });
     OptionsFrame = if props.isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
@@ -86,16 +97,24 @@ local function Dropdown(props: DropdownProps)
 
       end;
     }, {
-      UICorner = React.createElement("UICorner", {
-        CornerRadius = UDim.new(0, 15);
-      });
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
+      });
+      UIStroke = React.createElement("UIStroke", {
+        Color = colors.border;
+        Thickness = 1;
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
       });
       Children = React.createElement(React.Fragment, {}, {
         props.children;
       });
     }) else nil;
+    UIPadding = React.createElement("UIPadding", {
+      PaddingTop = UDim.new(0, 1);
+      PaddingBottom = UDim.new(0, 1);
+      PaddingLeft = UDim.new(0, 1);
+      PaddingRight = UDim.new(0, 1);
+    });
   });
 
 end;

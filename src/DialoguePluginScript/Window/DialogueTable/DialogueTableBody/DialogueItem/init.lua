@@ -36,7 +36,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
     if not specialScript then
 
-      local newSpecialScript = script.Parent.Parent.Templates[`{scriptType}Template`]:Clone();
+      local newSpecialScript = root.Templates[`{scriptType}Template`]:Clone();
       newSpecialScript.Name = scriptType;
       newSpecialScript.Parent = contentScript;
       specialScript = newSpecialScript;
@@ -54,7 +54,7 @@ local function DialogueItem(props: DialogueItemProperties)
   return React.createElement("Frame", {
     [React.Event.InputEnded] = function(self: Frame, input: InputObject)
 
-      if input.UserInputType == Enum.UserInputType.MouseButton1 then
+      if isDeleteModeEnabled and input.UserInputType == Enum.UserInputType.MouseButton1 then
 
         setShowDeletionConfirmation(true);
 
@@ -66,7 +66,7 @@ local function DialogueItem(props: DialogueItemProperties)
     BorderSizePixel = 0;
     ZIndex = props.zIndex;
     LayoutOrder = props.layoutOrder;
-    Size = UDim2.new(1, 0, 0, 22);
+    Size = UDim2.new(1, 0, 0, 25);
   }, {
     DeletionConfirmationFrame = if showDeletionConfirmation then React.createElement("Frame", {
       ZIndex = 2;
@@ -231,17 +231,6 @@ local function DialogueItem(props: DialogueItemProperties)
         isOpen = isDialogueTypeDropdownOpen;
         setIsOpen = setIsDialogueTypeDropdownOpen;
       }, {
-        MessageButton = React.createElement(DropdownOption, {
-          onClick = function()
-
-            props.contentScript:SetAttribute("DialogueType", "Message");
-            setIsDialogueTypeDropdownOpen(false);
-
-          end;
-          layoutOrder = 1;
-          text = "Message";
-          iconImage = "rbxassetid://14099768265";
-        });
         RedirectButton = React.createElement(DropdownOption, {
           onClick = function()
 
@@ -249,7 +238,7 @@ local function DialogueItem(props: DialogueItemProperties)
             setIsDialogueTypeDropdownOpen(false);
 
           end;
-          layoutOrder = 2;
+          layoutOrder = 1;
           text = "Redirect";
           iconImage = "rbxassetid://14099768484";
         });
@@ -260,9 +249,20 @@ local function DialogueItem(props: DialogueItemProperties)
             setIsDialogueTypeDropdownOpen(false);
 
           end;
-          layoutOrder = 1;
+          layoutOrder = 2;
           text = "Response";
           iconImage = "rbxassetid://14099769224";
+        });
+        MessageButton = React.createElement(DropdownOption, {
+          onClick = function()
+
+            props.contentScript:SetAttribute("DialogueType", "Message");
+            setIsDialogueTypeDropdownOpen(false);
+
+          end;
+          layoutOrder = 3;
+          text = "Message";
+          iconImage = "rbxassetid://14099768265";
         });
       });
       ConnectionsDropDown = React.createElement(Dropdown, {

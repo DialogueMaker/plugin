@@ -109,23 +109,48 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {dialogueParent :: any, isDeleteModeEnabled});
 
-  return React.createElement("ScrollingFrame", {
-    LayoutOrder = 3;
-    Size = UDim2.new(1, 0, 1, 0);
-    BackgroundColor3 = colors.backgroundTableRow;
-    BorderSizePixel = 0;
-    AutomaticCanvasSize = Enum.AutomaticSize.Y;
-    CanvasSize = UDim2.new(0, 0, 0, 0);
-    ScrollingDirection = Enum.ScrollingDirection.Y;
-  }, {
-    UIListLayout = React.createElement("UIListLayout", {
-      SortOrder = Enum.SortOrder.LayoutOrder;
-    });
-    UIFlexItem = React.createElement("UIFlexItem", {
-      FlexMode = Enum.UIFlexMode.Shrink;
-    });
-    Children = React.createElement(React.Fragment, {}, {dialogueItems});
-  })
+  return if #dialogueItems > 0 then
+    React.createElement("ScrollingFrame", {
+      LayoutOrder = 3;
+      Size = UDim2.new(1, 0, 1, 0);
+      BackgroundColor3 = colors.backgroundTableRow;
+      BorderSizePixel = 0;
+      AutomaticCanvasSize = Enum.AutomaticSize.Y;
+      CanvasSize = UDim2.new(0, 0, 0, 0);
+      ScrollingDirection = Enum.ScrollingDirection.Y;
+    }, {
+      UIListLayout = React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+      });
+      UIFlexItem = React.createElement("UIFlexItem", {
+        FlexMode = Enum.UIFlexMode.Shrink;
+      });
+      Children = React.createElement(React.Fragment, {}, {dialogueItems});
+    })
+  else (
+    React.createElement("Frame", {
+      LayoutOrder = 3;
+      Size = UDim2.fromScale(1, 1);
+      BackgroundTransparency = 1;
+    }, {
+      Message = React.createElement("TextLabel", {
+        AutomaticSize = Enum.AutomaticSize.XY;
+        AnchorPoint = Vector2.new(0.5, 0.5);
+        Position = UDim2.new(0.5, 0, 0.5, 0);
+        Size = UDim2.new();
+        BackgroundTransparency = 1;
+        Text = `No dialogue found. Press the "Add message" button to start.`;
+        TextColor3 = colors.textPlaceholder;
+        FontFace = Font.fromId(11702779517);
+        TextSize = 14;
+        TextXAlignment = Enum.TextXAlignment.Center;
+      }, {
+        UIPadding = React.createElement("UIPadding", {
+          PaddingBottom = UDim.new(0, 22);
+        });
+      })
+    })
+  )
 
 end;
 

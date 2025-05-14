@@ -57,7 +57,9 @@ end;
 -- @since v1.0.0
 local function openDialogueEditor(model: Model): ()
 
-  PluginGui = plugin:CreateDockWidgetPluginGui(`Dialogue Maker - Model "{model.Name}"`, DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150));
+  PluginGui = plugin:CreateDockWidgetPluginGui(
+    `Dialogue Maker - Model "{model.Name}"`, 
+    DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150));
   if PluginGui then
 
     PluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;

@@ -1,7 +1,6 @@
 --!strict
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
-local Colors = require(root.Colors);
 local useStudioColors = require(root.useStudioColors);
 
 export type DropdownOptionProperties = {
@@ -16,9 +15,9 @@ local function DropdownOption(props: DropdownOptionProperties)
   local colors = useStudioColors();
 
   return React.createElement("TextButton", {
-    LayoutOrder = 1;
+    LayoutOrder = props.layoutOrder;
     Size = UDim2.new(1, 0, 0, 25);
-    BackgroundColor3 = Color3.fromRGB(70, 70, 70);
+    BackgroundColor3 = colors.backgroundTableRow;
     Text = "";
     [React.Event.Activated] = function()
 
@@ -38,6 +37,7 @@ local function DropdownOption(props: DropdownOptionProperties)
       Image = props.iconImage;
       Size = UDim2.new(0, 20, 0, 20);
       BackgroundTransparency = 1;
+      ImageColor3 = colors.text;
     }) else nil;
     UIPadding = React.createElement("UIPadding", {
       PaddingLeft = UDim.new(0, 5);
