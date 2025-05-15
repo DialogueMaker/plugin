@@ -7,7 +7,6 @@ local useStudioColors = require(root.useStudioColors);
 export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;
   setDialogueParent: (ModuleScript | Folder) -> ();
-  isDeleteModeEnabled: boolean;
   plugin: Plugin;
 }
 
@@ -16,7 +15,6 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
   local colors = useStudioColors();
 
   local dialogueParent = props.dialogueParent;
-  local isDeleteModeEnabled = props.isDeleteModeEnabled;
   local dialogueItems, setDialogueItems = React.useState({});
   React.useEffect(function()
   
@@ -74,7 +72,6 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             layoutOrder = currentLayoutOrder;
             zIndex = currentZIndex;
             contentScript = childContentScript;
-            isDeleteModeEnabled = isDeleteModeEnabled;
             priority = childContentScript.Name;
             dialogueParent = dialogueParent;
             setDialogueParent = props.setDialogueParent;
@@ -108,7 +105,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
     end;
 
-  end, {dialogueParent :: any, isDeleteModeEnabled});
+  end, {dialogueParent :: any});
 
   return if #dialogueItems > 0 then
     React.createElement("ScrollingFrame", {

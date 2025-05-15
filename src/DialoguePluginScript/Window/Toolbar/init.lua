@@ -10,8 +10,6 @@ type ToolbarProps = {
   setDialogueParent: (ModuleScript | Folder) -> ();
   model: Model;
   repairNPC: () -> ();
-  isDeleteModeEnabled: boolean;
-  setIsDeleteModeEnabled: (boolean) -> ();
   plugin: Plugin;
 }
 
@@ -94,20 +92,6 @@ local function Toolbar(props: ToolbarProps)
 
         local npcDialogueSettingsScript = props.model:FindFirstChild("NPCDialogueSettings") :: Script;
         props.plugin:OpenScript(npcDialogueSettingsScript);
-
-      end;
-    });
-    ToggleDeleteModeButton = React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14099268988";
-      text = "Toggle delete mode";
-      layoutOrder = 4;
-      BackgroundColor3 = if props.isDeleteModeEnabled then Color3.fromRGB(217, 39, 39) else nil;
-      isHighlighted = props.isDeleteModeEnabled;
-      onClick = function()
-    
-        local isDeleteModeEnabled = not props.isDeleteModeEnabled;
-        props.setIsDeleteModeEnabled(isDeleteModeEnabled);
-        print("[Dialogue Maker] " .. if isDeleteModeEnabled then "Warning: Delete Mode has been enabled!" else "Whew. Delete Mode has been disabled.");
 
       end;
     });

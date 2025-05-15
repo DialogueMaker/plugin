@@ -6,7 +6,6 @@ local DialogueTableBody = require(script.DialogueTableBody);
 local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableProperties = {
-  isDeleteModeEnabled: boolean;
   dialogueParent: ModuleScript | Folder;
   setDialogueParent: (ModuleScript | Folder) -> ();
   plugin: Plugin;
@@ -37,7 +36,6 @@ local function DialogueTable(props: DialogueTableProperties)
     DialogueTableHeader = React.createElement(DialogueTableHeader);
     DialogueTableBody = React.createElement(DialogueTableBody, {
       dialogueParent = props.dialogueParent;
-      isDeleteModeEnabled = props.isDeleteModeEnabled;
       setDialogueParent = props.setDialogueParent;
       plugin = props.plugin;
     });

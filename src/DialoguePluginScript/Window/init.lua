@@ -12,7 +12,6 @@ export type WindowProperties = {
 
 local function Window(props: WindowProperties)
 
-  local isDeleteModeEnabled, setIsDeleteModeEnabled = React.useState(false);
   local dialogueParent, setDialogueParent = React.useState(props.model:FindFirstChild("DialogueContainer") :: (ModuleScript | Folder));
 
   return React.createElement("Frame", {
@@ -24,8 +23,6 @@ local function Window(props: WindowProperties)
       Padding = UDim.new(0, 0);
     });
     Toolbar = React.createElement(Toolbar, {
-      isDeleteModeEnabled = isDeleteModeEnabled;
-      setIsDeleteModeEnabled = setIsDeleteModeEnabled;
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
       plugin = props.plugin;
@@ -33,7 +30,6 @@ local function Window(props: WindowProperties)
       model = props.model;
     });
     DialogueTable = React.createElement(DialogueTable, {
-      isDeleteModeEnabled = isDeleteModeEnabled;
       dialogueParent = dialogueParent;
       setDialogueParent = setDialogueParent;
       plugin = props.plugin;
