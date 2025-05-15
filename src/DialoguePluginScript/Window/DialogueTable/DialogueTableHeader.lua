@@ -29,6 +29,17 @@ local function DialogueTableHeader()
       TextColor3 = colors.text;
       TextXAlignment = Enum.TextXAlignment.Center;
     });
+    LabelTextLabel = React.createElement("TextLabel", {
+      LayoutOrder = 1;
+      Text = "Label";
+      BorderSizePixel = 0;
+      BackgroundTransparency = 1;
+      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
+      Size = UDim2.new(0, 100, 1, 0);
+      TextSize = 14;
+      TextColor3 = colors.text;
+      TextXAlignment = Enum.TextXAlignment.Left;
+    });
     TypeTextLabel = React.createElement("TextLabel", {
       LayoutOrder = 2;
       BorderSizePixel = 0;
@@ -48,17 +59,6 @@ local function DialogueTableHeader()
         PaddingLeft = UDim.new(0, 5);
         PaddingRight = UDim.new(0, 5);
       });
-    });
-    ConnectionsTextLabel = React.createElement("TextLabel", {
-      LayoutOrder = 4;
-      Text = "Connections";
-      BorderSizePixel = 0;
-      BackgroundTransparency = 1;
-      FontFace = Font.fromId(11702779517, Enum.FontWeight.Medium);
-      Size = UDim2.new(0, 90, 1, 0);
-      TextSize = 14;
-      TextColor3 = colors.text;
-      TextXAlignment = Enum.TextXAlignment.Center;
     });
   })
 

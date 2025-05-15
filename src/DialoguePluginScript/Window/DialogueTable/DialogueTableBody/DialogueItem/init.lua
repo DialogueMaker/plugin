@@ -1,4 +1,7 @@
 --!strict
+local ChangeHistoryService = game:GetService("ChangeHistoryService");
+local Selection = game:GetService("Selection");
+
 local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
 local Dropdown = require(script.Dropdown);
@@ -29,27 +32,25 @@ local function DialogueItem(props: DialogueItemProperties)
   local dialogueContainer = useDialogueContainer(props.dialogueParent);
   local contentScript = props.contentScript;
 
-  local function openSpecialScript(scriptType: "Action" | "Condition"): ()
+  local isResponse = props.type == "Response";
+  local isRedirect = props.type == "Redirect";
 
-    -- Create a special script if necessary.
-    local specialScript = contentScript:FindFirstChild(scriptType) :: ModuleScript?;
+  local labelName, setLabelName = React.useState(contentScript:GetAttribute("Label") or "");
+  React.useEffect(function()
 
-    if not specialScript then
+    local changedSignal = contentScript:GetAttributeChangedSignal("Label"):Connect(function()
 
-      local newSpecialScript = root.Templates[`{scriptType}Template`]:Clone();
-      newSpecialScript.Name = scriptType;
-      newSpecialScript.Parent = contentScript;
-      specialScript = newSpecialScript;
+      setLabelName(contentScript:GetAttribute("Label") or "");
+
+    end);
+
+    return function()
+
+      changedSignal:Disconnect();
 
     end;
 
-    -- Open the condition script
-    props.plugin:OpenScript(specialScript :: ModuleScript);
-
-  end;
-
-  local isResponse = props.type == "Response";
-  local isRedirect = props.type == "Redirect";
+  end, {contentScript});
 
   return React.createElement("Frame", {
     [React.Event.InputEnded] = function(self: Frame, input: InputObject)
@@ -102,7 +103,9 @@ local function DialogueItem(props: DialogueItemProperties)
         AutomaticSize = Enum.AutomaticSize.XY;
         [React.Event.Activated] = function()
 
+          ChangeHistoryService:TryBeginRecording("Delete dialogue item");
           contentScript:Destroy();
+          ChangeHistoryService:FinishRecording("Delete dialogue item");
           setShowDeletionConfirmation(false);
 
         end;
@@ -150,7 +153,9 @@ local function DialogueItem(props: DialogueItemProperties)
         PlaceholderColor3 = if showDeletionConfirmation then nil else colors.textPlaceholder;
         LayoutOrder = 1;
         Size = UDim2.new(0, 60, 1, 0);
+        FontFace = Font.fromId(11702779517);
         BackgroundTransparency = 1;
+        TextSize = 14;
         [React.Event.FocusLost] = if showDeletionConfirmation then nil else function(self)
 
           -- Make sure the priority is valid
@@ -218,8 +223,26 @@ local function DialogueItem(props: DialogueItemProperties)
 
         end;
       });
+      LabelTextBox = React.createElement("TextBox", {
+        Text = labelName;
+        PlaceholderText = "Unlabeled";
+        TextColor3 = colors.text;
+        PlaceholderColor3 = colors.textPlaceholder;
+        LayoutOrder = 2;
+        Size = UDim2.new(0, 100, 1, 0);
+        FontFace = Font.fromId(11702779517);
+        BackgroundTransparency = 1;
+        TextSize = 14;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        ClearTextOnFocus = false;
+        [React.Change.Text] = function(self)
+          
+          contentScript:SetAttribute("Label", if self.Text == "" then nil else self.Text);
+
+        end;
+      });
       DialogueTypeDropdown = React.createElement(Dropdown, {
-        layoutOrder = 2;
+        layoutOrder = 3;
         size = UDim2.new(0, 0, 1, 0);
         text = props.type;
         isDisabled = isDeleteModeEnabled;
@@ -234,7 +257,16 @@ local function DialogueItem(props: DialogueItemProperties)
         RedirectButton = React.createElement(DropdownOption, {
           onClick = function()
 
-            props.contentScript:SetAttribute("DialogueType", "Redirect");
+            contentScript:SetAttribute("DialogueType", "Redirect");
+
+            if not contentScript:FindFirstChild("Redirect") then
+
+              local redirect = Instance.new("ObjectValue");
+              redirect.Name = "Redirect";
+              redirect.Parent = contentScript;
+
+            end;
+
             setIsDialogueTypeDropdownOpen(false);
 
           end;
@@ -245,7 +277,14 @@ local function DialogueItem(props: DialogueItemProperties)
         ResponseButton = React.createElement(DropdownOption, {
           onClick = function()
 
-            props.contentScript:SetAttribute("DialogueType", "Response");
+            local redirect = contentScript:FindFirstChild("Redirect");
+            if redirect then
+
+              redirect:Destroy();
+
+            end;
+
+            contentScript:SetAttribute("DialogueType", "Response");
             setIsDialogueTypeDropdownOpen(false);
 
           end;
@@ -256,7 +295,14 @@ local function DialogueItem(props: DialogueItemProperties)
         MessageButton = React.createElement(DropdownOption, {
           onClick = function()
 
-            props.contentScript:SetAttribute("DialogueType", "Message");
+            local redirect = contentScript:FindFirstChild("Redirect");
+            if redirect then
+
+              redirect:Destroy();
+
+            end;
+
+            contentScript:SetAttribute("DialogueType", "Message");
             setIsDialogueTypeDropdownOpen(false);
 
           end;
@@ -265,17 +311,17 @@ local function DialogueItem(props: DialogueItemProperties)
           iconImage = "rbxassetid://14099768265";
         });
       });
-      ConnectionsDropDown = React.createElement(Dropdown, {
-        text = "View";
-        layoutOrder = 3;
-        size = UDim2.new(0, 90, 1, 0);
+      OptionsDropDown = React.createElement(Dropdown, {
+        text = "Options";
+        layoutOrder = 4;
+        size = UDim2.new(0, 120, 1, 0);
         isDisabled = isDeleteModeEnabled;
         isOpen = isConnectionsDropdownOpen;
         setIsOpen = setIsConnectionsDropdownOpen;
       }, {
-        ViewContentButton = React.createElement(DropdownOption, {
+        ConfigureButton = React.createElement(DropdownOption, {
           layoutOrder = 1;
-          text = "Content";
+          text = "Configure";
           onClick = function()
   
             props.plugin:OpenScript(props.contentScript);
@@ -285,7 +331,7 @@ local function DialogueItem(props: DialogueItemProperties)
         });
         ViewChildrenButton = if isRedirect then nil else React.createElement(DropdownOption, {
           layoutOrder = 2;
-          text = "Children";
+          text = "View children";
           onClick = function()
   
             props.setDialogueParent(props.contentScript);
@@ -293,26 +339,16 @@ local function DialogueItem(props: DialogueItemProperties)
   
           end;
         });
-        ConditionButton = React.createElement(DropdownOption, {
+        SelectButton = React.createElement(DropdownOption, {
           layoutOrder = 3;
-          text = "Condition";
+          text = "Show in Explorer";
           onClick = function()
-
-            openSpecialScript("Condition");
+  
+            Selection:Set({props.contentScript});
             setIsConnectionsDropdownOpen(false);
-
+  
           end;
-        }, {});
-        ActionButton = if isRedirect or isResponse then nil else React.createElement(DropdownOption, {
-          layoutOrder = 4;
-          text = "Action";
-          onClick = function()
-
-            openSpecialScript("Action");
-            setIsConnectionsDropdownOpen(false);
-
-          end;
-        }, {});
+        });
       });
     });
   })

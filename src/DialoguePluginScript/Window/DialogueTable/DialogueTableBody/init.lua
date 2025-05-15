@@ -79,6 +79,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
             dialogueParent = dialogueParent;
             setDialogueParent = props.setDialogueParent;
             plugin = props.plugin;
+            key = childContentScript:GetDebugId();
           });
 
           table.insert(dialogueItems, dialogueItem);

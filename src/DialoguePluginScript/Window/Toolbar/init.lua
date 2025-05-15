@@ -62,7 +62,7 @@ local function Toolbar(props: ToolbarProps)
         end;
         
         -- Create the content script.
-        local MessageContentScript = script.Parent.Parent.Templates.ContentTemplate:Clone();
+        local MessageContentScript = script.Parent.Parent.Templates.DialogueTemplate:Clone();
         MessageContentScript.Name = targetPriority;
         MessageContentScript:SetAttribute("DialogueType", "Message");
         MessageContentScript.Parent = dialogueParent;
