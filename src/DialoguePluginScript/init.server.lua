@@ -10,16 +10,32 @@ local ReactRoblox = require(script.Packages["react-roblox"]);
 local Window = require(script.Window);
 
 local EditDialogueButton: PluginToolbarButton;
-local isDialogueEditorOpen = false;
 local PluginGui: DockWidgetPluginGui?;
+
+local function getSelectedModel(): Model?
+
+  local selectedObjects = Selection:Get();
+  if #selectedObjects ~= 1 then return nil; end;
+  
+  local model = selectedObjects[1];
+  if not model:IsA("Model") then return nil; end;
+  
+  return model;
+
+end;
 
 -- Closes the editor when called
 -- @since v1.0.0
 local function closeDialogueEditor(): ()
 
-  if PluginGui then PluginGui:Destroy(); end;
+  if PluginGui then 
+
+    PluginGui:Destroy();
+    PluginGui = nil;
+
+  end;
   EditDialogueButton:SetActive(false);
-  isDialogueEditorOpen = false;
+  EditDialogueButton.Enabled = getSelectedModel() ~= nil;
 
 end;
 
@@ -88,7 +104,7 @@ local themeName = settings().Studio.Theme.Name;
 EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", Icons[themeName].editDialogueButton);
 EditDialogueButton.Click:Connect(function()
 
-  if isDialogueEditorOpen then
+  if PluginGui then
     
     closeDialogueEditor();
     return;
@@ -100,12 +116,12 @@ EditDialogueButton.Click:Connect(function()
     
     -- Check if the user is selecting an object.
     local SelectedObjects = Selection:Get();
-    assert(#SelectedObjects ~= 0, "You didn't select an object.");
-    assert(#SelectedObjects == 1, "You must select one object; not multiple objects.");
+    assert(#SelectedObjects ~= 0, "You didn't select an model.");
+    assert(#SelectedObjects == 1, "You must select one model; not multiple models.");
 
     -- Check if the model has a part
     model = SelectedObjects[1]
-    assert(model:IsA("Model"), `You must select a Model, not a {model.ClassName}.`);
+    assert(model:IsA("Model"), `You must select a model, not a {model.ClassName}.`);
 
     local ModelHasPart = false;
     for _, object in model:GetChildren() do
@@ -145,10 +161,17 @@ EditDialogueButton.Click:Connect(function()
   end;
 
   -- Now we can open the dialogue editor.
+  EditDialogueButton:SetActive(true);
   openDialogueEditor(model);
 
 end);
-EditDialogueButton:SetActive(isDialogueEditorOpen);
+EditDialogueButton:SetActive(PluginGui ~= nil);
+
+Selection.SelectionChanged:Connect(function()
+
+  EditDialogueButton.Enabled = PluginGui ~= nil or getSelectedModel() ~= nil;
+
+end);
 
 local ResetScriptsButton = Toolbar:CreateButton("Fix Scripts", "Reset DialogueMakerSharedDependencies and DialogueClientScript back to the a stable version.", Icons[themeName].resetScriptsButton);
 ResetScriptsButton.Click:Connect(function()

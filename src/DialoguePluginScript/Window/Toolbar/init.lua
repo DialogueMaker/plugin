@@ -72,11 +72,13 @@ local function Toolbar(props: ToolbarProps)
           
         end;
         
+        -- TODO: Fix crash
+
         -- Create the content script.
-        local MessageContentScript = script.Parent.Parent.Templates.DialogueTemplate:Clone();
-        MessageContentScript.Name = targetPriority;
-        MessageContentScript:SetAttribute("DialogueType", "Message");
-        MessageContentScript.Parent = dialogueParent;
+        local newContentScript = script.Parent.Parent.Templates.DialogueTemplate:Clone();
+        newContentScript.Name = targetPriority;
+        newContentScript:SetAttribute("DialogueType", "Message");
+        newContentScript.Parent = dialogueParent;
 
         ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
 
