@@ -442,7 +442,8 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
 
   while DialogueModule.isPlayerTalkingWithNPC and task.wait() do
 
-    local contentScript = parent:FindFirstChild(priorities[priorityIndex]);
+    local priority = priorities[priorityIndex];
+    local contentScript = if priority then parent:FindFirstChild(priority) else nil;
     if not contentScript then
 
       -- No more content scripts available. Let's free the player.
@@ -512,11 +513,10 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
             dialogue:runAction();
   
             -- Check if there is more dialogue.
-            local hasPossibleDialogue = false;
             parent = if selectedResponseContentScript then selectedResponseContentScript else contentScript;
             updatePriorities();
   
-            if DialogueModule.isPlayerTalkingWithNPC and hasPossibleDialogue then
+            if DialogueModule.isPlayerTalkingWithNPC then
   
               priorityIndex = 1;
   
