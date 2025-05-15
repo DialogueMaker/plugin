@@ -16,7 +16,7 @@ local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
 local useDynamicSize = require(ReactHooks.useDynamicSize);
 local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.Types);
+local Types = require(DialogueClientScript.types);
 type ThemeProperties = Types.ThemeProperties;
 
 local skipPageEvent = Instance.new("BindableEvent");

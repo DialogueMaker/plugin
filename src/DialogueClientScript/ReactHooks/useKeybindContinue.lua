@@ -2,7 +2,7 @@
 local React = require(script.Parent.Parent.Packages.react);
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
-local Types = require(script.Parent.Parent.Types);
+local Types = require(script.Parent.Parent.types);
 type ClientSettings = Types.ClientSettings;
 
 function useKeybindContinue(clientSettings: ClientSettings, continueDialogueFunction: () -> ())

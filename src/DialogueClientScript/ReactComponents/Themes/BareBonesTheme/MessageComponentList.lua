@@ -1,7 +1,7 @@
 --!strict
 local React = require(script.Parent.Parent.Parent.Parent.Packages.react);
-local Types = require(script.Parent.Parent.Parent.Parent.Types);
-type Page = Types.Page;
+local Types = require(script.Parent.Parent.Parent.Parent.types);
+type Page = types.Page;
 type NPCSettings = Types.NPCSettings;
 
 export type useMessageComponentsProps = {

@@ -14,7 +14,7 @@ local api = {
 };
 local clientSettings = require(script.Settings);
 
-local Types = require(script.Types);
+local Types = require(script.types);
 local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   
   -- Make sure we can't talk to another NPC

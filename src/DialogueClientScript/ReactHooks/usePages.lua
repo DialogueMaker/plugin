@@ -1,7 +1,7 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
 local DialogueAPI = require(script.Parent.Parent.API.Dialogue);
-local Types = require(script.Parent.Parent.Types);
+local Types = require(script.Parent.Parent.types);
 type Page = Types.Page;
 
 local function usePages(dialogueContentArray, textContainerRef: any)

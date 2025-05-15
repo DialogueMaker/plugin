@@ -1,6 +1,6 @@
 --!strict
 local React = require(script.Parent.Parent.Packages.react);
-local Types = require(script.Parent.Parent.Types);
+local Types = require(script.Parent.Parent.types);
 local Player = game:GetService("Players").LocalPlayer;
 local TweenService = game:GetService("TweenService");
 type ClientSettings = Types.ClientSettings;

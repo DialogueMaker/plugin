@@ -1,5 +1,5 @@
 --!strict
-local Types = require(script.Parent.Parent.Types);
+local Types = require(script.Parent.Parent.types);
 type Page = Types.Page;
 
 export type ContinueDialogueProperties = {

@@ -443,7 +443,12 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
   while DialogueModule.isPlayerTalkingWithNPC and task.wait() do
 
     local contentScript = parent:FindFirstChild(priorities[priorityIndex]);
-    assert(contentScript and contentScript:IsA("ModuleScript"), "[Dialogue Maker] Content script not found.");
+    if not contentScript then
+
+      -- No more content scripts available. Let's free the player.
+      break;
+
+    end
 
     local dialogueType = contentScript:GetAttribute("DialogueType");
     local dialogue = require(contentScript) :: types.Dialogue;
@@ -551,9 +556,7 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
 
       -- There is a message; however, the player failed the condition.
       -- Let's check if there's something else available.
-      local SplitPriority = currentDialoguePriority:split(".");
-      SplitPriority[#SplitPriority] = tostring(tonumber(SplitPriority[#SplitPriority]) :: number + 1);
-      currentDialoguePriority = table.concat(SplitPriority, ".");
+      priorityIndex += 1;
 
     end;
 

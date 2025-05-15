@@ -1,5 +1,5 @@
 --!strict
-local Types = require(script.Parent.Types);
+local Types = require(script.Parent.types);
 type ClientSettings = Types.ClientSettings;
 
 local Settings: ClientSettings = {
