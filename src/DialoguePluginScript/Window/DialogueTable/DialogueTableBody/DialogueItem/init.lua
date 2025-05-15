@@ -103,9 +103,17 @@ local function DialogueItem(props: DialogueItemProperties)
         AutomaticSize = Enum.AutomaticSize.XY;
         [React.Event.Activated] = function()
 
-          ChangeHistoryService:TryBeginRecording("Delete dialogue item");
-          contentScript:Destroy();
-          ChangeHistoryService:FinishRecording("Delete dialogue item");
+          local identifier = ChangeHistoryService:TryBeginRecording("Delete dialogue item");
+          if ChangeHistoryService:IsRecordingInProgress(identifier) then
+
+            ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+            identifier = ChangeHistoryService:TryBeginRecording("Delete dialogue item");
+            assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+
+          end;
+
+          contentScript.Parent = nil;
+          ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
           setShowDeletionConfirmation(false);
 
         end;
@@ -257,6 +265,15 @@ local function DialogueItem(props: DialogueItemProperties)
         RedirectButton = React.createElement(DropdownOption, {
           onClick = function()
 
+            local identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to redirect");
+            if ChangeHistoryService:IsRecordingInProgress(identifier) then
+
+              ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+              identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to redirect");
+              assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+
+            end;
+
             contentScript:SetAttribute("DialogueType", "Redirect");
 
             if not contentScript:FindFirstChild("Redirect") then
@@ -266,6 +283,8 @@ local function DialogueItem(props: DialogueItemProperties)
               redirect.Parent = contentScript;
 
             end;
+
+            ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
 
             setIsDialogueTypeDropdownOpen(false);
 
@@ -277,14 +296,24 @@ local function DialogueItem(props: DialogueItemProperties)
         ResponseButton = React.createElement(DropdownOption, {
           onClick = function()
 
+            local identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to response");
+            if ChangeHistoryService:IsRecordingInProgress(identifier) then
+
+              ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+              identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to response");
+              assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+
+            end;
+
             local redirect = contentScript:FindFirstChild("Redirect");
             if redirect then
 
-              redirect:Destroy();
+              redirect.Parent = nil;
 
             end;
 
             contentScript:SetAttribute("DialogueType", "Response");
+            ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
             setIsDialogueTypeDropdownOpen(false);
 
           end;
@@ -295,14 +324,24 @@ local function DialogueItem(props: DialogueItemProperties)
         MessageButton = React.createElement(DropdownOption, {
           onClick = function()
 
+            local identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to message");
+            if ChangeHistoryService:IsRecordingInProgress(identifier) then
+
+              ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+              identifier = ChangeHistoryService:TryBeginRecording("Convert dialogue item to message");
+              assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+
+            end;
+
             local redirect = contentScript:FindFirstChild("Redirect");
             if redirect then
 
-              redirect:Destroy();
+              redirect.Parent = nil;
 
             end;
 
             contentScript:SetAttribute("DialogueType", "Message");
+            ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
             setIsDialogueTypeDropdownOpen(false);
 
           end;

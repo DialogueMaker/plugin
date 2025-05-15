@@ -1,4 +1,6 @@
 --!strict
+local ChangeHistoryService = game:GetService("ChangeHistoryService");
+
 local React = require(script.Parent.Parent.Packages.react);
 local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(script.Parent.Parent.useStudioColors);
@@ -45,6 +47,15 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 2;
       onClick = function()
 
+        local identifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
+        if ChangeHistoryService:IsRecordingInProgress(identifier) then
+
+          ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+          identifier = ChangeHistoryService:TryBeginRecording("Delete dialogue item");
+          assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+
+        end;
+
         -- Ensure the NPC is properly configured.
         props.repairNPC();
 
@@ -66,6 +77,8 @@ local function Toolbar(props: ToolbarProps)
         MessageContentScript.Name = targetPriority;
         MessageContentScript:SetAttribute("DialogueType", "Message");
         MessageContentScript.Parent = dialogueParent;
+
+        ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
 
       end;
     });
