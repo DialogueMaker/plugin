@@ -4,6 +4,7 @@ local StarterPlayer = game:GetService("StarterPlayer");
 local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
+local Icons = require(script.Icons);
 local React = require(script.Packages.react);
 local ReactRoblox = require(script.Packages["react-roblox"]);
 local Window = require(script.Window);
@@ -82,7 +83,9 @@ local function openDialogueEditor(model: Model): ()
 end;
 
 local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
-EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", "rbxassetid://14109181603");
+
+local themeName = settings().Studio.Theme.Name;
+EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", Icons[themeName].editDialogueButton);
 EditDialogueButton.Click:Connect(function()
 
   if isDialogueEditorOpen then
@@ -145,8 +148,9 @@ EditDialogueButton.Click:Connect(function()
   openDialogueEditor(model);
 
 end);
+EditDialogueButton:SetActive(isDialogueEditorOpen);
 
-local ResetScriptsButton = Toolbar:CreateButton("Fix Scripts", "Reset DialogueMakerSharedDependencies and DialogueClientScript back to the a stable version.", "rbxassetid://14109193905");
+local ResetScriptsButton = Toolbar:CreateButton("Fix Scripts", "Reset DialogueMakerSharedDependencies and DialogueClientScript back to the a stable version.", Icons[themeName].resetScriptsButton);
 ResetScriptsButton.Click:Connect(function()
 
   -- Debounce
@@ -181,7 +185,7 @@ ResetScriptsButton.Click:Connect(function()
 
 end);
 
-local RemoveUnusedInstancesButton = Toolbar:CreateButton("Remove Unused Instances", "Deletes unused actions, conditions, and dialogue locations.", "rbxassetid://14109207161")
+local RemoveUnusedInstancesButton = Toolbar:CreateButton("Remove Unused Instances", "Deletes unused actions, conditions, and dialogue locations.", Icons[themeName].removeUnusedInstancesButton)
 RemoveUnusedInstancesButton.Click:Connect(function()
 
   RemoveUnusedInstancesButton.Enabled = false;
@@ -238,3 +242,14 @@ RemoveUnusedInstancesButton.Click:Connect(function()
   print(`[Dialogue Maker] Removed unused {count} Dialogue Maker instance{plural}!`)
 
 end);
+
+local function refreshButtons()
+
+  local themeName = settings().Studio.Theme.Name;
+  EditDialogueButton.Icon = Icons[themeName].editDialogueButton;
+  ResetScriptsButton.Icon = Icons[themeName].resetScriptsButton;
+  RemoveUnusedInstancesButton.Icon = Icons[themeName].removeUnusedInstancesButton;
+
+end;
+
+settings().Studio.ThemeChanged:Connect(refreshButtons);
