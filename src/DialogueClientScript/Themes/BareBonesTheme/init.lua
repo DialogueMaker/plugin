@@ -2,21 +2,25 @@
 -- BareBonesTheme is the first theme that was created for Dialogue Maker.
 -- As the name describes, it is a barebones theme that priorities function over form.
 -- Developers can use this theme as a template for creating their own.
+--
 -- Programmer: Christian Toney (Christian_Toney)
+
 local TextSegment = require(script.TextSegment);
 local ResponseButton = require(script.ResponseButton);
 local MessageComponentList = require(script.MessageComponentList);
 local ResponseComponentList = require(script.ResponseComponentList);
-local DialogueClientScript = script.Parent.Parent.Parent;
+local DialogueClientScript = script.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
+local React = require(DialogueClientScript.Packages.react);
+local Types = require(DialogueClientScript.types);
+
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local usePages = require(ReactHooks.usePages);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
 local useDynamicSize = require(ReactHooks.useDynamicSize);
-local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.types);
+
 type ThemeProperties = Types.ThemeProperties;
 
 local skipPageEvent = Instance.new("BindableEvent");

@@ -6,12 +6,7 @@ local UserInputService = game:GetService("UserInputService");
 local CollectionService = game:GetService("CollectionService");
 local Player = game:GetService("Players").LocalPlayer;
 local PlayerGui = Player:WaitForChild("PlayerGui");
-local APIFolder = script.API;
-local api = {
-  dialogue = require(APIFolder.Dialogue);
-  triggers = require(APIFolder.Triggers);
-  player = require(APIFolder.Player);
-};
+local api = require(script.API);
 local clientSettings = require(script.Settings);
 
 local Types = require(script.types);

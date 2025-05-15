@@ -1,11 +1,13 @@
 --!strict
 local Players = game:GetService("Players");
 
-local ReactRoblox = require(script.Parent.Parent.Packages["react-roblox"]);
-local React = require(script.Parent.Parent.Packages.react);
-local types = require(script.Parent.Parent.types);
+local DialogueClientScript = script.Parent.Parent;
+local ReactRoblox = require(DialogueClientScript.Packages["react-roblox"]);
+local React = require(DialogueClientScript.Packages.react);
+local types = require(DialogueClientScript.types);
+local clientSettings = require(DialogueClientScript.Settings);
 
-local Player = Players.LocalPlayer;
+type Page = types.Page;
 
 local themeChangedEvent = Instance.new("BindableEvent");
 
@@ -15,16 +17,13 @@ local DialogueModule = {
   onThemeChanged = themeChangedEvent.Event;
 };
 
-local DialogueClientScript = script.Parent.Parent;
-type Page = types.Page;
-
-local clientSettings = require(DialogueClientScript.Settings);
+local player = Players.LocalPlayer;
 
 -- @since v5.0.0
 function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotFound: boolean?): ModuleScript
 
   -- Check if we have the theme
-  local ThemeFolder = DialogueClientScript.ReactComponents.Themes;
+  local ThemeFolder = DialogueClientScript.Themes;
   local themeModuleScript = ThemeFolder:FindFirstChild(themeName);
   if themeName and not themeModuleScript and useDefaultIfNotFound then
 
@@ -412,7 +411,7 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
   -- Initialize the theme, then listen for changes
   local themeModuleScript = DialogueModule:getThemeModuleScript(npcSettings.general.themeName, true);
   local dialogueGUI = Instance.new("ScreenGui");
-  dialogueGUI.Parent = Player.PlayerGui;
+  dialogueGUI.Parent = player.PlayerGui;
   local root = ReactRoblox.createRoot(dialogueGUI);
   self:setTheme(themeModuleScript);
 
@@ -569,7 +568,7 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
 
 end;
 
-Player.CharacterRemoving:Connect(function()
+player.CharacterRemoving:Connect(function()
 
   DialogueModule.isPlayerTalkingWithNPC = false;
 

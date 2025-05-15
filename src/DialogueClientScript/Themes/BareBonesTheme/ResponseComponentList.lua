@@ -1,5 +1,6 @@
 --!strict
-local React = require(script.Parent.Parent.Parent.Parent.Packages.react);
+local DialogueClientScript = script.Parent.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
 
 export type ResponseComponentListProperties = {
   responseButtonComponent: any;
