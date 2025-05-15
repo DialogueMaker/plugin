@@ -123,7 +123,6 @@ local function BareBonesTheme(props: ThemeProperties)
           pages = pages, 
           currentPageIndex = currentPageIndex, 
           skipPageEvent = skipPageEvent;
-          textSegmentComponent = TextSegment;
           npcSettings = npcSettings;
           responseContentScripts = responseContentScripts;
           onTimeout = props.onTimeout;
