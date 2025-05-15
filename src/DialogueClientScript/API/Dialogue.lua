@@ -1,7 +1,10 @@
 --!strict
+local Players = game:GetService("Players");
+
 local ReactRoblox = require(script.Parent.Parent.Packages["react-roblox"]);
 local React = require(script.Parent.Parent.Packages.react);
-local Players = game:GetService("Players");
+local types = require(script.Parent.Parent.types);
+
 local Player = Players.LocalPlayer;
 
 local themeChangedEvent = Instance.new("BindableEvent");
@@ -13,8 +16,7 @@ local DialogueModule = {
 };
 
 local DialogueClientScript = script.Parent.Parent;
-local Types = require(DialogueClientScript.Types);
-type Page = Types.Page;
+type Page = types.Page;
 
 local clientSettings = require(DialogueClientScript.Settings);
 
@@ -42,42 +44,12 @@ function DialogueModule:getThemeModuleScript(themeName: string, useDefaultIfNotF
 
 end;
 
--- Searches for a ModuleScript based on a given directory. Errors if it doesn't exist. 
--- @since v5.0.0
--- @returns A module script of a given directory.
-function DialogueModule:getContentScriptFromPriority(dialogueContainer: Folder, targetPath: {string}): ModuleScript
-
-  local currentPath = "";
-  local CurrentDirectoryScript: ModuleScript | Folder = dialogueContainer;
-  for index, directory in targetPath do
-
-    currentPath = currentPath .. (if currentPath ~= "" then "." else "") .. directory;
-    local PossibleDirectory = CurrentDirectoryScript:FindFirstChild(directory);
-    if not PossibleDirectory or not PossibleDirectory:IsA("ModuleScript") then
-
-      error("[Dialogue Maker]" .. currentPath .. " is not a ModuleScript");
-
-    end
-    CurrentDirectoryScript = PossibleDirectory;
-
-  end;
-  
-  if CurrentDirectoryScript:IsA("Folder") then
-    
-    error("[Dialogue Maker] Target path (" .. table.concat(targetPath, ".") .. ") not found.");
-    
-  end
-  
-  return CurrentDirectoryScript;
-
-end;
-
 -- Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
 -- @since v5.0.0
-function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: TextLabel): {Page}
+function DialogueModule:getPages(contentArray: types.ContentArray, textLabel: TextLabel): {Page}
   
-  local pages: {Types.Page} = {};
-  local currentPage: Types.Page = {};
+  local pages: {types.Page} = {};
+  local currentPage: types.Page = {};
   local textContainer = textLabel.Parent;
   assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
 
@@ -173,7 +145,7 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
           
           local function getRichTextIndices(text: string)
 
-            local richTextTagIndices: {Types.RichTextTagInformation} = {};
+            local richTextTagIndices: {types.RichTextTagInformation} = {};
             local openTagIndices: {number} = {};
             local textCopy = text;
             local tagPattern = "<[^<>]->";
@@ -379,7 +351,6 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
             if not lastSpaceIndex and textLabelClone.TextBounds.Y < textLabelClone.TextSize * textLabelClone.LineHeight then
               
               -- The given area is too small. Add this to a new page.
-              print("New page!");
               newPage();
               continue;              
               
@@ -420,16 +391,6 @@ function DialogueModule:getPages(contentArray: Types.ContentArray, textLabel: Te
 
 end;
 
--- Checks if the local player passes a condition.
--- @since v5.0.0
-function DialogueModule:doesPlayerPassCondition(contentScript: ModuleScript): boolean
-
-  local conditionScript = contentScript:FindFirstChild("Condition") :: ModuleScript?;
-  local conditionResult = if conditionScript then require(conditionScript)() :: boolean else true;
-  return conditionResult;
-
-end;
-
 function DialogueModule:setTheme(theme: ModuleScript): ()
 
   self.currentTheme = theme;
@@ -438,7 +399,7 @@ function DialogueModule:setTheme(theme: ModuleScript): ()
 end;
 
 -- @since v5.0.0
-function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings): ()
+function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings): ()
 
   -- Make sure we aren't already talking to an NPC
   assert(not DialogueModule.isPlayerTalkingWithNPC, "[Dialogue Maker] Cannot read dialogue because player is currently talking with another NPC.");
@@ -456,44 +417,72 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
   self:setTheme(themeModuleScript);
 
   -- Show the dialogue to the player
-  local currentDialoguePriority = "1";
-  local currentContentScript: ModuleScript;
+  local parent: Instance = NPCDialogueContainer;
+  local priorities = {};
+  local priorityIndex = 1;
+
+  local function updatePriorities()
+
+    priorities = {};
+
+    for _, possibleContentScript in parent:GetChildren() do
+  
+      local possibleDialogueType = possibleContentScript:GetAttribute("DialogueType");
+      if possibleContentScript:IsA("ModuleScript") and tonumber(possibleContentScript.Name) and (possibleDialogueType == "Message" or possibleDialogueType == "Redirect") then
+
+        table.insert(priorities, possibleContentScript.Name);
+
+      end
+
+    end
+
+  end;
+
+  updatePriorities();
+
   while DialogueModule.isPlayerTalkingWithNPC and task.wait() do
 
-    -- Get the current directory.
-    local isSuccess = pcall(function()
-    
-      currentContentScript = DialogueModule:getContentScriptFromPriority(NPCDialogueContainer, currentDialoguePriority:split("."));
+    local contentScript = parent:FindFirstChild(priorities[priorityIndex]);
+    assert(contentScript and contentScript:IsA("ModuleScript"), "[Dialogue Maker] Content script not found.");
 
-    end);
+    local dialogueType = contentScript:GetAttribute("DialogueType");
+    local dialogue = require(contentScript) :: types.Dialogue;
 
-    if not isSuccess then
-
-      break;
-
-    end;
-
-    local dialogueType = currentContentScript:GetAttribute("DialogueType");
-
-    if DialogueModule:doesPlayerPassCondition(currentContentScript) then
+    if dialogue:verifyCondition() then
       
-      local dialogueContentArray = (require(currentContentScript) :: () -> Types.ContentArray)();
       if dialogueType == "Redirect" then
 
         -- A redirect is available, so let's switch priorities.
-        assert(typeof(dialogueContentArray[1]) == "string", "[Dialogue Maker] Item at index 1 is not a directory.");
-        currentDialoguePriority = dialogueContentArray[1] :: string;
+        local redirectObjectValue = contentScript:FindFirstChild("Redirect");
+        assert(redirectObjectValue and redirectObjectValue:IsA("ObjectValue"), "[Dialogue Maker] Redirect object value not found.");
+
+        local goalRedirect = redirectObjectValue.Value;
+        assert(goalRedirect and goalRedirect:IsA("ModuleScript"), "[Dialogue Maker] Redirect object value is not a ModuleScript.");
+        assert(goalRedirect.Parent, "[Dialogue Maker] Redirect object value has no parent.");
+
+        parent = goalRedirect.Parent;
+        updatePriorities();
+        local index = table.find(priorities, goalRedirect.Name);
+        assert(index, "[Dialogue Maker] Redirect object value not found in priorities.");
+        priorityIndex = index;
+        
         continue;
 
       end;
 
       -- Get a list of responses from the dialogue.
       local responses: {ModuleScript} = {};
-      for _, PossibleResponse in currentContentScript:GetChildren() do
+      for _, possibleResponse in contentScript:GetChildren() do
 
-        if PossibleResponse:IsA("ModuleScript") and tonumber(PossibleResponse.Name) and PossibleResponse:GetAttribute("DialogueType") == "Response" and DialogueModule:doesPlayerPassCondition(PossibleResponse) then
+        if possibleResponse:IsA("ModuleScript") and tonumber(possibleResponse.Name) and possibleResponse:GetAttribute("DialogueType") == "Response" then
 
-          table.insert(responses, PossibleResponse);
+          local response = require(possibleResponse) :: any;
+
+          if response:verifyCondition() then
+
+            table.insert(responses, possibleResponse);
+
+          end;
 
         end
 
@@ -509,37 +498,22 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: Types.NPCSettings)
       local onCompletionEvent = Instance.new("BindableEvent");
       local function renderRoot()
 
+        local dialogueContentArray = dialogue:getContent();
         root:render(React.createElement(require(themeModuleScript) :: any, {
           responseContentScripts = responses;
           dialogueContentArray = dialogueContentArray;
           onComplete = function(selectedResponseContentScript: ModuleScript?)
       
-            -- Run action.
-            local actionScript = currentContentScript:FindFirstChild("Action") :: ModuleScript?;
-            if actionScript then 
-              
-              (require(actionScript) :: () -> ())(); 
-            
-            end;
+            dialogue:runAction();
   
             -- Check if there is more dialogue.
             local hasPossibleDialogue = false;
-            local nextScript = if selectedResponseContentScript then selectedResponseContentScript else currentContentScript;
-            for _, possibleContentScript in nextScript:GetChildren() do
-  
-              local possibleDialogueType = possibleContentScript:GetAttribute("DialogueType");
-              if possibleContentScript:IsA("ModuleScript") and tonumber(possibleContentScript.Name) and (possibleDialogueType == "Message" or possibleDialogueType == "Redirect") then
-  
-                hasPossibleDialogue = true;
-                break;
-  
-              end
-  
-            end
+            parent = if selectedResponseContentScript then selectedResponseContentScript else contentScript;
+            updatePriorities();
   
             if DialogueModule.isPlayerTalkingWithNPC and hasPossibleDialogue then
   
-              currentDialoguePriority = `{if selectedResponseContentScript then `{currentDialoguePriority}.{selectedResponseContentScript.Name}` else currentDialoguePriority}.1`;
+              priorityIndex = 1;
   
             else
   
