@@ -7,7 +7,6 @@ local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableProperties = {
   dialogueParent: ModuleScript | Folder;
-  setDialogueParent: (ModuleScript | Folder) -> ();
   plugin: Plugin;
 }
 
@@ -36,7 +35,6 @@ local function DialogueTable(props: DialogueTableProperties)
     DialogueTableHeader = React.createElement(DialogueTableHeader);
     DialogueTableBody = React.createElement(DialogueTableBody, {
       dialogueParent = props.dialogueParent;
-      setDialogueParent = props.setDialogueParent;
       plugin = props.plugin;
     });
   })

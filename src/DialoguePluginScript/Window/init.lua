@@ -68,7 +68,6 @@ local function Window(props: WindowProperties)
           });
           DialogueTable = React.createElement(DialogueTable, {
             dialogueParent = dialogueParent;
-            setDialogueParent = setDialogueParent;
             plugin = props.plugin;
           });
         })

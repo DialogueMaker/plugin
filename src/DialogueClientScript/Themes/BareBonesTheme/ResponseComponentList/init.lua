@@ -2,8 +2,9 @@
 local DialogueClientScript = script.Parent.Parent.Parent;
 local React = require(DialogueClientScript.Packages.react);
 
+local ResponseButton = require(script.ResponseButton);
+
 export type ResponseComponentListProperties = {
-  responseButtonComponent: any;
   responseContentScripts: {ModuleScript};
   onComplete: (ModuleScript) -> ();
 }
@@ -11,10 +12,12 @@ export type ResponseComponentListProperties = {
 local function ResponseComponentList(props: ResponseComponentListProperties)
   
   local responseComponents = {};
-  for _, responseModule in props.responseContentScripts do
+  for index, responseModule in props.responseContentScripts do
 
-    table.insert(responseComponents, React.createElement(props.responseButtonComponent, {
-      text = (require(responseModule) :: () -> {string})()[1]; -- The response's text is always at the first index.
+    table.insert(responseComponents, React.createElement(ResponseButton, {
+      text = require(responseModule):getContent()[1]; -- The response's text is always at the first index.
+      layoutOrder = index;
+      key = index;
       onClick = function()
 
         props.onComplete(responseModule);

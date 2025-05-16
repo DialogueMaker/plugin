@@ -4,10 +4,11 @@ local DialogueAPI = require(script.Parent.Parent.API.Dialogue);
 local Types = require(script.Parent.Parent.types);
 type Page = Types.Page;
 
-local function usePages(dialogueContentArray, textContainerRef: any)
+local function usePages(dialogueContentArray, textContainerRef: React.Ref<GuiObject>, textSegment: React.ReactElement<any, TextLabel>)
 
   local pages, setPages = React.useState({} :: {Page});
-  
+  assert(typeof(textContainerRef) ~= "function", "textContainerRef must be a ref to a GuiObject");
+
   React.useEffect(function()
   
     local textContainer = textContainerRef.current;

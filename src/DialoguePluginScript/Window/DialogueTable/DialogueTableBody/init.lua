@@ -6,7 +6,6 @@ local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableBodyProperties = {
   dialogueParent: ModuleScript | Folder;
-  setDialogueParent: (ModuleScript | Folder) -> ();
   plugin: Plugin;
 }
 
@@ -105,7 +104,6 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
         zIndex = currentZIndex;
         contentScript = childContentScript;
         dialogueParent = dialogueParent;
-        setDialogueParent = props.setDialogueParent;
         plugin = props.plugin;
         key = childContentScript:GetDebugId();
       });

@@ -5,7 +5,7 @@
 --
 -- Programmer: Christian Toney (Christian_Toney)
 
-local TextSegment = require(script.TextSegment);
+local MessageTextSegment = require(script.MessageTextSegment);
 local MessageComponentList = require(script.MessageComponentList);
 local ResponseComponentList = require(script.ResponseComponentList);
 local DialogueClientScript = script.Parent.Parent;
@@ -24,7 +24,7 @@ type ThemeProperties = Types.ThemeProperties;
 
 local skipPageEvent = Instance.new("BindableEvent");
 
-local function BareBonesTheme(props: ThemeProperties)
+local function StandardTheme(props: ThemeProperties)
 
   -- Props
   local npc = props.npc;
@@ -42,7 +42,7 @@ local function BareBonesTheme(props: ThemeProperties)
   local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
-  local pages = usePages(props.dialogueContentArray, textContainerRef);
+  local pages = usePages(props.dialogueContentArray, textContainerRef, MessageTextSegment);
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
@@ -73,7 +73,7 @@ local function BareBonesTheme(props: ThemeProperties)
     [React.Event.InputBegan] = function(self: Frame, input: InputObject)
 
       if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-          
+
         continueDialogue();
 
       end;
@@ -113,10 +113,6 @@ local function BareBonesTheme(props: ThemeProperties)
           PaddingTop = UDim.new(0, 5);
           PaddingRight = UDim.new(0, 5);
           PaddingBottom = UDim.new(0, 5);
-        });
-        TestSegment = React.createElement(TextSegment, {
-          isTest = true;
-          textSize = textSize;
         });
         MessageComponentList = React.createElement(MessageComponentList, {
           pages = pages, 
@@ -161,4 +157,4 @@ local function BareBonesTheme(props: ThemeProperties)
 
 end;
 
-return BareBonesTheme;
+return StandardTheme;
