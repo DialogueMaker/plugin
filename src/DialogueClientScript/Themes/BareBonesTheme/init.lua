@@ -11,7 +11,7 @@ local ResponseComponentList = require(script.ResponseComponentList);
 local DialogueClientScript = script.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.types);
+local Types = require(DialogueClientScript.Types);
 
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
@@ -42,7 +42,7 @@ local function BareBonesTheme(props: ThemeProperties)
   local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
-  local pages = usePages(props.dialogueContentArray, textContainerRef);
+  local pages = usePages(props.dialogueContentArray, textContainerRef, TextSegment);
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;

@@ -4,7 +4,7 @@ local Players = game:GetService("Players");
 local DialogueClientScript = script.Parent.Parent;
 local ReactRoblox = require(DialogueClientScript.Packages["react-roblox"]);
 local React = require(DialogueClientScript.Packages.react);
-local types = require(DialogueClientScript.types);
+local types = require(DialogueClientScript.Types);
 local clientSettings = require(DialogueClientScript.Settings);
 
 type Page = types.Page;
@@ -503,10 +503,9 @@ function DialogueModule:readDialogue(npc: Model, npcSettings: types.NPCSettings)
       local onCompletionEvent = Instance.new("BindableEvent");
       local function renderRoot()
 
-        local dialogueContentArray = dialogue:getContent();
         root:render(React.createElement(require(themeModuleScript) :: any, {
           responseContentScripts = responses;
-          dialogueContentArray = dialogueContentArray;
+          dialogue = dialogue;
           onComplete = function(selectedResponseContentScript: ModuleScript?)
       
             dialogue:runAction();

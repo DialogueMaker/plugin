@@ -11,7 +11,7 @@ export type TextSegmentProperties = {
   onComplete: () -> ();
 }
 
-local function MessageTextSegment(props: TextSegmentProperties)
+local function MessageTextSegment(props: TextSegmentProperties): React.ReactElement<any, TextLabel>
 
   local text = props.text;
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);

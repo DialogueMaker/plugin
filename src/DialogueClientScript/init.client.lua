@@ -9,7 +9,7 @@ local PlayerGui = Player:WaitForChild("PlayerGui");
 local api = require(script.API);
 local clientSettings = require(script.Settings);
 
-local Types = require(script.types);
+local Types = require(script.Types);
 local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   
   -- Make sure we can't talk to another NPC

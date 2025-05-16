@@ -1,3 +1,6 @@
+--!strict
+local React = require(script.Parent.Parent.Packages.react);
+
 export type ContentArray = {string | Effect};
 
 export type Effect = {
@@ -143,7 +146,7 @@ export type ThemeProperties = {
   responseContentScripts: {ModuleScript};
   clientSettings: ClientSettings;
   npcSettings: NPCSettings;
-  dialogueContentArray: any;
+  dialogue: Dialogue;
   npc: Model;
   onComplete: (selectedResponseContentScript: ModuleScript?) -> ();
   onTimeout: () -> ();
@@ -185,5 +188,15 @@ export type Dialogue = {
   runAction: (self: Dialogue) -> ();
   
 };
+
+export type TextSegmentProperties = {
+  text: string;
+  skipPageEvent: RBXScriptSignal?;
+  letterDelay: number;
+  layoutOrder: number;
+  textSize: number;
+  onComplete: () -> ();
+  ref: React.Ref<TextLabel>;
+}
 
 return {};

@@ -5,20 +5,17 @@
 --
 -- Programmer: Christian Toney (Christian_Toney)
 
-local MessageTextSegment = require(script.MessageTextSegment);
-local MessageComponentList = require(script.MessageComponentList);
+local MessageContainer = require(script.MessageContainer);
 local ResponseComponentList = require(script.ResponseComponentList);
 local DialogueClientScript = script.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.types);
+local Types = require(DialogueClientScript.Types);
 
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
-local usePages = require(ReactHooks.usePages);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
-local useDynamicSize = require(ReactHooks.useDynamicSize);
 
 type ThemeProperties = Types.ThemeProperties;
 
@@ -26,23 +23,20 @@ local skipPageEvent = Instance.new("BindableEvent");
 
 local function StandardTheme(props: ThemeProperties)
 
-  -- Props
   local npc = props.npc;
   local clientSettings = props.clientSettings;
   local npcSettings = props.npcSettings;
   local npcName = npcSettings.general.npcName;
   local responseContentScripts = props.responseContentScripts;
 
-  -- Refs
   local clickSoundRef = React.useRef(nil :: Sound?);
-  local textContainerRef = React.useRef(nil :: GuiObject?);
 
   -- States
   local currentPageIndex, setCurrentPageIndex = React.useState(1);
   local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
-  local pages = usePages(props.dialogueContentArray, textContainerRef, MessageTextSegment);
+  local pages, setPages = React.useState({});
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
@@ -54,16 +48,15 @@ local function StandardTheme(props: ThemeProperties)
     isNPCTalking = isNPCTalking;
     responseContentScripts = responseContentScripts;
   });
-  local sizeX, sizeY, textSize = useDynamicSize({
-    {
-      sizeX = 310;
-      sizeY = 117;
-      textSize = 14;
-    }
-  });
   useKeybindContinue(clientSettings, continueDialogue);
   useLookAtPlayer(npc, npcSettings);
   useOutOfDistanceDetection(npc, npcSettings, props.onTimeout);
+
+  React.useEffect(function()
+  
+    -- TODO: Implement timeout
+
+  end, {isNPCTalking});
 
   return React.createElement("Frame", {
     AnchorPoint = Vector2.new(0.5, 1);
@@ -98,32 +91,16 @@ local function StandardTheme(props: ThemeProperties)
         Padding = UDim.new(0, 5);
         VerticalAlignment = Enum.VerticalAlignment.Bottom;
       });
-      NPCTextContainer = React.createElement("Frame", {
-        Size = UDim2.new(0, sizeX, 0, sizeY);
-        ref = textContainerRef;
-        BackgroundColor3 = Color3.new(1, 1, 1);
-      }, {
-        UIListLayout = React.createElement("UIListLayout", {
-          SortOrder = Enum.SortOrder.LayoutOrder;
-          FillDirection = Enum.FillDirection.Horizontal;
-          Wraps = true;
-        });
-        UIPadding = React.createElement("UIPadding", {
-          PaddingLeft = UDim.new(0, 5);
-          PaddingTop = UDim.new(0, 5);
-          PaddingRight = UDim.new(0, 5);
-          PaddingBottom = UDim.new(0, 5);
-        });
-        MessageComponentList = React.createElement(MessageComponentList, {
-          pages = pages, 
-          currentPageIndex = currentPageIndex, 
-          skipPageEvent = skipPageEvent;
-          npcSettings = npcSettings;
-          responseContentScripts = responseContentScripts;
-          onTimeout = props.onTimeout;
-          setIsNPCTalking = setIsNPCTalking;
-          textSize = textSize;
-        });
+      MessageContainer = React.createElement(MessageContainer, {
+        pages = pages, 
+        currentPageIndex = currentPageIndex, 
+        skipPageEvent = skipPageEvent;
+        npcSettings = npcSettings;
+        responseContentScripts = responseContentScripts;
+        setIsNPCTalking = setIsNPCTalking;
+        continueDialogue = continueDialogue;
+        onPagesUpdated = setPages;
+        dialogue = props.dialogue;
       });
       ResponseContainer = if #responseContentScripts > 0 then React.createElement("ScrollingFrame", {
         BackgroundTransparency = 1;

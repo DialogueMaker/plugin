@@ -1,0 +1,64 @@
+--!strict
+local React = require(script.Parent.Parent.Packages.react);
+
+export type TypewriterProperties = {
+  text: string;
+  letterDelay: number;
+  skipPageEvent: RBXScriptSignal?;
+  onComplete: () -> ();
+  textLabelRef: React.Ref<TextLabel>;
+};
+
+local function useTypewriter(properties: TypewriterProperties): number
+  
+  local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
+
+  -- React.useEffect(function()
+  
+  --   setMaxVisibleGraphemes(0);
+
+  -- end, {text});
+
+  React.useEffect(function(): ()
+
+    local typewriterTask = task.delay(properties.letterDelay, function()
+
+      assert(typeof(properties.textLabelRef) ~= "function", "textLabelRef must be a ref to a TextLabel");
+
+      local textLabel = properties.textLabelRef.current;
+      if maxVisibleGraphemes ~= -1 and textLabel and maxVisibleGraphemes < #textLabel.ContentText then
+
+        setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
+
+      else
+
+        properties.onComplete();
+
+      end;
+
+    end);
+
+    if properties.skipPageEvent then
+
+      local skipConnection = properties.skipPageEvent:Once(function()
+      
+        task.cancel(typewriterTask);
+        setMaxVisibleGraphemes(-1);
+
+      end);
+
+      return function()
+
+        skipConnection:Disconnect();
+
+      end;
+
+    end;
+
+  end, {maxVisibleGraphemes});
+
+  return maxVisibleGraphemes;
+
+end;
+
+return useTypewriter;

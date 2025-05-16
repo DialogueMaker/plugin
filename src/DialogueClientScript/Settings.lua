@@ -1,11 +1,11 @@
 --!strict
-local Types = require(script.Parent.types);
+local Types = require(script.Parent.Types);
 type ClientSettings = Types.ClientSettings;
 
 local Settings: ClientSettings = {
 
   -- [ Theme Settings ] --
-  defaultTheme = "BareBonesTheme";
+  defaultTheme = "StandardTheme";
 
   -- [ Response Settings ] --
   showResponsesAfterMessageFinished = true; 
