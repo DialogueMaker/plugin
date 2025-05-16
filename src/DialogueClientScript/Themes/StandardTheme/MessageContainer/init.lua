@@ -5,7 +5,7 @@ local ReactHooks = DialogueClientScript.ReactHooks;
 local React = require(DialogueClientScript.Packages.react);
 local types = require(DialogueClientScript.Types);
 
-local MessageTextSegment = require(script.Parent.MessageTextSegment);
+local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
 local useDynamicSize = require(ReactHooks.useDynamicSize);
 
