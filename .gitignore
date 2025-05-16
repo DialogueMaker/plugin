@@ -8,3 +8,4 @@
 # Note to developers: Use Wally to locally install packages. 
 # Do not include Packages in commits.
 Packages
+sourcemap.json
