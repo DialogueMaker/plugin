@@ -5,7 +5,6 @@ local Selection = game:GetService("Selection");
 local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.Packages.react);
 local Dropdown = require(script.Dropdown);
-local useDialogueContainer = require(script.useDialogueContainer);
 local DropdownOption = require(script.DropdownOption);
 local useStudioColors = require(root.useStudioColors);
 
@@ -24,7 +23,6 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
   local isConnectionsDropdownOpen, setIsConnectionsDropdownOpen = React.useState(false);
-  local dialogueContainer = useDialogueContainer(props.dialogueParent);
   local contentScript = props.contentScript;
 
   local isResponse = props.type == "Response";
@@ -72,68 +70,10 @@ local function DialogueItem(props: DialogueItemProperties)
       TextSize = 14;
       [React.Event.FocusLost] = function(self)
 
-        -- Make sure the priority is valid
-        local isUserTextInvalid = false;
-        local userText = self.Text :: string;
-        if userText:sub(1, 1) == "." or userText:sub(userText:len()) == "." then
-
-          isUserTextInvalid = true;
-
-        end;
-
-        local currentDirectory: Folder | ModuleScript = dialogueContainer;
-        local splitPriority = userText:split(".");
-        if not isUserTextInvalid then
-
-          for index, priority in splitPriority do
-
-            -- Make sure everyone's a number
-            if not tonumber(priority) then
-
-              warn("[Dialogue Maker] " .. userText .. " is not a valid priority. Make sure you're not using any characters other than numbers and periods.");
-              isUserTextInvalid = true;
-              break;
-
-            end;
-
-            -- Make sure the folder exists
-            local TargetDirectory = currentDirectory:FindFirstChild(priority);
-            if not TargetDirectory and index ~= #splitPriority then
-
-              warn("[Dialogue Maker] " .. userText .. " is not a valid priority. Make sure all parent directories exist.");
-              isUserTextInvalid = true;
-              break;
-
-            elseif index == #splitPriority then
-
-              if TargetDirectory then
-
-                warn("[Dialogue Maker] " .. userText .. " is not a valid priority. Make sure that " .. userText .. " isn't already being used.");
-                isUserTextInvalid = true;
-
-              else
-                
-                local UserSplitPriority = userText:split(".");
-                props.contentScript.Name = UserSplitPriority[#UserSplitPriority];
-                contentScript.Parent = currentDirectory;
-
-              end;
-              break;
-
-            end;
-
-            currentDirectory = currentDirectory:FindFirstChild(priority) :: ModuleScript;
-
-          end;
-
-        end;
-
-        if isUserTextInvalid then
-
-          -- Reset the text.
-          self.Text = props.contentScript.Name;
-
-        end;
+        local newPriority = tonumber(self.Text);
+        assert(newPriority, "[Dialogue Maker] Invalid priority. Must be a number.");
+        
+        props.contentScript.Name = self.Text;
 
       end;
     });
