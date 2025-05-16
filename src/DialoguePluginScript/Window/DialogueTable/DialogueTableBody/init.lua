@@ -15,82 +15,50 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
   local colors = useStudioColors();
 
   local dialogueParent = props.dialogueParent;
-  local dialogueItems, setDialogueItems = React.useState({});
+  local redirects, setRedirects = React.useState({} :: {ModuleScript});
+  local responses, setResponses = React.useState({} :: {ModuleScript});
+  local messages, setMessages = React.useState({} :: {ModuleScript});
   React.useEffect(function()
   
     local contentScriptConnections: {RBXScriptConnection} = {};
 
+    local function cleanupConnections()
+      
+      for _, connection in contentScriptConnections do
+        
+        connection:Disconnect();
+        
+      end;
+
+      contentScriptConnections = {};
+
+    end;
+
     local function refreshTable()
 
-      for _, connection in contentScriptConnections do
-
-        connection:Disconnect();
-
-      end;
+      cleanupConnections();
 
       -- Separate the dialogue item types.
       local responses: {ModuleScript} = {};
       local messages: {ModuleScript} = {};
       local redirects: {ModuleScript} = {};
-      for _, PossibleDialogueItem in dialogueParent:GetChildren() do
+      for _, possibleDialogueItem in dialogueParent:GetChildren() do
         
-        if PossibleDialogueItem:IsA("ModuleScript") and tonumber(PossibleDialogueItem.Name) then
+        if possibleDialogueItem:IsA("ModuleScript") and tonumber(possibleDialogueItem.Name) then
           
-          -- Get the dialogue item type.
-          local DialogueType = PossibleDialogueItem:GetAttribute("DialogueType");
-          table.insert(if DialogueType == "Response" then responses elseif DialogueType == "Message" then messages else redirects, PossibleDialogueItem);
+          local dialogueType = possibleDialogueItem:GetAttribute("DialogueType");
+          local targetTable = if dialogueType == "Response" then responses elseif dialogueType == "Message" then messages else redirects;
+          table.insert(targetTable, possibleDialogueItem);
+          table.insert(contentScriptConnections, possibleDialogueItem:GetPropertyChangedSignal("Name"):Connect(refreshTable));
+          table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
           
         end
         
       end
       
-      -- Sort the directory based on priority
-      local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
-        
-        local messageAPriority = tonumber(dialogueA.Name) or math.huge;
-        local messageBPriority = tonumber(dialogueB.Name) or math.huge;
-        
-        return messageAPriority < messageBPriority;
-        
-      end;
-      
-      table.sort(redirects, sortByMessagePriority);
-      table.sort(responses, sortByMessagePriority);
-      table.sort(messages, sortByMessagePriority);
-
-      -- Create new status
-      local currentZIndex = #redirects + #responses + #messages;
-      local dialogueItems = {};
-      local currentLayoutOrder = 1;
-      for categoryIndex, category in {redirects, responses, messages} do
-
-        for _, childContentScript in category do
-
-          -- Make sure the message container is completely visible, even when dropdowns are open.
-          local dialogueItem = React.createElement(DialogueItem, {
-            type = ({"Redirect", "Response", "Message"})[categoryIndex];
-            layoutOrder = currentLayoutOrder;
-            zIndex = currentZIndex;
-            contentScript = childContentScript;
-            priority = childContentScript.Name;
-            dialogueParent = dialogueParent;
-            setDialogueParent = props.setDialogueParent;
-            plugin = props.plugin;
-            key = childContentScript:GetDebugId();
-          });
-
-          table.insert(dialogueItems, dialogueItem);
-
-          currentZIndex -= 1;
-          currentLayoutOrder += 1;
-
-          table.insert(contentScriptConnections, childContentScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
-          table.insert(contentScriptConnections, childContentScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
-
-        end;
-
-      end;
-      setDialogueItems(dialogueItems);
+      setRedirects(redirects);
+      setResponses(responses);
+      setMessages(messages);
 
     end;
     
@@ -100,6 +68,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
     return function()
 
+      cleanupConnections();
       childAddedEvent:Disconnect();
       childRemovedEvent:Disconnect();
 
@@ -107,7 +76,50 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {dialogueParent :: any});
 
-  return if #dialogueItems > 0 then
+  -- Sort the directory based on priority
+  local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
+    
+    local messageAPriority = tonumber(dialogueA.Name) or math.huge;
+    local messageBPriority = tonumber(dialogueB.Name) or math.huge;
+    
+    return messageAPriority < messageBPriority;
+    
+  end;
+  
+  table.sort(redirects, sortByMessagePriority);
+  table.sort(responses, sortByMessagePriority);
+  table.sort(messages, sortByMessagePriority);
+
+  -- Create new status
+  local currentZIndex = #redirects + #responses + #messages;
+  local dialogueItems = {};
+  local currentLayoutOrder = 1;
+  for categoryIndex, category in {redirects, responses, messages} do
+
+    for _, childContentScript in category do
+
+      -- Make sure the message container is completely visible, even when dropdowns are open.
+      local dialogueItem = React.createElement(DialogueItem, {
+        type = ({"Redirect", "Response", "Message"})[categoryIndex];
+        layoutOrder = currentLayoutOrder;
+        zIndex = currentZIndex;
+        contentScript = childContentScript;
+        dialogueParent = dialogueParent;
+        setDialogueParent = props.setDialogueParent;
+        plugin = props.plugin;
+        key = childContentScript:GetDebugId();
+      });
+
+      table.insert(dialogueItems, dialogueItem);
+
+      currentZIndex -= 1;
+      currentLayoutOrder += 1;
+
+    end;
+
+  end;
+
+  return if #dialogueItems > 0 then (
     React.createElement("ScrollingFrame", {
       LayoutOrder = 3;
       Size = UDim2.new(1, 0, 1, 0);
@@ -123,9 +135,9 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
       UIFlexItem = React.createElement("UIFlexItem", {
         FlexMode = Enum.UIFlexMode.Shrink;
       });
-      Children = React.createElement(React.Fragment, {}, {dialogueItems});
+      DialogueItems = React.createElement(React.Fragment, {}, {dialogueItems});
     })
-  else (
+  ) else (
     React.createElement("Frame", {
       LayoutOrder = 3;
       Size = UDim2.fromScale(1, 1);
@@ -148,7 +160,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
         });
       })
     })
-  )
+  );
 
 end;
 

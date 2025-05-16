@@ -1,43 +1,90 @@
 --!strict
+local Selection = game:GetService("Selection");
+
 local React = require(script.Parent.Packages.react);
 local Toolbar = require(script.Toolbar);
-local StatusSection = require(script.StatusSection);
 local DialogueTable = require(script.DialogueTable);
 
 export type WindowProperties = {
-  model: Model;
-  repairNPC: () -> ();
+  repairNPC: (model: Model) -> ();
   plugin: Plugin;
+  pluginGUI: DockWidgetPluginGui;
+  closeDialogueEditor: () -> ();
 }
 
 local function Window(props: WindowProperties)
 
-  local dialogueParent, setDialogueParent = React.useState(props.model:FindFirstChild("DialogueContainer") :: (ModuleScript | Folder));
+  local model: Model?, setModel = React.useState(nil :: Model?);
+  local dialogueParent: (Folder | ModuleScript)?, setDialogueParent = React.useState(nil :: (Folder | ModuleScript)?);
 
-  return React.createElement("Frame", {
-    Size = UDim2.new(1, 0, 1, 0);
-    BackgroundTransparency = 1;
-  }, {
-    UIListLayout = React.createElement("UIListLayout", {
-      SortOrder = Enum.SortOrder.LayoutOrder;
-      Padding = UDim.new(0, 0);
-    });
-    Toolbar = React.createElement(Toolbar, {
-      dialogueParent = dialogueParent;
-      setDialogueParent = setDialogueParent;
-      plugin = props.plugin;
-      repairNPC = props.repairNPC;
-      model = props.model;
-    });
-    DialogueTable = React.createElement(DialogueTable, {
-      dialogueParent = dialogueParent;
-      setDialogueParent = setDialogueParent;
-      plugin = props.plugin;
-    });
-    StatusSection = React.createElement(StatusSection, {
-      dialogueParent = dialogueParent;
-    });
-  });
+  React.useEffect(function()
+  
+    local function checkSelection()
+
+      local selection = Selection:Get();
+      if #selection == 1 then
+
+        local selectedInstance = selection[1];
+        local model = if selectedInstance:IsA("Model") then selectedInstance else selectedInstance:FindFirstAncestorWhichIsA("Model");
+        props.pluginGUI.Title = `Dialogue Maker • {model.Name}`;
+        setModel(model);
+        setDialogueParent(if selectedInstance == model then model:FindFirstChild("DialogueContainer") else selectedInstance);
+
+      elseif #selection == 0 then
+
+        props.closeDialogueEditor();
+
+      end
+
+    end;
+
+    local selectionChangedConnection = Selection.SelectionChanged:Connect(checkSelection);
+    task.spawn(checkSelection);
+
+    return function()
+
+      selectionChangedConnection:Disconnect();
+
+    end;
+
+  end, {model});
+
+  return if model then
+    React.createElement("Frame", {
+      Size = UDim2.new(1, 0, 1, 0);
+      BackgroundTransparency = 1;
+    }, {
+      UIListLayout = React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        Padding = UDim.new(0, 0);
+      });
+      Editor = if model:HasTag("DialogueMakerNPC") then 
+        React.createElement(React.Fragment, {}, {
+          Toolbar = React.createElement(Toolbar, {
+            dialogueParent = dialogueParent;
+            plugin = props.plugin;
+            repairNPC = props.repairNPC;
+            model = model;
+          });
+          DialogueTable = React.createElement(DialogueTable, {
+            dialogueParent = dialogueParent;
+            setDialogueParent = setDialogueParent;
+            plugin = props.plugin;
+          });
+        })
+      else (
+        React.createElement("TextButton", {
+          Text = "Initialize NPC";
+          [React.Event.Activated] = function()
+
+            props.repairNPC(model);
+            setDialogueParent(model:FindFirstChild("DialogueContainer") :: Folder);
+
+          end;
+        })
+      )
+    })
+  else nil;
 
 end;
 

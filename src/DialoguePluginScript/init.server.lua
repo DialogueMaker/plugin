@@ -10,7 +10,7 @@ local ReactRoblox = require(script.Packages["react-roblox"]);
 local Window = require(script.Window);
 
 local EditDialogueButton: PluginToolbarButton;
-local PluginGui: DockWidgetPluginGui?;
+local pluginGUI: DockWidgetPluginGui?;
 
 local function getSelectedModel(): Model?
 
@@ -28,10 +28,10 @@ end;
 -- @since v1.0.0
 local function closeDialogueEditor(): ()
 
-  if PluginGui then 
+  if pluginGUI then 
 
-    PluginGui:Destroy();
-    PluginGui = nil;
+    pluginGUI:Destroy();
+    pluginGUI = nil;
 
   end;
   EditDialogueButton:SetActive(false);
@@ -72,24 +72,26 @@ end;
 
 -- Open the editor when called.
 -- @since v1.0.0
-local function openDialogueEditor(model: Model): ()
+local function openDialogueEditor(): ()
 
-  PluginGui = plugin:CreateDockWidgetPluginGui(
-    `Dialogue Maker - Model "{model.Name}"`, 
+  pluginGUI = plugin:CreateDockWidgetPluginGui(
+    `Dialogue Maker`, 
     DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150));
-  if PluginGui then
+  if pluginGUI then
 
-    PluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-    PluginGui.Title = `Dialogue Maker - Model "{model.Name}"`;
-    PluginGui:BindToClose(closeDialogueEditor);
+    pluginGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+    pluginGUI.Title = `Dialogue Maker`;
+    pluginGUI:BindToClose(closeDialogueEditor);
     
-    local pluginGUIRoot = ReactRoblox.createRoot(PluginGui);
+    local pluginGUIRoot = ReactRoblox.createRoot(pluginGUI);
     pluginGUIRoot:render(React.createElement(Window, {
       plugin = plugin;
-      model = model;
-      repairNPC = function()
+      pluginGUI = pluginGUI;
+      repairNPC = repairNPC;
+      closeDialogueEditor = function()
 
-        repairNPC(model);
+        pluginGUIRoot:unmount();
+        closeDialogueEditor();
 
       end;
     }));
@@ -104,7 +106,7 @@ local themeName = settings().Studio.Theme.Name;
 EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", Icons[themeName].editDialogueButton);
 EditDialogueButton.Click:Connect(function()
 
-  if PluginGui then
+  if pluginGUI then
     
     closeDialogueEditor();
     return;
@@ -162,14 +164,14 @@ EditDialogueButton.Click:Connect(function()
 
   -- Now we can open the dialogue editor.
   EditDialogueButton:SetActive(true);
-  openDialogueEditor(model);
+  openDialogueEditor();
 
 end);
-EditDialogueButton:SetActive(PluginGui ~= nil);
+EditDialogueButton:SetActive(pluginGUI ~= nil);
 
 Selection.SelectionChanged:Connect(function()
 
-  EditDialogueButton.Enabled = PluginGui ~= nil or getSelectedModel() ~= nil;
+  EditDialogueButton.Enabled = pluginGUI ~= nil or getSelectedModel() ~= nil;
 
 end);
 

@@ -12,10 +12,8 @@ local useStudioColors = require(root.useStudioColors);
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
   contentScript: ModuleScript;
-  setDialogueParent: (ModuleScript | Folder) -> ();
   layoutOrder: number;
   zIndex: number;
-  priority: string;
   dialogueParent: ModuleScript | Folder;
   plugin: Plugin;
 }
@@ -63,8 +61,8 @@ local function DialogueItem(props: DialogueItemProperties)
         Padding = UDim.new(0, 3);
     });
     PriorityTextBox = React.createElement("TextBox", {
-      Text = props.priority;
-      PlaceholderText = props.priority;
+      Text = props.contentScript.Name;
+      PlaceholderText = props.contentScript.Name;
       TextColor3 = colors.text;
       PlaceholderColor3 = colors.textPlaceholder;
       LayoutOrder = 1;
@@ -133,7 +131,7 @@ local function DialogueItem(props: DialogueItemProperties)
         if isUserTextInvalid then
 
           -- Reset the text.
-          self.Text = props.priority;
+          self.Text = props.contentScript.Name;
 
         end;
 
@@ -279,23 +277,13 @@ local function DialogueItem(props: DialogueItemProperties)
         text = "View children";
         onClick = function()
 
-          props.setDialogueParent(props.contentScript);
-          setIsConnectionsDropdownOpen(false);
-
-        end;
-      });
-      SelectButton = React.createElement(DropdownOption, {
-        layoutOrder = 3;
-        text = "Show in Explorer";
-        onClick = function()
-
           Selection:Set({props.contentScript});
           setIsConnectionsDropdownOpen(false);
 
         end;
       });
       DeleteButton = React.createElement(DropdownOption, {
-        layoutOrder = 4;
+        layoutOrder = 3;
         text = "Delete";
         onClick = function()
 

@@ -1,5 +1,6 @@
 --!strict
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
+local Selection = game:GetService("Selection");
 
 local React = require(script.Parent.Parent.Packages.react);
 local ToolbarButton = require(script.ToolbarButton);
@@ -7,9 +8,8 @@ local useStudioColors = require(script.Parent.Parent.useStudioColors);
 
 type ToolbarProps = {
   dialogueParent: ModuleScript | Folder;
-  setDialogueParent: (ModuleScript | Folder) -> ();
   model: Model;
-  repairNPC: () -> ();
+  repairNPC: (model: Model) -> ();
   plugin: Plugin;
 }
 
@@ -35,7 +35,7 @@ local function Toolbar(props: ToolbarProps)
       isDisabled = dialogueParent:IsA("Folder");
       onClick = function()
 
-        props.setDialogueParent(props.dialogueParent.Parent :: ModuleScript | Folder);
+        Selection:Set({props.dialogueParent.Parent});
 
       end;
     });
@@ -55,7 +55,7 @@ local function Toolbar(props: ToolbarProps)
         end;
 
         -- Ensure the NPC is properly configured.
-        props.repairNPC();
+        props.repairNPC(props.model);
 
         -- Find a name for the content script.
         local targetPriority = 1;
@@ -69,8 +69,6 @@ local function Toolbar(props: ToolbarProps)
           end
           
         end;
-        
-        -- TODO: Fix crash
 
         -- Create the content script.
         local newContentScript = script.Parent.Parent.Templates.DialogueTemplate:Clone();
@@ -88,7 +86,7 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.repairNPC();
+        props.repairNPC(props.model);
 
         local npcDialogueSettingsScript = props.model:FindFirstChild("NPCDialogueSettings") :: Script;
         props.plugin:OpenScript(npcDialogueSettingsScript);
