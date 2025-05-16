@@ -57,8 +57,9 @@ local function MessageContainer(props: MessageContainerProperties)
   end, {pages :: any, currentPageIndex});
     
   local messageComponentList = {};
-  if pages then
 
+  if not testTextSegment then
+    
     local page = pages[currentPageIndex];
     if page then
       
