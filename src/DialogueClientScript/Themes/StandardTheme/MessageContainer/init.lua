@@ -13,7 +13,6 @@ type Page = types.Page;
 type NPCSettings = types.NPCSettings;
 
 export type MessageContainerProperties = {
-  pages: {Page}?;
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
   npcSettings: NPCSettings;
