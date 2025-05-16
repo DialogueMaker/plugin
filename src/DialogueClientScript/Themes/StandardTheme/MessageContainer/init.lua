@@ -132,7 +132,7 @@ local function MessageContainer(props: MessageContainerProperties)
       PaddingRight = UDim.new(0, 5);
       PaddingBottom = UDim.new(0, 5);
     });
-    MessageComponentList = React.createElement(React.Fragment, {}, if testTextSegment then testTextSegment else messageComponentList)
+    MessageComponentList = if not testTextSegment then React.createElement(React.Fragment, {}, messageComponentList) else nil;
   });
 
 end;
