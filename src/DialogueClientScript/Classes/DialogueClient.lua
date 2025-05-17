@@ -16,7 +16,9 @@ type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local DialogueClient = {};
+local DialogueClient = {
+  sharedDialogueClient = nil :: DialogueClient?;
+};
 
 function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClientSettings): DialogueClient
 
@@ -331,6 +333,31 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
   end;
 
   return dialogueClient;
+
+end;
+
+function DialogueClient:getFromSharedObject(shouldWaitForObject: boolean?): DialogueClient
+
+  if not DialogueClient.sharedDialogueClient then
+
+    if shouldWaitForObject then
+
+      repeat task.wait() until DialogueClient.sharedDialogueClient;
+
+    end;
+
+  end;
+
+  assert(DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client not set. Please call DialogueClient:setSharedObject() before calling this function.");
+
+  return DialogueClient.sharedDialogueClient;
+
+end;
+
+function DialogueClient:setSharedObject(dialogueClient: DialogueClient?): ()
+
+  assert(not DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client already set.");
+  DialogueClient.sharedDialogueClient = dialogueClient;
 
 end;
 

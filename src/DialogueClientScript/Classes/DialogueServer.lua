@@ -60,30 +60,6 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
   local parent = dialogueServer.instance.Parent;
   assert(parent, "[Dialogue Maker]: The parent of the dialogue server instance is nil. Please check your setup.");
 
-  -- Now, the proximity prompts.
-  if dialogueServer.settings.proximityPrompt.enabled then
-
-    local proximityPrompt = dialogueServer.settings.proximityPrompt.location;
-    if dialogueServer.settings.proximityPrompt.autoCreate then
-
-      local proximityPromptTemp = Instance.new("ProximityPrompt");
-      proximityPromptTemp.Parent = instance.Parent;
-      proximityPrompt = proximityPromptTemp;
-
-    end;
-
-    if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
-
-
-
-    else
-
-      warn(`[Dialogue Maker]: The proximity prompt location for {parent.Name} is not a ProximityPrompt.`);
-
-    end;
-
-  end;
-
   -- Almost there: it's time for the click detectors.
   if dialogueServer.settings.clickDetector.enabled then
 
