@@ -1,36 +1,44 @@
 --!strict
-local Players = game:GetService("Players");
-local RunService = game:GetService("RunService");
-local ContextActionService = game:GetService("ContextActionService");
-local UserInputService = game:GetService("UserInputService");
+
 local CollectionService = game:GetService("CollectionService");
-local Player = game:GetService("Players").LocalPlayer;
-local PlayerGui = Player:WaitForChild("PlayerGui");
-local api = require(script.API);
-local clientSettings = require(script.Settings);
+local DialogueClient = require(script.Classes.DialogueClient);
+local IDialogueServer = require(script.Interfaces.DialogueServer);
 
 local Types = require(script.Types);
+local dialogueServers: {DialogueServer} = {};
+
+local dialogueClient = DialogueClient.new({
+
+  -- [ Theme Settings ] --
+  defaultTheme = "StandardTheme";
+
+  -- [ Response Settings ] --
+  showResponsesAfterMessageFinished = true; 
+  defaultClickSound = 0; 
+
+  -- [ Chat Triggers and Keybinds ] --
+  minimumDistanceFromCharacter = 10; 
+  keybindsEnabled = true; 
+  defaultChatTriggerKey = Enum.KeyCode.F; 
+  defaultChatTriggerKeyGamepad = Enum.KeyCode.ButtonX; 
+  defaultChatContinueKey = Enum.KeyCode.F; 
+  defaultChatContinueKeyGamepad = Enum.KeyCode.ButtonA; 
+
+});
+
 local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   
-  -- Make sure we can't talk to another NPC
-  api.triggers:disableAllSpeechBubbles();
-  api.triggers:disableAllClickDetectors();
-  api.triggers:disableAllProximityPrompts();
   
-  local freezePlayer = npcSettings.general.freezePlayer;
-  if freezePlayer then 
-
-    api.player:freezePlayer(); 
-
-  end;
   
   -- Let the Dialogue module handle it.
   api.dialogue:readDialogue(NPC, npcSettings);
   
   -- Clean up.
-  api.triggers:enableAllSpeechBubbles();
-  api.triggers:enableAllClickDetectors();
-  api.triggers:enableAllProximityPrompts();
+  for _, dialogueServer in dialogueServers do
+
+    dialogueServer:toggleTriggers(true);
+
+  end;
   if freezePlayer then 
 
     api.player:unfreezePlayer(); 
@@ -39,156 +47,19 @@ local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
   
 end
 
--- Iterate through every NPC
-print("[Dialogue Maker]: Preparing dialogue received from the server...");
-for _, npc in CollectionService:GetTagged("DialogueMakerNPC") do
+print("[Dialogue Maker]: Preparing dialogue...");
+for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
   
-  -- Make sure all NPCs aren't affected if this one doesn't load properly
-  local success, msg = pcall(function()
-    
-    -- Set up speech bubbles.
-    local dialogueSettings = require(npc:FindFirstChild("NPCDialogueSettings")) :: Types.NPCSettings;
-    if dialogueSettings.speechBubble.enabled then
+  local didInitializeDialogueServer, errorMessage = pcall(function()
 
-      local SpeechBubblePart = dialogueSettings.speechBubble.location;
-      if SpeechBubblePart and SpeechBubblePart:IsA("BasePart") then
-
-        -- Listen if the player clicks the speech bubble
-        local SpeechBubble = api.triggers:createSpeechBubble(npc, dialogueSettings);
-        (SpeechBubble:FindFirstChild("SpeechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
-
-          readDialogue(npc, dialogueSettings);
-
-        end);
-        SpeechBubble.Parent = PlayerGui;
-
-      else
-
-        warn("[Dialogue Maker]: The SpeechBubblePart for " .. npc.Name .. " is not a Part.");
-
-      end;
-
-    end;
-
-    -- Next, the prompt regions.
-    if dialogueSettings.promptRegion.enabled then
-
-      local PromptRegionPart = dialogueSettings.promptRegion.location;
-      if PromptRegionPart and PromptRegionPart:IsA("BasePart") then
-
-        PromptRegionPart.Touched:Connect(function(part)
-
-          -- Make sure our player touched it and not someone else
-          local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-          if PlayerFromCharacter == Player then
-
-            api.dialogue:readDialogue(npc, dialogueSettings);
-
-          end;
-
-        end);
-
-      else
-
-        warn("[Dialogue Maker]: The PromptRegionPart for " .. npc.Name .. " is not a Part.");
-
-      end;
-
-    end;
-
-    -- Now, the proximity prompts.
-    if dialogueSettings.proximityPrompt.enabled then
-
-      local ProximityPrompt = dialogueSettings.proximityPrompt.location;
-      if dialogueSettings.proximityPrompt.autoCreate then
-
-        local ProximityPromptTemp = Instance.new("ProximityPrompt");
-        ProximityPromptTemp.Parent = npc;
-        ProximityPrompt = ProximityPromptTemp;
-
-      end;
-
-      if ProximityPrompt and ProximityPrompt:IsA("ProximityPrompt") then
-
-        api.triggers:addProximityPrompt(npc, ProximityPrompt);
-
-        ProximityPrompt.Triggered:Connect(function()
-          
-          readDialogue(npc, dialogueSettings);
-          
-        end);
-
-      else
-
-        warn("[Dialogue Maker]: The proximity prompt location for " .. npc.Name .. " is not a ProximityPrompt.");
-
-      end;
-
-    end;
-
-    -- Almost there: it's time for the click detectors.
-    if dialogueSettings.clickDetector.enabled then
-
-      local ClickDetector = dialogueSettings.clickDetector.location;
-      if dialogueSettings.clickDetector.autoCreate then
-
-        local ClickDetectorTemp = Instance.new("ClickDetector");
-        ClickDetectorTemp.Parent = npc;
-        ClickDetector = ClickDetectorTemp;
-
-      end;
-
-      if ClickDetector and ClickDetector:IsA("ClickDetector") then
-
-        api.triggers:addClickDetector(npc, ClickDetector);
-
-        ClickDetector.MouseClick:Connect(function()
-          
-          readDialogue(npc, dialogueSettings);
-          
-        end);
-
-      else
-
-        warn("[Dialogue Maker]: The ClickDetectorLocation for " .. npc.Name .. " is not a ClickDetector.");
-
-      end;
-
-    end;
-
-    -- Finally, the keybinds.
-    if clientSettings.keybindsEnabled then
-
-      local CanPressButton = false;
-      local ReadDialogueWithKeybind;
-      local defaultChatTriggerKey = clientSettings.defaultChatTriggerKey;
-      local defaultChatTriggerKeyGamepad = clientSettings.defaultChatTriggerKeyGamepad;
-      ReadDialogueWithKeybind = function()
-
-        if CanPressButton and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
-            
-          readDialogue(npc, dialogueSettings);
-
-        end;
-
-      end;
-      ContextActionService:BindAction("OpenDialogueWithKeybind", ReadDialogueWithKeybind, false, defaultChatTriggerKey, defaultChatTriggerKeyGamepad);
-
-      -- Check if the player is in range
-      RunService.Heartbeat:Connect(function()
-
-        CanPressButton = Player:DistanceFromCharacter(npc:GetPivot().Position) < clientSettings.minimumDistanceFromCharacter;
-
-      end);
-
-    end;
+    local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
+    table.insert(dialogueServers, dialogueServer);
 
   end);
 
-  -- One NPC doesn't stop the show, but it's important for you to know which ones didn't load properly.
-  if not success then
+  if not didInitializeDialogueServer then
 
-    warn("[Dialogue Maker]: Couldn't load NPC " .. npc.Name .. ": " .. msg);
+    warn(`[Dialogue Maker]: {errorMessage}`);
 
   end;
 

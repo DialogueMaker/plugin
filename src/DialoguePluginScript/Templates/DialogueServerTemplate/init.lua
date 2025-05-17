@@ -1,5 +1,10 @@
 --!strict
-local settings = {
+
+local StarterPlayer = game:GetService("StarterPlayer");
+
+local DialogueServer = require(StarterPlayer.StarterPlayerScripts.DialogueClientScript.Classes.DialogueServer);
+
+local dialogueServerSettings = {
 
   general = {
 
@@ -124,4 +129,6 @@ local settings = {
 
 };
 
-return settings; 
+local dialogueServer = DialogueServer.new(dialogueServerSettings);
+
+return dialogueServer; 

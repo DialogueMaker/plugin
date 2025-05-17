@@ -18,7 +18,7 @@ local function usePages(dialogue: Types.Dialogue, TextSegment: (TextSegmentPrope
     letterDelay = 0;
     layoutOrder = 1;
     textSize = 14;
-    ref2 = testTextSegmentRef;
+    ref2 = testTextSegmentRef; 
     onComplete = function() end;
   });
 

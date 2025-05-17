@@ -5,9 +5,6 @@
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "DialogueClientScript": {
-          "$properties": {
-            "Disabled": false
-          },
           "$path": "src/DialogueClientScript",
           "Packages": {
             "$path": "Packages"

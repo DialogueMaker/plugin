@@ -9,6 +9,19 @@
           "$path": "Packages"
         },
         "DialogueClientScript": {
+          "$properties": {
+            "Enabled": false
+          },
+          "$path": "src/DialogueClientScript",
+          "Packages": {
+            "$path": "Packages"
+          }
+        }
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "DialogueClientScript": {
           "$path": "src/DialogueClientScript",
           "Packages": {
             "$path": "Packages"

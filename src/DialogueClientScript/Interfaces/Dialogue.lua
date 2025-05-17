@@ -1,3 +1,5 @@
+--!strict
+
 export type Dialogue = {
 
   --[[
@@ -24,6 +26,11 @@ export type Dialogue = {
     This function does not run if the dialogue is a redirect.
   ]]
   runAction: (self: Dialogue) -> ();
+  
+  --[[
+    Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
+  ]]
+  getPages: (self: Dialogue, textLabel: TextLabel) -> {Types.Page};
   
 };
 
