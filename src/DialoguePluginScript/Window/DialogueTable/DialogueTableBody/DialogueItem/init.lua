@@ -25,9 +25,6 @@ local function DialogueItem(props: DialogueItemProperties)
   local isConnectionsDropdownOpen, setIsConnectionsDropdownOpen = React.useState(false);
   local contentScript = props.contentScript;
 
-  local isResponse = props.type == "Response";
-  local isRedirect = props.type == "Redirect";
-
   local labelName, setLabelName = React.useState(contentScript:GetAttribute("Label") or "");
   React.useEffect(function()
 
@@ -46,8 +43,7 @@ local function DialogueItem(props: DialogueItemProperties)
   end, {contentScript});
 
   return React.createElement("Frame", {
-    BackgroundColor3 = if isResponse then colors.backgroundResponse else colors.backgroundRedirect;
-    BackgroundTransparency = if isResponse or isRedirect then 0.4 else 1;
+    BackgroundTransparency = 1;
     BorderSizePixel = 0;
     ZIndex = props.zIndex;
     LayoutOrder = props.layoutOrder;
@@ -98,7 +94,7 @@ local function DialogueItem(props: DialogueItemProperties)
     DialogueTypeDropdown = React.createElement(Dropdown, {
       layoutOrder = 3;
       size = UDim2.new(0, 0, 1, 0);
-      text = props.type;
+      text = props.type :: string;
       toggleButtonChildren = {
         UIFlexItem = React.createElement("UIFlexItem", {
           FlexMode = Enum.UIFlexMode.Fill;
@@ -212,7 +208,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
         end;
       });
-      ViewChildrenButton = if isRedirect then nil else React.createElement(DropdownOption, {
+      ViewChildrenButton = if props.type == "Redirect" then nil else React.createElement(DropdownOption, {
         layoutOrder = 2;
         text = "View children";
         onClick = function()

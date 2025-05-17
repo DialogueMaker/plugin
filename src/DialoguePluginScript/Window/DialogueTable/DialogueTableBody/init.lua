@@ -99,7 +99,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
       -- Make sure the message container is completely visible, even when dropdowns are open.
       local dialogueItem = React.createElement(DialogueItem, {
-        type = ({"Redirect", "Response", "Message"})[categoryIndex];
+        type = ({"Redirect", "Response", "Message"})[categoryIndex] :: ("Message" | "Response" | "Redirect");
         layoutOrder = currentLayoutOrder;
         zIndex = currentZIndex;
         contentScript = childContentScript;

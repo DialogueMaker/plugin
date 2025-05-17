@@ -4,7 +4,7 @@ local React = require(root.Packages.react);
 local useStudioColors = require(root.useStudioColors);
 
 export type DropdownProps = {
-  text: string?;
+  text: string;
   children: any;
   size: UDim2?;
   layoutOrder: number?;

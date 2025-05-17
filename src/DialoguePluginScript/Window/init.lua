@@ -49,7 +49,7 @@ local function Window(props: WindowProperties)
 
   end, {model});
 
-  return if model then
+  return if model and dialogueParent then
     React.createElement("Frame", {
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 1;

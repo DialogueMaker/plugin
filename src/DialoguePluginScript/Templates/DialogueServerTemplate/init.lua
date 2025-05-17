@@ -18,7 +18,7 @@ local dialogueServerSettings = {
     fitName = true :: boolean; 
 
     -- Change this to a theme you've added to the Themes folder in order to override default theme settings.
-    themeName = "" :: string;
+    theme = nil :: ModuleScript?;
 
     -- Change this to the amount of seconds you want to wait before the next letter in the NPC's message is shown. 
     -- [accepts number >= 0]
@@ -56,7 +56,7 @@ local dialogueServerSettings = {
     enabled = false :: boolean; 
 
     -- Change this value to a part. (Ex. workspace.Part)
-    BasePart = nil :: BasePart?; 
+    location = nil :: BasePart?; 
 
   };
 
@@ -74,27 +74,6 @@ local dialogueServerSettings = {
 
   };
 
-  speechBubble = {
-
-    -- If true, this causes a speech bubble to appear over the NPC's head.
-    enabled = false :: boolean;
-
-    -- Set this to a BasePart to set the speech bubble's origin point.
-    BasePart = nil :: BasePart?;
-
-    -- Change this to a Roblox asset ID. Example: "rbxassetid://6403436054"
-    image = "" :: string;
-
-    -- How big do you want the speech bubble to be?
-    -- More info: https://create.roblox.com/docs/reference/engine/classes/BillboardGui#Size
-    size = UDim2.new(1, 0, 1, 0) :: UDim2;
-
-    -- How far do you want the bubble away from BasePart?
-    -- More info: https://create.roblox.com/docs/reference/engine/classes/BillboardGui#StudsOffset
-    studsOffset = Vector3.new(0, 0, 0) :: Vector3;
-
-  };
-
   clickDetector = {
 
     -- If true, this causes the player to be able to trigger the dialogue by activating a ClickDetector.
@@ -107,7 +86,7 @@ local dialogueServerSettings = {
     disappearsWhenDialogueActive = true :: boolean; 
 
     -- Replace this with the location of the ClickDetector. (Ex. workspace.Model.ClickDetector) This setting will be ignored if AutomaticallyCreateClickDetector is true. 
-    Instance = nil :: ClickDetector?;
+    location = nil :: ClickDetector?;
 
   };
 
@@ -120,7 +99,7 @@ local dialogueServerSettings = {
     autoCreate = true :: boolean; 
 
     -- The location of the ProximityPrompt. (Ex. workspace.Model.ProximityPrompt) This setting will be ignored if AutoCreate is true. 
-    Instance = nil :: ProximityPrompt?; 
+    location = nil :: ProximityPrompt?; 
 
   };
 
