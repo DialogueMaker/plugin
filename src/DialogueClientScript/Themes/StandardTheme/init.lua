@@ -125,10 +125,10 @@ local function StandardTheme(props: ThemeProperties)
 
       --   end;
       -- });
-      ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
-        SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
-        ref = clickSoundRef;
-      }) else nil;
+      -- ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
+      --   SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
+      --   ref = clickSoundRef;
+      -- }) else nil;
     });
   })
 
