@@ -5,7 +5,7 @@ local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 local types = require(DialogueClientScript.Types);
 
 type Dialogue = IDialogue.Dialogue;
-type Page = types.Page;
+type Page = IDialogue.Page;
 
 local Dialogue = {
   isPlayerTalkingWithNPC = false;  
@@ -25,8 +25,8 @@ function Dialogue.new(properties: ConstructorProperties): Dialogue
 
   local function getPages(self: Dialogue, textLabel: TextLabel): {Page}
   
-    local pages: {types.Page} = {};
-    local currentPage: types.Page = {};
+    local pages: {Page} = {};
+    local currentPage: Page = {};
     local textContainer = textLabel.Parent;
     assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
 

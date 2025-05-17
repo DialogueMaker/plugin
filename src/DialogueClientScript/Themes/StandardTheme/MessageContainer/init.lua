@@ -3,23 +3,25 @@ local DialogueClientScript = script.Parent.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 
 local React = require(DialogueClientScript.Packages.react);
-local types = require(DialogueClientScript.Types);
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
 
 local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
 local useDynamicSize = require(ReactHooks.useDynamicSize);
 
-type Page = types.Page;
-type NPCSettings = types.NPCSettings;
+type Page = IDialogue.Page;
+type Dialogue = IDialogue.Dialogue;
+type DialogueServer = IDialogueServer.DialogueServer;
 
 export type MessageContainerProperties = {
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
-  npcSettings: NPCSettings;
+  dialogueServer: DialogueServer;
   setIsNPCTalking: (boolean) -> ();
   continueDialogue: () -> ();
   onPagesUpdated: (pages: {Page}) -> ();
-  dialogue: types.Dialogue;
+  dialogue: Dialogue;
 }
 
 local function MessageContainer(props: MessageContainerProperties)
@@ -97,7 +99,7 @@ local function MessageContainer(props: MessageContainerProperties)
             layoutOrder = index;
             textSize = textSize;
             key = index;
-            letterDelay = props.npcSettings.general.letterDelay;
+            letterDelay = props.dialogueServer.settings.general.letterDelay;
             onComplete = function()
 
               if index == #page then 

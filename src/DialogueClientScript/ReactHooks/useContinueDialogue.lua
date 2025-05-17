@@ -1,7 +1,7 @@
 --!strict
 local DialogueClientScript = script.Parent.Parent;
-local Types = require(DialogueClientScript.Types);
-type Page = Types.Page;
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+type Page = IDialogue.Page;
 
 export type ContinueDialogueProperties = {
   isNPCTalking: boolean;

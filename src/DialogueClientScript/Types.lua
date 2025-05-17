@@ -8,26 +8,6 @@ type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
 type DialogueServer = IDialogueServer.DialogueServer;
 
-export type ContentArray = {string | Effect};
-
-export type Effect = {
-  
-  type: "effect";
-  
-  run: (skipPageEvent: BindableEvent?) -> any;
-
-  getMaxDimensions: () -> {x: number, y: number};
-
-  getBreakpoints: () -> {number};
-
-  onSkip: () -> any;
-  
-  name: string;
-
-}
-
-export type UseEffectFunction = (effectName: string, effectProperties: {[string]: any}) -> Effect;
-
 export type RichTextTagInformation = {
   attributes: string?;
   endOffset: number?;
@@ -44,14 +24,6 @@ export type ThemeProperties = {
   onComplete: (selectedResponseContentScript: ModuleScript?) -> ();
   onTimeout: () -> ();
 }
-
-export type Page = {
-  {
-    type: "text"; 
-    text: string; 
-    size: Vector2;
-  } | Effect
-};
 
 export type TextSegmentProperties = {
   text: string;

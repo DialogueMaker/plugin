@@ -1,5 +1,17 @@
 --!strict
 
+local IEffect = require(script.Parent.Effect);
+
+type Effect = IEffect.Effect;
+
+export type Page = {
+  {
+    type: "text"; 
+    text: string; 
+    size: Vector2;
+  } | Effect
+};
+
 export type Dialogue = {
 
   --[[
@@ -30,7 +42,7 @@ export type Dialogue = {
   --[[
     Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
   ]]
-  getPages: (self: Dialogue, textLabel: TextLabel) -> {Types.Page};
+  getPages: (self: Dialogue, textLabel: TextLabel) -> {Page};
   
 };
 

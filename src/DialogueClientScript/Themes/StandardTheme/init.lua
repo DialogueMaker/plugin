@@ -5,13 +5,13 @@
 --
 -- Programmer: Christian Toney (Christian_Toney)
 
-local MessageContainer = require(script.MessageContainer);
-local ResponseComponentList = require(script.ResponseComponentList);
 local DialogueClientScript = script.Parent.Parent;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);
 
+local MessageContainer = require(script.MessageContainer);
+local ResponseContainer = require(script.ResponseContainer);
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
@@ -24,9 +24,9 @@ local skipPageEvent = Instance.new("BindableEvent");
 local function StandardTheme(props: ThemeProperties)
 
   local npc = props.npc;
-  local clientSettings = props.clientSettings;
-  local npcSettings = props.npcSettings;
-  local npcName = npcSettings.general.npcName;
+  local dialogueClient = props.dialogueClient;
+  local dialogueServer = props.dialogueServer;
+  local npcName = dialogueServer.settings.general.npcName;
   local responseContentScripts = props.responseContentScripts;
 
   local clickSoundRef = React.useRef(nil :: Sound?);
@@ -40,7 +40,7 @@ local function StandardTheme(props: ThemeProperties)
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
-    allowPlayerToSkipDelay = npcSettings.general.allowPlayerToSkipDelay;
+    allowPlayerToSkipDelay = dialogueServer.settings.general.allowPlayerToSkipDelay;
     currentPageIndex = currentPageIndex;
     setCurrentPageIndex = setCurrentPageIndex;
     onComplete = props.onComplete;
@@ -48,9 +48,9 @@ local function StandardTheme(props: ThemeProperties)
     isNPCTalking = isNPCTalking;
     responseContentScripts = responseContentScripts;
   });
-  useKeybindContinue(clientSettings, continueDialogue);
-  useLookAtPlayer(npc, npcSettings);
-  useOutOfDistanceDetection(npc, npcSettings, props.onTimeout);
+  useKeybindContinue(dialogueClient, continueDialogue);
+  useLookAtPlayer(npc, dialogueServer);
+  useOutOfDistanceDetection(npc, dialogueServer, props.onTimeout);
 
   React.useEffect(function()
   
@@ -76,7 +76,7 @@ local function StandardTheme(props: ThemeProperties)
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
     });
-    NPCNameTextLabel = if npcSettings.general.showName then React.createElement("TextLabel", {
+    NPCNameTextLabel = if dialogueServer.settings.general.showName then React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
       Text = npcName;
       LayoutOrder = 1;
@@ -95,7 +95,7 @@ local function StandardTheme(props: ThemeProperties)
         pages = pages, 
         currentPageIndex = currentPageIndex, 
         skipPageEvent = skipPageEvent;
-        npcSettings = npcSettings;
+        dialogueServer = dialogueServer;
         responseContentScripts = responseContentScripts;
         setIsNPCTalking = setIsNPCTalking;
         continueDialogue = continueDialogue;
@@ -108,7 +108,7 @@ local function StandardTheme(props: ThemeProperties)
         UIListLayout = React.createElement("UIListLayout", {
           SortOrder = Enum.SortOrder.LayoutOrder;
         });
-        ResponseComponentList = React.createElement(ResponseComponentList, {
+        ResponseContainer = React.createElement(ResponseContainer, {
           responseContentScripts = props.responseContentScripts;
           onComplete = props.onComplete;
         });

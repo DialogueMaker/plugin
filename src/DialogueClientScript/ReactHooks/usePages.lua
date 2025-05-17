@@ -5,7 +5,7 @@ local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 local Types = require(DialogueClientScript.Types);
 
 type Dialogue = IDialogue.Dialogue;
-type Page = Types.Page;
+type Page = IDialogue.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 

@@ -14,10 +14,10 @@ function useKeybindContinue(dialogueClient: DialogueClient, continueDialogueFunc
 
   React.useEffect(function(): ()
   
-    local defaultChatContinueKey = dialogueClient.settings.defaultChatContinueKey;
-    local defaultChatContinueKeyGamepad = dialogueClient.settings.defaultChatContinueKeyGamepad;
+    local defaultChatContinueKey = dialogueClient.settings.triggers.defaultChatContinueKey;
+    local defaultChatContinueKeyGamepad = dialogueClient.settings.triggers.defaultChatContinueKeyGamepad;
 
-    if dialogueClient.settings.keybindsEnabled then
+    if dialogueClient.settings.triggers.keybindsEnabled then
 
       local function checkKeybinds(keybind: Enum.KeyCode)
 
