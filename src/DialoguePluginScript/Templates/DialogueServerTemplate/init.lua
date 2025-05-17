@@ -129,6 +129,6 @@ local dialogueServerSettings = {
 
 };
 
-local dialogueServer = DialogueServer.new(dialogueServerSettings);
+local dialogueServer = DialogueServer.new(dialogueServerSettings, script);
 
 return dialogueServer; 

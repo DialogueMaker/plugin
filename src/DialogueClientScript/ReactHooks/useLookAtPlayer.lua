@@ -1,18 +1,20 @@
 --!strict
+
+local TweenService = game:GetService("TweenService");
+
 local DialogueClientScript = script.Parent.Parent;
 local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.Types);
 local Player = game:GetService("Players").LocalPlayer;
-local TweenService = game:GetService("TweenService");
-type ClientSettings = Types.ClientSettings;
-type NPCSettings = Types.NPCSettings;
 
-local function useLookAtPlayer(npc: Model, npcSettings: NPCSettings)
+local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
+type DialogueServer = IDialogueServer.DialogueServer;
+
+local function useLookAtPlayer(npc: Model, dialogueServer: DialogueServer)
 
   React.useEffect(function(): ()
   
     -- Check if the NPC needs to look at the player.
-    if npcSettings.general.npcLooksAtPlayerDuringDialogue and npcSettings.general.npcNeckRotationMaxY then
+    if dialogueServer.settings.general.npcLooksAtPlayerDuringDialogue and dialogueServer.settings.general.npcNeckRotationMaxY then
 
       -- Handle this in a coroutine because the look shouldn't stop the dialogue.
       local lookTask = task.spawn(function()
@@ -35,9 +37,9 @@ local function useLookAtPlayer(npc: Model, npcSettings: NPCSettings)
     
           while NPCPrimaryPart and NPCHead and NPCNeck and PlayerHead and task.wait() do
     
-            local maxRotationX = npcSettings.general.npcNeckRotationMaxX;
-            local maxRotationY = npcSettings.general.npcNeckRotationMaxY;
-            local maxRotationZ = npcSettings.general.npcNeckRotationMaxZ;
+            local maxRotationX = dialogueServer.settings.general.npcNeckRotationMaxX;
+            local maxRotationY = dialogueServer.settings.general.npcNeckRotationMaxY;
+            local maxRotationZ = dialogueServer.settings.general.npcNeckRotationMaxZ;
             local goalRotationX, goalRotationY, goalRotationZ = CFrame.new(NPCHead.Position, PlayerHead.Position):ToOrientation();
             local rotationOffsetX = goalRotationX - math.rad(NPCPrimaryPart.Orientation.X);
             local rotationOffsetY = goalRotationY - math.rad(NPCPrimaryPart.Orientation.Y);

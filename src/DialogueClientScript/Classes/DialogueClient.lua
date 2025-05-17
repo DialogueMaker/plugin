@@ -1,43 +1,60 @@
 --!strict
 
+local ContextActionService = game:GetService("ContextActionService");
 local Players = game:GetService("Players");
+local UserInputService = game:GetService("UserInputService");
+local RunService = game:GetService("RunService");
 
 local DialogueClientScript = script.Parent.Parent;
 local React = require(DialogueClientScript.Packages.react);
 local ReactRoblox = require(DialogueClientScript.Packages["react-roblox"]);
 local IDialogueClient = require(DialogueClientScript.Interfaces.DialogueClient);
 local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 
+type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
 type DialogueServer = IDialogueServer.DialogueServer;
 
 local DialogueClient = {};
 
-function DialogueClient.new(): DialogueClient
+function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClientSettings): DialogueClient
 
   local themeChangedEvent = Instance.new("BindableEvent");
-
   local player = Players.LocalPlayer;
+
+  local function addDialogueServer(self: DialogueClient, dialogueServer: DialogueServer)
+
+    local speechBubble = dialogueServer.speechBubble;
+    if speechBubble then
+
+      (speechBubble:FindFirstChild("speechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
+
+        self:interact(dialogueServer);
+
+      end);
+
+    end;
+    
+    local proximityPrompt = dialogueServer.proximityPrompt;
+    if proximityPrompt then
+
+      proximityPrompt.Triggered:Connect(function()
+
+        self:interact(dialogueServer);
+
+      end);
+
+    end;
+
+    table.insert(self.dialogueServers, dialogueServer);
+
+  end;
+
   local function freezePlayer(): ()
   
     (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Disable();
     
-  end;
-
-  local function unfreezePlayer(): ()
-
-    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Enable();
-    
-  end;
-
-  local function toggleAllTriggers(self: DialogueClient, shouldEnable: boolean): ()
-
-    for _, dialogueServer in self.dialogueServers do
-
-      dialogueServer:toggleTriggers(shouldEnable);
-
-    end;
-
   end;
 
   local function interact(self: DialogueClient, dialogueServer: DialogueServer)
@@ -57,7 +74,7 @@ function DialogueClient.new(): DialogueClient
     end;
 
     -- Initialize the theme, then listen for changes
-    local themeModuleScript = dialogueServer:getTheme(true);
+    local themeModuleScript = dialogueServer.settings.general.theme or dialogueClientSettings.theme.defaultTheme;
     local dialogueGUI = Instance.new("ScreenGui");
     dialogueGUI.Parent = player.PlayerGui;
     local root = ReactRoblox.createRoot(dialogueGUI);
@@ -99,7 +116,7 @@ function DialogueClient.new(): DialogueClient
       end
 
       local dialogueType = contentScript:GetAttribute("DialogueType");
-      local dialogue = require(contentScript) :: types.Dialogue;
+      local dialogue = require(contentScript) :: Dialogue;
 
       if dialogue:verifyCondition() then
         
@@ -148,7 +165,7 @@ function DialogueClient.new(): DialogueClient
     
         end);
 
-        local onCompletionEvent = Instance.new("BindableEvent");
+        local completionSignal = Instance.new("BindableEvent");
         local function renderRoot()
 
           root:render(React.createElement(require(themeModuleScript) :: any, {
@@ -162,43 +179,39 @@ function DialogueClient.new(): DialogueClient
               parent = if selectedResponseContentScript then selectedResponseContentScript else contentScript;
               updatePriorities();
     
-              if Dialogue.isPlayerTalkingWithNPC then
+              if self.isTalkingWithNPC then
     
                 priorityIndex = 1;
     
-              else
-    
-                Dialogue.isPlayerTalkingWithNPC = false;
-    
               end;
     
-              onCompletionEvent:Fire();
+              completionSignal:Fire();
         
             end;
             onTimeout = function()
     
-              Dialogue.isPlayerTalkingWithNPC = false;
-              onCompletionEvent:Fire();
+              self.isTalkingWithNPC = false;
+              completionSignal:Fire();
     
             end;
-            clientSettings = clientSettings;
-            npcSettings = npcSettings;
+            dialogueClient = self;
+            dialogueServer = dialogueServer;
             npc = npc;
           }));
 
         end;
 
-        local themeChangedEvent = Dialogue.onThemeChanged:Connect(function()
+        local themeChangedSignal = self.ThemeChanged:Connect(function()
 
           renderRoot();
       
         end);
 
         renderRoot();
-        onCompletionEvent.Event:Wait();
-        themeChangedEvent:Disconnect();
+        completionSignal.Event:Wait();
+        themeChangedSignal:Disconnect();
 
-      elseif Dialogue.isPlayerTalkingWithNPC then
+      elseif self.isTalkingWithNPC then
 
         -- There is a message; however, the player failed the condition.
         -- Let's check if there's something else available.
@@ -210,9 +223,16 @@ function DialogueClient.new(): DialogueClient
 
     -- Free the player :)
     self:toggleAllTriggers(true);
+
+    if freezePlayer then 
+
+      self:unfreezePlayer(); 
+
+    end;
+
     root:unmount();
     dialogueGUI:Destroy();
-    Dialogue.isPlayerTalkingWithNPC = false;
+    self.isTalkingWithNPC = false;
 
   end;
 
@@ -223,41 +243,32 @@ function DialogueClient.new(): DialogueClient
 
   end;
 
-  local function addDialogueServer(self: DialogueClient, dialogueServer: DialogueServer)
+  local function toggleAllTriggers(self: DialogueClient, shouldEnable: boolean): ()
 
-    local speechBubble = dialogueServer.speechBubble;
-    if speechBubble then
+    for _, dialogueServer in self.dialogueServers do
 
-      (speechBubble:FindFirstChild("speechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
-
-        self:interact(dialogueServer);
-
-      end);
+      dialogueServer:toggleTriggers(shouldEnable);
 
     end;
+
+  end;
+
+  local function unfreezePlayer(): ()
+
+    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Enable();
     
-    local proximityPrompt = dialogueServer.proximityPrompt;
-    if proximityPrompt then
-
-      proximityPrompt.Triggered:Connect(function()
-
-        self:interact(dialogueServer);
-
-      end);
-
-    end;
-
-    table.insert(self.dialogueServers, dialogueServer);
-
   end;
 
   local dialogueClient: DialogueClient = {
     dialogueServers = {};
     isTalkingWithNPC = false;
+    settings = dialogueClientSettings;
     addDialogueServer = addDialogueServer;
+    freezePlayer = freezePlayer;
     interact = interact;
     setTheme = setTheme;
     toggleAllTriggers = toggleAllTriggers;
+    unfreezePlayer = unfreezePlayer;
     ThemeChanged = themeChangedEvent.Event;
   };
 
@@ -266,6 +277,32 @@ function DialogueClient.new(): DialogueClient
     dialogueClient.isTalkingWithNPC = false;
 
   end);
+
+  if dialogueClient.settings.keybindsEnabled then
+
+    local CanPressButton = false;
+    local ReadDialogueWithKeybind;
+    local defaultChatTriggerKey = dialogueClient.settings.defaultChatTriggerKey;
+    local defaultChatTriggerKeyGamepad = dialogueClient.settings.defaultChatTriggerKeyGamepad;
+    ReadDialogueWithKeybind = function()
+
+      if CanPressButton and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
+          
+        readDialogue(npc, dialogueSettings);
+
+      end;
+
+    end;
+    ContextActionService:BindAction("OpenDialogueWithKeybind", ReadDialogueWithKeybind, false, defaultChatTriggerKey, defaultChatTriggerKeyGamepad);
+
+    -- Check if the player is in range
+    RunService.Heartbeat:Connect(function()
+
+      CanPressButton = player:DistanceFromCharacter(npc:GetPivot().Position) < dialogueClient.settings.minimumDistanceFromCharacter;
+
+    end);
+
+  end;
 
   return dialogueClient;
 

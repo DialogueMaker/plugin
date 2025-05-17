@@ -4,48 +4,27 @@ local CollectionService = game:GetService("CollectionService");
 local DialogueClient = require(script.Classes.DialogueClient);
 local IDialogueServer = require(script.Interfaces.DialogueServer);
 
-local Types = require(script.Types);
+type DialogueServer = IDialogueServer.DialogueServer;
+
 local dialogueServers: {DialogueServer} = {};
 
 local dialogueClient = DialogueClient.new({
-
-  -- [ Theme Settings ] --
-  defaultTheme = "StandardTheme";
-
-  -- [ Response Settings ] --
-  showResponsesAfterMessageFinished = true; 
-  defaultClickSound = 0; 
-
-  -- [ Chat Triggers and Keybinds ] --
-  minimumDistanceFromCharacter = 10; 
-  keybindsEnabled = true; 
-  defaultChatTriggerKey = Enum.KeyCode.F; 
-  defaultChatTriggerKeyGamepad = Enum.KeyCode.ButtonX; 
-  defaultChatContinueKey = Enum.KeyCode.F; 
-  defaultChatContinueKeyGamepad = Enum.KeyCode.ButtonA; 
-
+  theme = {
+    defaultTheme = script.Themes.StandardTheme;
+  };
+  responses = {
+    showResponsesAfterMessageFinished = true;
+    defaultClickSound = 0;
+  };
+  triggers = {
+    minimumDistanceFromCharacter = 10; 
+    keybindsEnabled = true; 
+    defaultChatTriggerKey = Enum.KeyCode.F; 
+    defaultChatTriggerKeyGamepad = Enum.KeyCode.ButtonX; 
+    defaultChatContinueKey = Enum.KeyCode.F; 
+    defaultChatContinueKeyGamepad = Enum.KeyCode.ButtonA; 
+  }
 });
-
-local function readDialogue(NPC: Model, npcSettings: Types.NPCSettings)
-  
-  
-  
-  -- Let the Dialogue module handle it.
-  api.dialogue:readDialogue(NPC, npcSettings);
-  
-  -- Clean up.
-  for _, dialogueServer in dialogueServers do
-
-    dialogueServer:toggleTriggers(true);
-
-  end;
-  if freezePlayer then 
-
-    api.player:unfreezePlayer(); 
-
-  end;
-  
-end
 
 print("[Dialogue Maker]: Preparing dialogue...");
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do

@@ -7,12 +7,9 @@ local types = require(DialogueClientScript.Types);
 type Dialogue = IDialogue.Dialogue;
 type Page = types.Page;
 
-local themeChangedEvent = Instance.new("BindableEvent");
-
 local Dialogue = {
   isPlayerTalkingWithNPC = false;  
   currentTheme = nil;
-  onThemeChanged = themeChangedEvent.Event;
 };
 
 export type ConstructorProperties = {

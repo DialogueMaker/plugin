@@ -1,5 +1,12 @@
 --!strict
 local React = require(script.Parent.Packages.react);
+local IDialogueClient = require(script.Parent.Interfaces.DialogueClient);
+local IDialogueServer = require(script.Parent.Interfaces.DialogueServer);
+local IDialogue = require(script.Parent.Interfaces.Dialogue);
+
+type Dialogue = IDialogue.Dialogue;
+type DialogueClient = IDialogueClient.DialogueClient;
+type DialogueServer = IDialogueServer.DialogueServer;
 
 export type ContentArray = {string | Effect};
 
@@ -28,124 +35,10 @@ export type RichTextTagInformation = {
   startOffset: number;
 }
 
-export type NPCSettings = {
-
-  general: {
-
-    npcName: string; 
-
-    showName: boolean; 
-
-    fitName: boolean; 
-
-    textBoundsOffset: number; 
-
-    themeName: string; 
-
-    letterDelay: number; 
-
-    allowPlayerToSkipDelay: boolean; 
-
-    freezePlayer: boolean; 
-
-    endConversationIfOutOfDistance: boolean;
-
-    maxConversationDistance: number;
-
-    npcLooksAtPlayerDuringDialogue: boolean;
-
-    npcNeckRotationMaxX: number;
-
-    npcNeckRotationMaxY: number;
-
-    npcNeckRotationMaxZ: number;
-
-  };
-
-  promptRegion: {
-
-    enabled: boolean;
-
-    location: BasePart?;
-
-  };
-
-  timeout: {
-
-    enabled: boolean;
-
-    seconds: number;
-
-    waitForResponse: boolean;
-
-  };
-
-  speechBubble: {
-
-    enabled: boolean;
-
-    location: BasePart?;
-
-  };
-
-  clickDetector: {
-
-    enabled: boolean;
-
-    autoCreate: boolean;
-
-    disappearsWhenDialogueActive: boolean;
-
-    location: ClickDetector?;
-
-  };
-
-  proximityPrompt: {
-
-    enabled: boolean;
-
-    autoCreate: boolean;
-
-    location: ProximityPrompt?;
-
-  };
-
-};
-
-export type ClientSettings = {
-
-  -- This is the default theme that will be used when talking with NPCs
-  defaultTheme: string;
-
-  -- Prevents the player from selecting responses without first viewing the dialogue
-  showResponsesAfterMessageFinished: boolean;
-
-  -- Replace this with an audio ID that'll play every time a player continues a conversation or selects a response. Replace with 0 to not play any sound.
-  defaultClickSound: number;
-
-  -- Minimum distance from a character required for keybinds should work
-  minimumDistanceFromCharacter: number;
-
-  -- Whether keybinds should work
-  keybindsEnabled: boolean;
-
-  -- Keyboard keybind to start a conversation with an NPC
-  defaultChatTriggerKey: Enum.KeyCode;
-
-  -- Gamepad keybind to start a conversation with an NPC
-  defaultChatTriggerKeyGamepad: Enum.KeyCode;
-
-  -- Keyboard keybind to continue a conversation with an NPC
-  defaultChatContinueKey: Enum.KeyCode;
-
-  -- Gamepad keybind to continue a conversation with an NPC
-  defaultChatContinueKeyGamepad: Enum.KeyCode;
-};
-
 export type ThemeProperties = {
   responseContentScripts: {ModuleScript};
-  clientSettings: ClientSettings;
-  npcSettings: NPCSettings;
+  dialogueClient: DialogueClient;
+  dialogueServer: DialogueServer;
   dialogue: Dialogue;
   npc: Model;
   onComplete: (selectedResponseContentScript: ModuleScript?) -> ();
@@ -159,8 +52,6 @@ export type Page = {
     size: Vector2;
   } | Effect
 };
-
-
 
 export type TextSegmentProperties = {
   text: string;
