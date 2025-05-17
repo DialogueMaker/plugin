@@ -1,5 +1,6 @@
 --!strict
-local Types = require(script.Parent.Parent.types);
+local DialogueClientScript = script.Parent.Parent;
+local Types = require(DialogueClientScript.Types);
 type Page = Types.Page;
 
 export type ContinueDialogueProperties = {

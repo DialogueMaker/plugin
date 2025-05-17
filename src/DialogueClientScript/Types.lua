@@ -1,5 +1,5 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
+local React = require(script.Parent.Packages.react);
 
 export type ContentArray = {string | Effect};
 
@@ -196,7 +196,7 @@ export type TextSegmentProperties = {
   layoutOrder: number;
   textSize: number;
   onComplete: () -> ();
-  ref: React.Ref<TextLabel>;
+  ref2: React.Ref<TextLabel>?;
 }
 
 return {};

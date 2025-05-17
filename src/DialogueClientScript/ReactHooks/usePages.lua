@@ -6,11 +6,10 @@ type Page = Types.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(contentArray: Types.ContentArray, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
+local function usePages(contentArray: Types.ContentArray, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
-  assert(typeof(textContainerRef) ~= "function", "textContainerRef must be a ref to a GuiObject");
 
   local testTextSegmentRef: React.Ref<TextLabel> = React.useRef(nil :: TextLabel?);
   local testTextSegment: TextSegmentElement = React.createElement(TextSegment, {
@@ -19,23 +18,18 @@ local function usePages(contentArray: Types.ContentArray, textContainerRef: Reac
     letterDelay = 0;
     layoutOrder = 1;
     textSize = 14;
-    ref = testTextSegmentRef;
+    ref2 = testTextSegmentRef;
     onComplete = function() end;
   });
 
   React.useEffect(function()
   
-    local textContainer = textContainerRef.current;
     assert(typeof(testTextSegmentRef) ~= "function", "textContainerRef must be a ref to a GuiObject");
     local testTextSegment = testTextSegmentRef.current;
-    if textContainer and textContainer.Parent and testTextSegment then
-
-      local testTextContainer = textContainer:Clone();
-      testTextContainer.Parent = textContainer.Parent;
+    if testTextSegment then
 
       local pages = DialogueAPI:getPages(contentArray, testTextSegment);
       setPages(pages);
-
       setShouldShowTestSegment(false);
 
     end;
@@ -46,8 +40,8 @@ local function usePages(contentArray: Types.ContentArray, textContainerRef: Reac
 
     end;
 
-  end, {contentArray :: unknown, textContainerRef, TextSegment});
-
+  end, {contentArray :: unknown, TextSegment});
+  
   return pages, if shouldShowTestSegment then testTextSegment else nil;
 
 end;

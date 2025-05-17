@@ -13,11 +13,11 @@ local function useTypewriter(properties: TypewriterProperties): number
   
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
 
-  -- React.useEffect(function()
+  React.useEffect(function()
   
-  --   setMaxVisibleGraphemes(0);
+    setMaxVisibleGraphemes(0);
 
-  -- end, {text});
+  end, {properties.text});
 
   React.useEffect(function(): ()
 

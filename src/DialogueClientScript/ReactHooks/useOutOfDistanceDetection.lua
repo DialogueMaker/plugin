@@ -1,6 +1,8 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local Types = require(script.Parent.Parent.types);
+
+local DialogueClientScript = script.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
+local Types = require(DialogueClientScript.Types);
 type NPCSettings = Types.NPCSettings;
 local Players = game:GetService("Players");
 

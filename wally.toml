@@ -6,6 +6,6 @@ realm = "shared"
 private = true
 
 [dependencies]
-react = "jsdotlua/react@17.1.0"
+react = "jsdotlua/react@17.2.1"
 react-roblox = "jsdotlua/react-roblox@17.1.0"
 react-error-boundary = "chriscerie/react-error-boundary@0.2.0"

@@ -113,18 +113,18 @@ local function StandardTheme(props: ThemeProperties)
           onComplete = props.onComplete;
         });
       }) else nil;
-      ContinueButton = React.createElement("ImageButton", {
-        Size = UDim2.new(0, 20, 0, 20);
-        LayoutOrder = 3;
-        Image = "rbxassetid://90966430453504";
-        BackgroundColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.705882, 0.705882, 0.705882) else Color3.new(1, 1, 1);
-        ImageColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.486275, 0.486275, 0.486275) else Color3.new(1, 1, 1);
-        [React.Event.Activated] = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then nil else function()
+      -- ContinueButton = React.createElement("ImageButton", {
+      --   Size = UDim2.new(0, 20, 0, 20);
+      --   LayoutOrder = 3;
+      --   Image = "rbxassetid://90966430453504";
+      --   BackgroundColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.705882, 0.705882, 0.705882) else Color3.new(1, 1, 1);
+      --   ImageColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.486275, 0.486275, 0.486275) else Color3.new(1, 1, 1);
+      --   [React.Event.Activated] = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then nil else function()
 
-          continueDialogue()
+      --     continueDialogue()
 
-        end;
-      });
+      --   end;
+      -- });
       ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
         SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
         ref = clickSoundRef;

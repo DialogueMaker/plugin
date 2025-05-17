@@ -25,8 +25,7 @@ export type MessageContainerProperties = {
 local function MessageContainer(props: MessageContainerProperties)
 
   local componentIndex, setComponentIndex = React.useState(1);
-  local textContainerRef = React.useRef(nil :: GuiObject?);
-  local pages, testTextSegment = usePages(props.dialogue:getContent(), textContainerRef, MessageTextSegment);
+  local pages, testTextSegment = usePages(props.dialogue:getContent(), MessageTextSegment);
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
 
@@ -118,8 +117,8 @@ local function MessageContainer(props: MessageContainerProperties)
 
   return React.createElement("Frame", {
     Size = UDim2.new(0, sizeX, 0, sizeY);
-    ref = textContainerRef;
-    BackgroundColor3 = Color3.new(1, 1, 1);
+    BackgroundColor3 = Color3.fromHex("#202020");
+    BackgroundTransparency = 0.2;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
@@ -127,12 +126,15 @@ local function MessageContainer(props: MessageContainerProperties)
       Wraps = true;
     });
     UIPadding = React.createElement("UIPadding", {
-      PaddingLeft = UDim.new(0, 5);
-      PaddingTop = UDim.new(0, 5);
-      PaddingRight = UDim.new(0, 5);
-      PaddingBottom = UDim.new(0, 5);
+      PaddingLeft = UDim.new(0, 15);
+      PaddingTop = UDim.new(0, 15);
+      PaddingRight = UDim.new(0, 15);
+      PaddingBottom = UDim.new(0, 15);
     });
-    MessageComponentList = if not testTextSegment then React.createElement(React.Fragment, {}, messageComponentList) else nil;
+    UICorner = React.createElement("UICorner", {
+      CornerRadius = UDim.new(0, 5);
+    });
+    MessageComponentList = React.createElement(React.Fragment, {}, testTextSegment or messageComponentList);
   });
 
 end;

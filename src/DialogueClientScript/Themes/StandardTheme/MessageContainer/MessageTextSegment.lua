@@ -7,25 +7,28 @@ type TextSegmentProperties = types.TextSegmentProperties;
 
 local function TextSegment(props: TextSegmentProperties)
 
+  local ref = React.useRef(nil :: TextLabel?);
+
   local text = props.text;
   local maxVisibleGraphemes = useTypewriter({
     text = text;
     letterDelay = props.letterDelay;
     onComplete = props.onComplete;
-    textLabelRef = props.ref;
+    textLabelRef = props.ref2 or ref;
   });
 
   return React.createElement("TextLabel", {
     AutomaticSize = Enum.AutomaticSize.XY;
     Text = text;
-    ref = props.ref;
+    ref = props.ref2 or ref;
     MaxVisibleGraphemes = maxVisibleGraphemes;
     LayoutOrder = props.layoutOrder;
-    FontFace = Font.fromName("Builder Sans", Enum.FontWeight.Regular);
+    FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
     TextSize = props.textSize;
     BackgroundTransparency = 1;
     TextXAlignment = Enum.TextXAlignment.Left;
     TextWrapped = true;
+    TextColor3 = Color3.new(1, 1, 1);
   })
 
 end;
