@@ -5,32 +5,45 @@ type DialogueServer = IDialogueServer.DialogueServer;
 
 export type DialogueClientSettings = {
 
-  -- This is the default theme that will be used when talking with NPCs
-  defaultTheme: string;
+  theme: {
 
-  -- Prevents the player from selecting responses without first viewing the dialogue
-  showResponsesAfterMessageFinished: boolean;
+    -- This is the default theme that will be used when talking with NPCs
+    defaultTheme: string;
 
-  -- Replace this with an audio ID that'll play every time a player continues a conversation or selects a response. Replace with 0 to not play any sound.
-  defaultClickSound: number;
+  };
 
-  -- Minimum distance from a character required for keybinds should work
-  minimumDistanceFromCharacter: number;
+  responses: {
 
-  -- Whether keybinds should work
-  keybindsEnabled: boolean;
+    -- Whether to show the responses after the message has finished playing
+    showResponsesAfterMessageFinished: boolean;
 
-  -- Keyboard keybind to start a conversation with an NPC
-  defaultChatTriggerKey: Enum.KeyCode;
+    -- Replace this with an audio ID that'll play every time a player selects a response. Replace with 0 to not play any sound.
+    defaultClickSound: number;
 
-  -- Gamepad keybind to start a conversation with an NPC
-  defaultChatTriggerKeyGamepad: Enum.KeyCode;
+  };
 
-  -- Keyboard keybind to continue a conversation with an NPC
-  defaultChatContinueKey: Enum.KeyCode;
+  triggers: {
 
-  -- Gamepad keybind to continue a conversation with an NPC
-  defaultChatContinueKeyGamepad: Enum.KeyCode;
+    -- Minimum distance from a character required for keybinds should work
+    minimumDistanceFromCharacter: number;
+
+    -- Whether keybinds should work
+    keybindsEnabled: boolean;
+
+    -- Keyboard keybind to start a conversation with an NPC
+    defaultChatTriggerKey: Enum.KeyCode;
+
+    -- Gamepad keybind to start a conversation with an NPC
+    defaultChatTriggerKeyGamepad: Enum.KeyCode;
+
+    -- Keyboard keybind to continue a conversation with an NPC
+    defaultChatContinueKey: Enum.KeyCode;
+
+    -- Gamepad keybind to continue a conversation with an NPC
+    defaultChatContinueKeyGamepad: Enum.KeyCode;
+
+  };
+
 };
 
 export type DialogueClientProperties = {
@@ -41,6 +54,7 @@ export type DialogueClientProperties = {
 }
 
 export type DialogueClientMethods = {
+  addDialogueServer: (self: DialogueClient, dialogueServer: DialogueServer) -> ();
   freezePlayer: (self: DialogueClient) -> ();
   unfreezePlayer: (self: DialogueClient) -> ();
   interact: (self: DialogueClient, dialogueServer: DialogueServer) -> ();

@@ -10,8 +10,6 @@ export type DialogueServerSettings = {
 
     fitName: boolean; 
 
-    textBoundsOffset: number; 
-
     theme: ModuleScript?; 
 
     letterDelay: number; 

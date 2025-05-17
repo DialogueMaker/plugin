@@ -6,8 +6,6 @@ local IDialogueServer = require(script.Interfaces.DialogueServer);
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueServers: {DialogueServer} = {};
-
 local dialogueClient = DialogueClient.new({
   theme = {
     defaultTheme = script.Themes.StandardTheme;
@@ -32,7 +30,7 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
   local didInitializeDialogueServer, errorMessage = pcall(function()
 
     local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
-    table.insert(dialogueServers, dialogueServer);
+    dialogueClient:addDialogueServer(dialogueServer);
 
   end);
 

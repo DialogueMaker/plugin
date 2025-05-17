@@ -17,9 +17,6 @@ local dialogueServerSettings = {
     -- When true, the NPCNameFrame will be automatically resized to fit NPC names.
     fitName = true :: boolean; 
 
-    -- If General.FitName is true, this value will be added to the TextBounds offset of the NPC's name.
-    textBoundsOffset = 30 :: number; 
-
     -- Change this to a theme you've added to the Themes folder in order to override default theme settings.
     themeName = "" :: string;
 
