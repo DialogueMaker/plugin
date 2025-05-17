@@ -5,8 +5,8 @@ export type TypewriterProperties = {
   text: string;
   letterDelay: number;
   skipPageEvent: RBXScriptSignal?;
+  shouldUseRichText: boolean?;
   onComplete: () -> ();
-  textLabelRef: React.Ref<TextLabel>;
 };
 
 local function useTypewriter(properties: TypewriterProperties): number
@@ -23,10 +23,14 @@ local function useTypewriter(properties: TypewriterProperties): number
 
     local typewriterTask = task.delay(properties.letterDelay, function()
 
-      assert(typeof(properties.textLabelRef) ~= "function", "textLabelRef must be a ref to a TextLabel");
+      local textLabel = Instance.new("TextLabel");
+      textLabel.Text = properties.text;
+      textLabel.RichText = not not properties.shouldUseRichText;
 
-      local textLabel = properties.textLabelRef.current;
-      if maxVisibleGraphemes ~= -1 and textLabel and maxVisibleGraphemes < #textLabel.ContentText then
+      local contentText = textLabel.ContentText;
+      textLabel:Destroy();
+
+      if maxVisibleGraphemes ~= -1 and maxVisibleGraphemes < #contentText then
 
         setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
 
@@ -55,7 +59,7 @@ local function useTypewriter(properties: TypewriterProperties): number
 
     end;
 
-  end, {maxVisibleGraphemes});
+  end, {properties.text :: unknown, maxVisibleGraphemes});
 
   return maxVisibleGraphemes;
 

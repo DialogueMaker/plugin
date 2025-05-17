@@ -18,9 +18,9 @@ local function useDynamicSize(array: {DynamicSizeProperties})
     for _, properties in array do
 
       local isDefault = not properties.minimumHeight and not properties.minimumWidth;
-      local isAtOrBelowMinimumHeight = properties.minimumHeight and properties.minimumHeight >= viewportSize.Y;
-      local isAtOrBelowMinimumWidth = properties.minimumWidth and properties.minimumWidth >= viewportSize.X;
-      if isDefault or (isAtOrBelowMinimumHeight and isAtOrBelowMinimumWidth) then
+      local isAtOrAboveMinimumHeight = not properties.minimumHeight or viewportSize.Y >= properties.minimumHeight;
+      local isAtOrAboveMinimumWidth = not properties.minimumWidth or viewportSize.X >= properties.minimumWidth;
+      if isDefault or (isAtOrAboveMinimumHeight and isAtOrAboveMinimumWidth) then
 
         selectedProperties = properties;
 

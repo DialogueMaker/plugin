@@ -29,17 +29,17 @@ local function MessageContainer(props: MessageContainerProperties)
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
 
-  React.useEffect(function()
-  
-    print(1);
-
-  end, {props.dialogue});
-
   local sizeX, sizeY, textSize = useDynamicSize({
     {
       sizeX = 310;
       sizeY = 117;
       textSize = 14;
+    }, 
+    {
+      sizeX = 500;
+      sizeY = 117;
+      textSize = 14;
+      minimumWidth = 736;
     }
   });
 
