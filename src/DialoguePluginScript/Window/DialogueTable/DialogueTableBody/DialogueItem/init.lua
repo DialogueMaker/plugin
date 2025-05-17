@@ -13,7 +13,7 @@ export type DialogueItemProperties = {
   contentScript: ModuleScript;
   layoutOrder: number;
   zIndex: number;
-  dialogueParent: ModuleScript | Folder;
+  dialogueParent: ModuleScript;
   plugin: Plugin;
 }
 

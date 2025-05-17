@@ -6,7 +6,7 @@ local DialogueTableBody = require(script.DialogueTableBody);
 local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableProperties = {
-  dialogueParent: ModuleScript | Folder;
+  dialogueParent: ModuleScript;
   plugin: Plugin;
 }
 

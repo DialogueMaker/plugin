@@ -40,33 +40,16 @@ local function closeDialogueEditor(): ()
 end;
 
 local function repairNPC(model: Model): ()
-
-  if not model:FindFirstChild("DialogueContainer") then
-
-    -- Add the dialogue container to the NPC
-    local DialogueContainer = Instance.new("Folder");
-    DialogueContainer.Name = "DialogueContainer";
-
-    -- Add the dialogue folder to the model
-    DialogueContainer.Parent = model;
-    return;
-
-  end;
   
-  if not model:FindFirstChild("NPCDialogueSettings") then
+  if not model:FindFirstChild("DialogueServer") then
 
-    print(`[Dialogue Maker] Adding settings script to {model.Name}`);
+    print(`[Dialogue Maker] Adding settings script to {model.Name}...`);
 
-    local SettingsScript = script.Templates.NPCSettingsTemplate:Clone();
-    SettingsScript.Name = "NPCDialogueSettings";
+    local SettingsScript = script.Templates.DialogueServerTemplate:Clone();
+    SettingsScript.Name = "DialogueServer";
     SettingsScript.Parent = model;
 
-    print(`[Dialogue Maker] Added settings script to {model.Name}`)
-
   end;
-
-  -- Initialize dialogue locations for indexing.
-  model:AddTag("DialogueMakerNPC");
 
 end;
 
@@ -210,70 +193,11 @@ ResetScriptsButton.Click:Connect(function()
 
 end);
 
-local RemoveUnusedInstancesButton = Toolbar:CreateButton("Remove Unused Instances", "Deletes unused actions, conditions, and dialogue locations.", Icons[themeName].removeUnusedInstancesButton)
-RemoveUnusedInstancesButton.Click:Connect(function()
-
-  RemoveUnusedInstancesButton.Enabled = false;
-
-  local count = 0;
-  pcall(function()
-
-    -- Set an undo point
-    ChangeHistoryService:SetWaypoint("Removing unused Dialogue Maker instances");
-
-    -- Remove the unused instances
-    for _, folder in StarterPlayerScripts.DialogueClientScript:GetChildren() do
-
-      if not folder:IsA("Folder") then
-
-        continue;
-
-      end
-
-      for _, child in folder:GetChildren() do
-
-        if folder.Name == "Actions" then
-
-          for _, module in child:GetChildren() do
-
-            local NPC = module:FindFirstChild("NPC");
-            if not NPC or not NPC.Value or not NPC.Value.Parent then
-
-              count += 1;
-              module:Destroy();
-
-            end
-
-          end
-
-        elseif not child.Value or not child.Value.Parent then
-
-          count += 1;
-          child:Destroy();
-
-        end;
-
-      end;
-
-    end;
-
-    -- Finalize the undo point
-    ChangeHistoryService:SetWaypoint("Removed unused Dialogue Maker instances");
-  end)
-
-  -- Done!
-  RemoveUnusedInstancesButton.Enabled = true;
-  local plural = if count ~= 1 then "s" else "";
-  print(`[Dialogue Maker] Removed unused {count} Dialogue Maker instance{plural}!`)
-
-end);
-
 local function refreshButtons()
 
   local themeName = settings().Studio.Theme.Name;
   EditDialogueButton.Icon = Icons[themeName].editDialogueButton;
   ResetScriptsButton.Icon = Icons[themeName].resetScriptsButton;
-  RemoveUnusedInstancesButton.Icon = Icons[themeName].removeUnusedInstancesButton;
 
 end;
 

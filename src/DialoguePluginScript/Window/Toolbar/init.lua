@@ -7,7 +7,7 @@ local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(script.Parent.Parent.useStudioColors);
 
 type ToolbarProps = {
-  dialogueParent: ModuleScript | Folder;
+  dialogueParent: ModuleScript;
   model: Model;
   repairNPC: (model: Model) -> ();
   plugin: Plugin;
@@ -32,7 +32,7 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = dialogueParent:IsA("Folder");
+      isDisabled = dialogueParent:HasTag("DialogueMaker_DialogueServer");
       onClick = function()
 
         Selection:Set({props.dialogueParent.Parent});
@@ -88,7 +88,7 @@ local function Toolbar(props: ToolbarProps)
 
         props.repairNPC(props.model);
 
-        local npcDialogueSettingsScript = props.model:FindFirstChild("NPCDialogueSettings") :: Script;
+        local npcDialogueSettingsScript = props.model:FindFirstChild("DialogueServer") :: ModuleScript;
         props.plugin:OpenScript(npcDialogueSettingsScript);
 
       end;

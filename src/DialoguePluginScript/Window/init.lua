@@ -15,7 +15,7 @@ export type WindowProperties = {
 local function Window(props: WindowProperties)
 
   local model: Model?, setModel = React.useState(nil :: Model?);
-  local dialogueParent: (Folder | ModuleScript)?, setDialogueParent = React.useState(nil :: (Folder | ModuleScript)?);
+  local dialogueParent: ModuleScript?, setDialogueParent = React.useState(nil :: ModuleScript?);
 
   React.useEffect(function()
   
@@ -28,7 +28,7 @@ local function Window(props: WindowProperties)
         local model = if selectedInstance:IsA("Model") then selectedInstance else selectedInstance:FindFirstAncestorWhichIsA("Model");
         props.pluginGUI.Title = `Dialogue Maker • {model.Name}`;
         setModel(model);
-        setDialogueParent(if selectedInstance == model then model:FindFirstChild("DialogueContainer") else selectedInstance);
+        setDialogueParent(if selectedInstance == model then model:FindFirstChild("DialogueServer") else selectedInstance);
 
       elseif #selection == 0 then
 
@@ -77,7 +77,7 @@ local function Window(props: WindowProperties)
           [React.Event.Activated] = function()
 
             props.repairNPC(model);
-            setDialogueParent(model:FindFirstChild("DialogueContainer") :: Folder);
+            setDialogueParent(model:FindFirstChild("DialogueServer") :: ModuleScript);
 
           end;
         })

@@ -1,5 +1,5 @@
 {
-  "$properties": {
-    "Tags": ["DialogueMaker_DialogueOwner"]
+  "properties": {
+    "Tags": ["DialogueMaker_DialogueServer"]
   }
 }
