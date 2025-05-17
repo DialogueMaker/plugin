@@ -1,18 +1,20 @@
 --!strict
 
-local DialogueClientScript = script.Parent.Parent;
-local React = require(DialogueClientScript.Packages.react);
-local Types = require(DialogueClientScript.Types);
-type NPCSettings = Types.NPCSettings;
 local Players = game:GetService("Players");
 
-local function useOutOfDistanceDetection(npc: Model, npcSettings: NPCSettings, endConversationFunction: () -> ())
+local DialogueClientScript = script.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
+local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
+
+type DialogueServer = IDialogueServer.DialogueServer;
+
+local function useOutOfDistanceDetection(npc: Model, dialogueServer: DialogueServer, endConversation: () -> ())
 
   React.useEffect(function(): ()
   
     local NPCPrimaryPart = npc.PrimaryPart;
-    local MaxConversationDistance = npcSettings.general.maxConversationDistance;
-    local EndConversationIfOutOfDistance = npcSettings.general.endConversationIfOutOfDistance;
+    local MaxConversationDistance = dialogueServer.settings.general.maxConversationDistance;
+    local EndConversationIfOutOfDistance = dialogueServer.settings.general.endConversationIfOutOfDistance;
     if EndConversationIfOutOfDistance and MaxConversationDistance and NPCPrimaryPart then
 
       local detectionTask = task.spawn(function() 
@@ -21,7 +23,7 @@ local function useOutOfDistanceDetection(npc: Model, npcSettings: NPCSettings, e
 
           if math.abs(NPCPrimaryPart.Position.Magnitude - Players.LocalPlayer.Character.PrimaryPart.Position.Magnitude) > MaxConversationDistance then
 
-            endConversationFunction();
+            endConversation();
             break;
 
           end;
@@ -38,7 +40,7 @@ local function useOutOfDistanceDetection(npc: Model, npcSettings: NPCSettings, e
 
     end;
 
-  end, {npc :: any, npcSettings, endConversationFunction});
+  end, {npc :: unknown, dialogueServer, endConversation});
 
 end;
 

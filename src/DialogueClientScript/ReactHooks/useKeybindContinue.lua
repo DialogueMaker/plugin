@@ -1,19 +1,23 @@
 --!strict
-local DialogueClientScript = script.Parent.Parent;
-local React = require(DialogueClientScript.Packages.react);
+
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
-local Types = require(DialogueClientScript.Types);
-type ClientSettings = Types.ClientSettings;
 
-function useKeybindContinue(clientSettings: ClientSettings, continueDialogueFunction: () -> ())
+local DialogueClientScript = script.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
+
+local IDialogueClient = require(DialogueClientScript.Interfaces.DialogueClient);
+
+type DialogueClient = IDialogueClient.DialogueClient;
+
+function useKeybindContinue(dialogueClient: DialogueClient, continueDialogueFunction: () -> ())
 
   React.useEffect(function(): ()
   
-    local defaultChatContinueKey = clientSettings.defaultChatContinueKey;
-    local defaultChatContinueKeyGamepad = clientSettings.defaultChatContinueKeyGamepad;
+    local defaultChatContinueKey = dialogueClient.settings.defaultChatContinueKey;
+    local defaultChatContinueKeyGamepad = dialogueClient.settings.defaultChatContinueKeyGamepad;
 
-    if clientSettings.keybindsEnabled then
+    if dialogueClient.settings.keybindsEnabled then
 
       local function checkKeybinds(keybind: Enum.KeyCode)
 
@@ -35,7 +39,7 @@ function useKeybindContinue(clientSettings: ClientSettings, continueDialogueFunc
 
     end;
 
-  end, {clientSettings});
+  end, {dialogueClient});
 
 end;
 
