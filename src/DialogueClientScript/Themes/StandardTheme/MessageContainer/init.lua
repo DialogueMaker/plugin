@@ -25,9 +25,15 @@ export type MessageContainerProperties = {
 local function MessageContainer(props: MessageContainerProperties)
 
   local componentIndex, setComponentIndex = React.useState(1);
-  local pages, testTextSegment = usePages(props.dialogue:getContent(), MessageTextSegment);
+  local pages, testTextSegment = usePages(props.dialogue, MessageTextSegment);
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
+
+  React.useEffect(function()
+  
+    print(1);
+
+  end, {props.dialogue});
 
   local sizeX, sizeY, textSize = useDynamicSize({
     {

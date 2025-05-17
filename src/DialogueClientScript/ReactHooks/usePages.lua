@@ -6,7 +6,7 @@ type Page = Types.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(contentArray: Types.ContentArray, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
+local function usePages(dialogue: Types.Dialogue, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
@@ -28,7 +28,7 @@ local function usePages(contentArray: Types.ContentArray, TextSegment: (TextSegm
     local testTextSegment = testTextSegmentRef.current;
     if testTextSegment then
 
-      local pages = DialogueAPI:getPages(contentArray, testTextSegment);
+      local pages = DialogueAPI:getPages(dialogue:getContent(), testTextSegment);
       setPages(pages);
       setShouldShowTestSegment(false);
 
@@ -40,8 +40,8 @@ local function usePages(contentArray: Types.ContentArray, TextSegment: (TextSegm
 
     end;
 
-  end, {contentArray :: unknown, TextSegment});
-  
+  end, {dialogue :: unknown, TextSegment});
+
   return pages, if shouldShowTestSegment then testTextSegment else nil;
 
 end;
