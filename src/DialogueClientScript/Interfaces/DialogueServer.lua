@@ -50,14 +50,6 @@ export type DialogueServerSettings = {
 
   };
 
-  speechBubble: {
-
-    enabled: boolean;
-
-    location: BasePart?;
-
-  };
-
   clickDetector: {
 
     enabled: boolean;

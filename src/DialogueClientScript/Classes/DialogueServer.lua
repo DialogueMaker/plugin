@@ -16,12 +16,6 @@ export type ConstructorProperties = {
 function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServerSettings, instance: ModuleScript): DialogueServer
 
   local function toggleTriggers(self: DialogueServer, enabled: boolean): ()
-    
-    if self.speechBubble then
-
-      self.speechBubble.Enabled = enabled;
-
-    end;
 
     if self.proximityPrompt then
 
@@ -58,58 +52,23 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
 
   end;
 
-  local dialogueOwner: DialogueServer = {
+  local dialogueServer: DialogueServer = {
     toggleTriggers = toggleTriggers;
     instance = instance;
     settings = dialogueServerSettings;
   };
-    
-  -- Set up speech bubbles.
-  if dialogueOwner.settings.speechBubble.enabled then
 
-    local speechBubblePart = properties.settings.speechBubble.location;
-    if speechBubblePart and speechBubblePart:IsA("BasePart") then
+  -- Set up the prompt regions.
+  if dialogueServer.settings.promptRegion.enabled then
 
-      -- Listen if the player clicks the speech bubble
-      local speechBubble = Instance.new("BillboardGui");
-      speechBubble.Name = "SpeechBubble";
-      speechBubble.Active = true;
-      speechBubble.LightInfluence = 0;
-      speechBubble.ResetOnSpawn = false;
-      speechBubble.Size = properties.settings.speechBubble.Size;
-      speechBubble.StudsOffset = properties.settings.speechBubble.StudsOffset;
-      speechBubble.Adornee = properties.settings.speechBubble.BasePart;
-
-      local speechBubbleButton = Instance.new("ImageButton");
-      speechBubbleButton.BackgroundTransparency = 1;
-      speechBubbleButton.BorderSizePixel = 0;
-      speechBubbleButton.Name = "SpeechBubbleButton";
-      speechBubbleButton.Size = UDim2.fromScale(1, 1);
-      speechBubbleButton.Image = properties.settings.speechBubble.image;
-      speechBubbleButton.Parent = instance.Parent;
-      speechBubble.Parent = PlayerGui;
-
-      dialogueServer.speechBubble = speechBubble;
-
-    else
-
-      warn("[Dialogue Maker]: The speechBubblePart for " .. npc.Name .. " is not a Part.");
-
-    end;
-
-  end;
-
-  -- Next, the prompt regions.
-  if dialogueOwner.settings.promptRegion.enabled then
-
-    local PromptRegionPart = dialogueSettings.promptRegion.location;
+    local PromptRegionPart = dialogueServer.settings.promptRegion.location;
     if PromptRegionPart and PromptRegionPart:IsA("BasePart") then
 
       PromptRegionPart.Touched:Connect(function(part)
 
         -- Make sure our player touched it and not someone else
         local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-        if PlayerFromCharacter == Player then
+        if PlayerFromCharacter == player then
 
           api.dialogue:readDialogue(npc, dialogueSettings);
 
@@ -126,10 +85,10 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
   end;
 
   -- Now, the proximity prompts.
-  if dialogueOwner.settings.proximityPrompt.enabled then
+  if dialogueServer.settings.proximityPrompt.enabled then
 
-    local proximityPrompt = properties.settings.proximityPrompt.location;
-    if properties.settings.proximityPrompt.autoCreate then
+    local proximityPrompt = dialogueServer.settings.proximityPrompt.location;
+    if dialogueServer.settings.proximityPrompt.autoCreate then
 
       local proximityPromptTemp = Instance.new("ProximityPrompt");
       proximityPromptTemp.Parent = instance.Parent;
@@ -139,31 +98,31 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
 
     if proximityPrompt and proximityPrompt:IsA("ProximityPrompt") then
 
-      api.triggers:addProximityPrompt(npc, ProximityPrompt);
+
 
     else
 
-      warn("[Dialogue Maker]: The proximity prompt location for " .. npc.Name .. " is not a ProximityPrompt.");
+      warn("[Dialogue Maker]: The proximity prompt location for " .. dialogueServer.instance.Name .. " is not a ProximityPrompt.");
 
     end;
 
   end;
 
   -- Almost there: it's time for the click detectors.
-  if dialogueOwner.settings.clickDetector.enabled then
+  if dialogueServer.settings.clickDetector.enabled then
 
-    local ClickDetector = dialogueSettings.clickDetector.location;
-    if dialogueSettings.clickDetector.autoCreate then
+    local ClickDetector = dialogueServer.settings.clickDetector.location;
+    if dialogueServer.settings.clickDetector.autoCreate then
 
       local ClickDetectorTemp = Instance.new("ClickDetector");
-      ClickDetectorTemp.Parent = npc;
+      ClickDetectorTemp.Parent = dialogueServer.instance.Parent;
       ClickDetector = ClickDetectorTemp;
 
     end;
 
     if ClickDetector and ClickDetector:IsA("ClickDetector") then
 
-      api.triggers:addClickDetector(npc, ClickDetector);
+      
 
       ClickDetector.MouseClick:Connect(function()
         
@@ -179,7 +138,7 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
 
   end;
 
-  return dialogueOwner;
+  return dialogueServer;
 
 end;
 

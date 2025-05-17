@@ -8,7 +8,7 @@ export type DialogueClientSettings = {
   theme: {
 
     -- This is the default theme that will be used when talking with NPCs
-    defaultTheme: string;
+    defaultTheme: ModuleScript;
 
   };
 

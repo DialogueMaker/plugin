@@ -196,7 +196,6 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
             end;
             dialogueClient = self;
             dialogueServer = dialogueServer;
-            npc = npc;
           }));
 
         end;
@@ -278,17 +277,17 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
 
   end);
 
-  if dialogueClient.settings.keybindsEnabled then
+  if dialogueClient.settings.triggers.keybindsEnabled then
 
-    local CanPressButton = false;
+    local nearestDialogueServer: DialogueServer? = nil;
     local ReadDialogueWithKeybind;
-    local defaultChatTriggerKey = dialogueClient.settings.defaultChatTriggerKey;
-    local defaultChatTriggerKeyGamepad = dialogueClient.settings.defaultChatTriggerKeyGamepad;
+    local defaultChatTriggerKey = dialogueClient.settings.triggers.defaultChatTriggerKey;
+    local defaultChatTriggerKeyGamepad = dialogueClient.settings.triggers.defaultChatTriggerKeyGamepad;
     ReadDialogueWithKeybind = function()
 
-      if CanPressButton and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
+      if nearestDialogueServer and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
           
-        readDialogue(npc, dialogueSettings);
+        dialogueClient:interact(nearestDialogueServer);
 
       end;
 
@@ -298,7 +297,28 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
     -- Check if the player is in range
     RunService.Heartbeat:Connect(function()
 
-      CanPressButton = player:DistanceFromCharacter(npc:GetPivot().Position) < dialogueClient.settings.minimumDistanceFromCharacter;
+      local newNearestDialogueServer: DialogueServer? = nil;
+      local nearestDistance: number? = nil;
+      for _, dialogueServer in pairs(dialogueClient.dialogueServers) do
+
+        local parent = dialogueServer.instance.Parent;
+        if not parent then continue; end;
+
+        local parentPosition = if parent:IsA("PVInstance") then parent:GetPivot().Position else nil;
+        if not parentPosition then continue; end;
+
+        local distance = player:DistanceFromCharacter(parentPosition);
+        if distance <= dialogueClient.settings.triggers.minimumDistanceFromCharacter and (not nearestDistance or distance < nearestDistance) then
+
+          newNearestDialogueServer = dialogueServer;
+          nearestDistance = distance;
+          break;
+
+        end;
+
+      end;
+
+      nearestDialogueServer = newNearestDialogueServer;
 
     end);
 
