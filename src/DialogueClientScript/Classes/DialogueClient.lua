@@ -24,13 +24,19 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
   local player = Players.LocalPlayer;
 
   local function addDialogueServer(self: DialogueClient, dialogueServer: DialogueServer)
+    
+    local promptRegionPart = dialogueServer.settings.promptRegion.location;
+    if promptRegionPart then
 
-    local speechBubble = dialogueServer.speechBubble;
-    if speechBubble then
+      promptRegionPart.Touched:Connect(function(part)
 
-      (speechBubble:FindFirstChild("speechBubbleButton") :: ImageButton).MouseButton1Click:Connect(function()
+        -- Make sure our player touched it and not someone else
+        local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
+        if PlayerFromCharacter == player then
 
-        self:interact(dialogueServer);
+          self:interact(dialogueServer);
+
+        end;
 
       end);
 

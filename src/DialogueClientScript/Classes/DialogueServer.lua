@@ -1,7 +1,5 @@
 --!strict
 
-local Players = game:GetService("Players");
-
 local DialogueClientScript = script.Parent.Parent;
 
 local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
@@ -59,30 +57,8 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
   };
 
   -- Set up the prompt regions.
-  if dialogueServer.settings.promptRegion.enabled then
-
-    local PromptRegionPart = dialogueServer.settings.promptRegion.location;
-    if PromptRegionPart and PromptRegionPart:IsA("BasePart") then
-
-      PromptRegionPart.Touched:Connect(function(part)
-
-        -- Make sure our player touched it and not someone else
-        local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-        if PlayerFromCharacter == player then
-
-          api.dialogue:readDialogue(npc, dialogueSettings);
-
-        end;
-
-      end);
-
-    else
-
-      warn("[Dialogue Maker]: The PromptRegionPart for " .. npc.Name .. " is not a Part.");
-
-    end;
-
-  end;
+  local parent = dialogueServer.instance.Parent;
+  assert(parent, "[Dialogue Maker]: The parent of the dialogue server instance is nil. Please check your setup.");
 
   -- Now, the proximity prompts.
   if dialogueServer.settings.proximityPrompt.enabled then
@@ -102,7 +78,7 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
 
     else
 
-      warn("[Dialogue Maker]: The proximity prompt location for " .. dialogueServer.instance.Name .. " is not a ProximityPrompt.");
+      warn(`[Dialogue Maker]: The proximity prompt location for {parent.Name} is not a ProximityPrompt.`);
 
     end;
 
@@ -111,30 +87,16 @@ function DialogueServer.new(dialogueServerSettings: IDialogueServer.DialogueServ
   -- Almost there: it's time for the click detectors.
   if dialogueServer.settings.clickDetector.enabled then
 
-    local ClickDetector = dialogueServer.settings.clickDetector.location;
+    local clickDetector = dialogueServer.settings.clickDetector.location;
     if dialogueServer.settings.clickDetector.autoCreate then
 
-      local ClickDetectorTemp = Instance.new("ClickDetector");
-      ClickDetectorTemp.Parent = dialogueServer.instance.Parent;
-      ClickDetector = ClickDetectorTemp;
+      local clickDetectorTemp = Instance.new("ClickDetector");
+      clickDetectorTemp.Parent = dialogueServer.instance.Parent;
+      clickDetector = clickDetectorTemp;
 
     end;
-
-    if ClickDetector and ClickDetector:IsA("ClickDetector") then
-
-      
-
-      ClickDetector.MouseClick:Connect(function()
-        
-        readDialogue(npc, dialogueSettings);
-        
-      end);
-
-    else
-
-      warn("[Dialogue Maker]: The ClickDetectorLocation for " .. npc.Name .. " is not a ClickDetector.");
-
-    end;
+    
+    dialogueServer.clickDetector = clickDetector;
 
   end;
 
