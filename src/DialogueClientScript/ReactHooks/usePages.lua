@@ -1,12 +1,15 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
-local DialogueAPI = require(script.Parent.Parent.API.Dialogue);
-local Types = require(script.Parent.Parent.Types);
+local DialogueClientScript = script.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local Types = require(DialogueClientScript.Types);
+
+type Dialogue = IDialogue.Dialogue;
 type Page = Types.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(dialogue: Types.Dialogue, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
+local function usePages(dialogue: Dialogue, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
@@ -28,7 +31,7 @@ local function usePages(dialogue: Types.Dialogue, TextSegment: (TextSegmentPrope
     local testTextSegment = testTextSegmentRef.current;
     if testTextSegment then
 
-      local pages = DialogueAPI:getPages(dialogue:getContent(), testTextSegment);
+      local pages = dialogue:getPages(testTextSegment);
       setPages(pages);
       setShouldShowTestSegment(false);
 
