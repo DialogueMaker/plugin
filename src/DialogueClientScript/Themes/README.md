@@ -18,12 +18,13 @@ dialogueClient:setTheme(StandardTheme);
 ```
 
 ### Setting themes at the DialogueServer level
-
+If you want a specific theme for an NPC without affecting the other NPC's themes, you can set a theme at the DialogueServer level.
 
 ### Setting themes at the Dialogue level
-Setting themes per dialogue is unsupported for now, but this feature will be added in the future.
+Setting themes per dialogue is unsupported for now, but this feature will be added in the future. This feature can be helpful for when you want to enhance emotion at specific moments.
 
 ## Creating a theme
+
 
 ## Pre-installed themes
 [StandardTheme](./StandardTheme) is the only pre-installed theme in the plugin. StandardTheme is available out-of-the-box, which can be especially helpful for developers who are unfamiliar with [React Lua](https://jsdotlua.github.io/react-lua/).
