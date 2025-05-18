@@ -6,7 +6,7 @@ As of Dialogue Maker v5.0.0, you can create custom triggers for conversations.
 You can put your custom triggers in this folder, or you can put them somewhere else in your game. Just make sure to get the shared DialogueClient, call `:interact()`, and you're good to go.
 
 > [!WARNING]
-> It is not recommended get a DialogueClient via bindable functions and events. [You will only receive a *copy* of the DialogueClient object instead of the *real* object.](https://create.roblox.com/docs/scripting/events/bindable#table-identities) In this case, your trigger probably won't work properly.
+> It is not recommended to get a DialogueClient via bindable functions and events. [You will only receive a *copy* of the DialogueClient object instead of the *real* object.](https://create.roblox.com/docs/scripting/events/bindable#table-identities) In this case, your trigger probably won't work properly.
 
 ## Configuring triggers at the DialogueServer level
 Maybe you want to have specific NPCs with triggers instead of all of them. Good news: Dialogue Maker gives you that control.
