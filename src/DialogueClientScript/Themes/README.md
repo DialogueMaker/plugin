@@ -1,5 +1,27 @@
 # Themes
+Want to mix up how messages and responses are shown to players? It's time for a new theme. 
+
 ## Using themes
+### Setting themes at the DialogueClient level
+The theme at the DialogueClient level is the default theme for conversations. You can set the theme at the DialogueClient level when you create the DialogueClient object or by using the `setTheme()` method.
+
+```luau
+local StandardTheme = require(DialogueClientScript.Themes.StandardTheme);
+
+-- Set theme when creating DialogueClient
+local dialogueClient = DialogueClient.new({
+  theme = StandardTheme;
+});
+
+-- Set theme after creating DialogueClient
+dialogueClient:setTheme(StandardTheme);
+```
+
+### Setting themes at the DialogueServer level
+
+
+### Setting themes at the Dialogue level
+Setting themes per dialogue is unsupported for now, but this feature will be added in the future.
 
 ## Creating a theme
 
