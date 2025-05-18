@@ -20,3 +20,53 @@ For organization, pre-installed triggers are located in the "Triggers" folder of
 * [Trigger conversations with a prompt region part](./PromptRegionTrigger.client.lua)
 * [Trigger conversations with a floating speech bubble](./SpeechBubbleTrigger.client.lua)
 * [Trigger conversations with a ProximityPrompt](./ProximityPromptTrigger.client.lua)
+
+## Templates
+Here's some templates that you can start out with. These templates are for your convienence; you can follow a different format if you want.
+
+### Template for targeting a specific DialogueServer
+```luau
+--!strict
+
+local CollectionService = game:GetService("CollectionService");
+local StarterPlayer = game:GetService("StarterPlayer");
+
+local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
+local DialogueClient = require(StarterPlayerScripts.DialogueClientScript.Classes.DialogueClient);
+local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interfaces.DialogueServer);
+
+type DialogueServer = IDialogueServer.DialogueServer;
+
+local dialogueClient = DialogueClient.getFromSharedObject(true);
+
+local dialogueServer = require(workspace.NPC.DialogueServer) :: DialogueServer;
+
+-- Handle the trigger from here.
+-- Check out the pre-installed triggers for examples.
+
+```
+
+### Template for targeting all DialogueServers
+```luau
+--!strict
+
+local CollectionService = game:GetService("CollectionService");
+local StarterPlayer = game:GetService("StarterPlayer");
+
+local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
+local DialogueClient = require(StarterPlayerScripts.DialogueClientScript.Classes.DialogueClient);
+local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interfaces.DialogueServer);
+
+type DialogueServer = IDialogueServer.DialogueServer;
+
+local dialogueClient = DialogueClient.getFromSharedObject(true);
+
+for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
+
+  local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
+
+  -- Handle the trigger from here.
+  -- Check out the pre-installed triggers for examples.
+
+end;
+```
