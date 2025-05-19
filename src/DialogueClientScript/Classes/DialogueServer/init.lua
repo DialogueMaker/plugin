@@ -55,38 +55,7 @@ local DialogueServer = {
 export type ConstructorProperties = {
 }
 
-function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettings?, instance: ModuleScript): DialogueServer
-
-  local function toggleTriggers(self: DialogueServer, enabled: boolean): ()
-
-    if self.clickDetector then
-
-      if enabled then
-
-        self.clickDetector.Parent = instance.Parent;
-
-        local OriginalParent = self.clickDetector:FindFirstChild("OriginalParent");
-        if OriginalParent and OriginalParent:IsA("ObjectValue") and OriginalParent.Value then
-
-          self.clickDetector.Parent = OriginalParent.Value;
-          OriginalParent:Destroy();
-
-        end;
-
-      elseif self.clickDetector.Parent then
-
-        local OriginalParent = Instance.new("ObjectValue");
-        OriginalParent.Name = "OriginalParent";
-        OriginalParent.Value = self.clickDetector.Parent;
-        OriginalParent.Parent = self.clickDetector;
-
-        self.clickDetector.Parent = instance;
-
-      end;
-
-    end;
-
-  end;
+function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettings?): DialogueServer
 
   local settings: DialogueServerSettings = {
     general = {
@@ -131,26 +100,8 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
   };
 
   local dialogueServer: DialogueServer = {
-    toggleTriggers = toggleTriggers;
-    instance = instance;
     settings = settings;
   };
-
-  -- Set up the prompt regions.
-  local parent = dialogueServer.instance.Parent;
-  assert(parent, "[Dialogue Maker]: The parent of the dialogue server instance is nil. Please check your setup.");
-
-  -- Almost there: it's time for the click detectors.
-  local clickDetector = dialogueServer.settings.clickDetector.instance;
-  if dialogueServer.settings.clickDetector.shouldAutoCreate then
-
-    local clickDetectorTemp = Instance.new("ClickDetector");
-    clickDetectorTemp.Parent = dialogueServer.instance.Parent;
-    clickDetector = clickDetectorTemp;
-
-  end;
-  
-  dialogueServer.clickDetector = clickDetector;
 
   return dialogueServer;
 

@@ -142,14 +142,9 @@ export type DialogueServerSettings = {
 
 export type DialogueServerProperties = {
   settings: DialogueServerSettings;
-  instance: ModuleScript;
-  speechBubble: BillboardGui?;
-  proximityPrompt: ProximityPrompt?;
-  clickDetector: ClickDetector?;
 };
 
 export type DialogueServerMethods = {
-  toggleTriggers: (self: DialogueServer, enabled: boolean) -> ();
 };
 
 export type DialogueServer = DialogueServerProperties & DialogueServerMethods;

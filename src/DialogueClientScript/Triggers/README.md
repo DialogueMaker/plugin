@@ -14,7 +14,7 @@ Maybe you want to have specific NPCs with triggers instead of all of them. Good 
 You can create new settings in that NPC's `DialogueServer` ModuleScript, and handle them from your trigger script. For example, we added multiple DialogueServer-level settings for pre-installed triggers. To see how we handle them, check out the [pre-installed triggers](#pre-installed-triggers).
 
 ## Pre-installed triggers
-For organization, pre-installed triggers are located in the "Triggers" folder of the DialogueClientScript. 
+For organization, pre-installed triggers are located in the "Triggers" folder of the DialogueClientScript. You can configure or use them for your game. If you edit the scripts, ensure that a tag labeled "DialogueMaker_Custom" is on the script so it doesn't get overwritten by the "Reset Scripts" button.
 
 * [Trigger conversations with a ClickDetector](./ClickDetectorTrigger.client.lua)
 * [Trigger conversations with a prompt region part](./PromptRegionTrigger.client.lua)
@@ -43,7 +43,6 @@ local dialogueServer = require(workspace.NPC.DialogueServer) :: DialogueServer;
 
 -- Handle the trigger from here.
 -- Check out the pre-installed triggers for examples.
-
 ```
 
 ### Template for targeting all DialogueServers
