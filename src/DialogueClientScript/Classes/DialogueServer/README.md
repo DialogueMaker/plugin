@@ -9,7 +9,7 @@ The `DialogueServer` class is called DialogueServer because the object is typica
 ### defaultSettings
 An object of [DefaultServerSettings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't configured in the [constructor](#newdialogueserversettings-module) is defined by the default settings.
 
-The current default settings are opinionated and aim to best suit the average non-programmer user of. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
+The current default settings are opinionated and aim to best suit the average non-programmer. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
 
 ```luau
 local defaultSettings = {
