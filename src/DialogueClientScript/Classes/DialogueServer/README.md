@@ -7,7 +7,7 @@ The `DialogueServer` class is called DialogueServer because the object is typica
 
 ## Static properties
 ### defaultSettings
-An object of [DefaultServerSettings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't configured in the [constructor](#newdialogueserversettings-module) is defined by the default settings.
+An object of [default server settings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't explicitly configured in the [constructor](#newdialogueserversettings-module) is defined by the default settings.
 
 The current default settings are opinionated and aim to best suit the average non-programmer. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
 
@@ -69,6 +69,9 @@ Creates and returns a new `DialogueServer` object.
 The `DialogueServer`'s [settings](#dialogueserversettings). They start out with the [default settings](#defaultsettings), but they can be overwritten by [the constructor](#newdialogueserversettings-module) or direct assignment.
 
 ## Relevant types
+### ClickDetectorDialogueServerSettings
+TBA
+
 ### DialogueServerSettings
 | Name | Type | Description |
 | :- | :- | :- |
@@ -81,10 +84,31 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 | timeout | [TimeoutDialogueServerSettings](#timeoutdialogueserversettings) | Settings for conversation timeouts. |
 | typewriter | [TypewriterDialogueServerSettings](#typewriterdialogueserversettings) | Settings intended for StandardTheme's [typewriter hook](/src/DialogueClientScript/ReactHooks/useTypewriter.lua). |
 
-### OptionalDialogueServerSettings
-OptionalDialogueServerSettings is used to let developers configure *some* settings that they need, but offer the convenience of not configuring *all* settings. 
+### GeneralDialogueServerSettings
+TBA
 
-As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recursive partial types](https://stackoverflow.com/a/47914631), so we created a new type where every property in [DialogueServerSettings](#dialogueserversettings) is optional. Refer to DialogueServerSettings for property documentation.
+### HumanoidDialogueServerSettings
+TBA
+
+### OptionalDialogueServerSettings
+OptionalDialogueServerSettings is used to let developers configure *some* [settings](#dialogueserversettings) that they need, but offer the convenience of not configuring *all* settings. 
+
+As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recursive partial types](https://stackoverflow.com/a/47914631), so we created a new type where every property in DialogueServerSettings is optional. Refer to DialogueServerSettings for property documentation.
+
+### PromptRegionDialogueServerSettings
+TBA
+
+### ProximityPromptDialogueServerSettings
+TBA
+
+### SpeechBubbleDialogueServerSettings
+TBA
+
+### TimeoutDialogueServerSettings
+TBA
+
+### TypewriterDialogueServerSettings
+TBA
 
 ---
 
