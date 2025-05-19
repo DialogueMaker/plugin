@@ -14,6 +14,7 @@ local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 
 type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
+type DialogueClientSettings = IDialogueClient.DialogueClientSettings;
 type DialogueServer = IDialogueServer.DialogueServer;
 
 local DialogueClient = {
@@ -24,40 +25,6 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
 
   local themeChangedEvent = Instance.new("BindableEvent");
   local player = Players.LocalPlayer;
-
-  local function addDialogueServer(self: DialogueClient, dialogueServer: DialogueServer)
-    
-    local promptRegionPart = dialogueServer.settings.promptRegion.location;
-    if promptRegionPart then
-
-      promptRegionPart.Touched:Connect(function(part)
-
-        -- Make sure our player touched it and not someone else
-        local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-        if PlayerFromCharacter == player then
-
-          self:interact(dialogueServer);
-
-        end;
-
-      end);
-
-    end;
-    
-    local proximityPrompt = dialogueServer.proximityPrompt;
-    if proximityPrompt then
-
-      proximityPrompt.Triggered:Connect(function()
-
-        self:interact(dialogueServer);
-
-      end);
-
-    end;
-
-    table.insert(self.dialogueServers, dialogueServer);
-
-  end;
 
   local function freezePlayer(): ()
   
@@ -74,7 +41,7 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
     -- Make sure we can't talk to another NPC
     self:toggleAllTriggers(false);
     
-    local freezePlayer = dialogueServer.settings.general.freezePlayer;
+    local freezePlayer = dialogueServer.settings.general.shouldFreezePlayer;
     if freezePlayer then 
 
       self:freezePlayer(); 
@@ -266,11 +233,28 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
     
   end;
 
+  local settings: DialogueClientSettings = {
+    theme = {
+      defaultTheme = script.Themes.StandardTheme;
+    };
+    responses = {
+      showResponsesAfterMessageFinished = true;
+      defaultClickSound = 0;
+    };
+    keybinds = {
+      minimumDistanceFromCharacter = 10; 
+      keybindsEnabled = true; 
+      interactKey = Enum.KeyCode.F; 
+      interactKeyGamepad = Enum.KeyCode.ButtonX; 
+      defaultChatContinueKey = Enum.KeyCode.F; 
+      defaultChatContinueKeyGamepad = Enum.KeyCode.ButtonA; 
+    }
+  };
+
   local dialogueClient: DialogueClient = {
     dialogueServers = {};
     isTalkingWithNPC = false;
-    settings = dialogueClientSettings;
-    addDialogueServer = addDialogueServer;
+    settings = settings;
     freezePlayer = freezePlayer;
     interact = interact;
     setTheme = setTheme;
@@ -285,22 +269,21 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
 
   end);
 
-  if dialogueClient.settings.triggers.keybindsEnabled then
+  local keybinds = dialogueClient.settings.keybinds;
+  if keybinds.interactKey or keybinds.interactKeyGamepad then
 
     local nearestDialogueServer: DialogueServer? = nil;
     local ReadDialogueWithKeybind;
-    local defaultChatTriggerKey = dialogueClient.settings.triggers.defaultChatTriggerKey;
-    local defaultChatTriggerKeyGamepad = dialogueClient.settings.triggers.defaultChatTriggerKeyGamepad;
     ReadDialogueWithKeybind = function()
 
-      if nearestDialogueServer and (UserInputService:IsKeyDown(defaultChatTriggerKey) or UserInputService:IsKeyDown(defaultChatTriggerKeyGamepad)) then
+      if nearestDialogueServer and (UserInputService:IsKeyDown(keybinds.interactKey) or UserInputService:IsKeyDown(keybinds.interactKeyGamepad)) then
           
         dialogueClient:interact(nearestDialogueServer);
 
       end;
 
     end;
-    ContextActionService:BindAction("OpenDialogueWithKeybind", ReadDialogueWithKeybind, false, defaultChatTriggerKey, defaultChatTriggerKeyGamepad);
+    ContextActionService:BindAction("OpenDialogueWithKeybind", ReadDialogueWithKeybind, false, keybinds.interactKey, keybinds.interactKeyGamepad);
 
     -- Check if the player is in range
     RunService.Heartbeat:Connect(function()
@@ -316,7 +299,7 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.DialogueClie
         if not parentPosition then continue; end;
 
         local distance = player:DistanceFromCharacter(parentPosition);
-        if distance <= dialogueClient.settings.triggers.minimumDistanceFromCharacter and (not nearestDistance or distance < nearestDistance) then
+        if distance <= dialogueClient.settings.keybinds.minimumDistanceFromCharacter and (not nearestDistance or distance < nearestDistance) then
 
           newNearestDialogueServer = dialogueServer;
           nearestDistance = distance;

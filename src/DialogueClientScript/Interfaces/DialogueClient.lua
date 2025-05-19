@@ -14,36 +14,28 @@ export type DialogueClientSettings = {
 
   responses: {
 
-    -- Whether to show the responses after the message has finished playing
-    showResponsesAfterMessageFinished: boolean;
-
     -- Replace this with an audio ID that'll play every time a player selects a response. Replace with 0 to not play any sound.
     defaultClickSound: number;
 
   };
+  keybinds: {
 
-  triggers: {
-
-    -- Minimum distance from a character required for keybinds should work
+    --[[
+      Minimum distance from a character required for keybinds should work.
+    ]]
     minimumDistanceFromCharacter: number;
 
-    -- Whether keybinds should work
-    keybindsEnabled: boolean;
+    --[[
+      Keyboard keybind to start a conversation with a character.
+    ]]
+    interactKey: Enum.KeyCode?;
 
-    -- Keyboard keybind to start a conversation with an NPC
-    defaultChatTriggerKey: Enum.KeyCode;
-
-    -- Gamepad keybind to start a conversation with an NPC
-    defaultChatTriggerKeyGamepad: Enum.KeyCode;
-
-    -- Keyboard keybind to continue a conversation with an NPC
-    defaultChatContinueKey: Enum.KeyCode;
-
-    -- Gamepad keybind to continue a conversation with an NPC
-    defaultChatContinueKeyGamepad: Enum.KeyCode;
+    --[[
+      Gamepad keybind to start a conversation with a character.
+    ]]
+    interactKeyGamepad: Enum.KeyCode?;
 
   };
-
 };
 
 export type DialogueClientProperties = {
@@ -54,7 +46,6 @@ export type DialogueClientProperties = {
 }
 
 export type DialogueClientMethods = {
-  addDialogueServer: (self: DialogueClient, dialogueServer: DialogueServer) -> ();
   freezePlayer: (self: DialogueClient) -> ();
   unfreezePlayer: (self: DialogueClient) -> ();
   interact: (self: DialogueClient, dialogueServer: DialogueServer) -> ();

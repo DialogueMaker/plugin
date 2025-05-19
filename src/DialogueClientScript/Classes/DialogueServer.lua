@@ -5,8 +5,48 @@ local DialogueClientScript = script.Parent.Parent;
 local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
 
 type DialogueServer = IDialogueServer.DialogueServer;
+type DialogueServerSettings = IDialogueServer.DialogueServerSettings;
 
-local DialogueServer = {};
+local DialogueServer = {
+  defaultSettings = {
+    general = {
+      name = nil;
+      theme = nil;
+      shouldFreezePlayer = true; 
+      shouldEndConversationIfOutOfDistance = false;
+      maxConversationDistance = 10;
+    };
+    typewriter = {
+      characterDelaySeconds = 0.025; 
+      allowPlayerToSkipDelay = true; 
+    };
+    humanoid = {
+      shouldLookAtPlayer = true; 
+      neckRotationMaxX = 0.8726;
+      neckRotationMaxY = 1.0472; 
+      neckRotationMaxZ = 0.8726; 
+    };
+    promptRegion = {
+      regionPart = nil; 
+    };
+    timeout = {
+      isEnabled = false;	
+      seconds = 0; 
+      shouldWaitForResponse = true; 
+    };
+    clickDetector = {
+      isEnabled = false; 
+      isAutoCreateEnabled = true; 
+      shouldDisappearDuringConversation = true; 
+      instance = nil;
+    };
+    proximityPrompt = {
+      isEnabled = true; 
+      isAutoCreateEnabled = true; 
+      instance = nil; 
+    };
+  } :: DialogueServerSettings;
+};
 
 export type ConstructorProperties = {
 }

@@ -15,6 +15,10 @@ export type Page = {
 export type Dialogue = {
 
   --[[
+    ]]
+  theme: ModuleScript?;
+
+  --[[
     This is the code that's ran when the dialogue is shown.
     If this is a message or a response, then the string array will be the message or response content.
 

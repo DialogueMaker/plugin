@@ -6,23 +6,7 @@ local IDialogueServer = require(script.Interfaces.DialogueServer);
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueClient = DialogueClient.new({
-  theme = {
-    defaultTheme = script.Themes.StandardTheme;
-  };
-  responses = {
-    showResponsesAfterMessageFinished = true;
-    defaultClickSound = 0;
-  };
-  triggers = {
-    minimumDistanceFromCharacter = 10; 
-    keybindsEnabled = true; 
-    defaultChatTriggerKey = Enum.KeyCode.F; 
-    defaultChatTriggerKeyGamepad = Enum.KeyCode.ButtonX; 
-    defaultChatContinueKey = Enum.KeyCode.F; 
-    defaultChatContinueKeyGamepad = Enum.KeyCode.ButtonA; 
-  }
-});
+local dialogueClient = DialogueClient.new({});
 
 print("[Dialogue Maker]: Preparing dialogue...");
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
