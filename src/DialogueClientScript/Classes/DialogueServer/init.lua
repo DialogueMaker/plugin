@@ -35,7 +35,7 @@ local DialogueServer = {
       shouldWaitForResponse = true; 
     };
     clickDetector = { 
-      shouldAutoCreate = true; 
+      shouldAutoCreate = false; 
       shouldDisappearDuringConversation = true; 
       instance = nil;
     };
