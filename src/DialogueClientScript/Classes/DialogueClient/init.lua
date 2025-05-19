@@ -30,7 +30,7 @@ local DialogueClient = {
   } :: DialogueClientSettings;
 };
 
-function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDialogueClientSettings?): DialogueClient
+function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDialogueClientSettings?, module: ModuleScript): DialogueClient
 
   local themeChangedEvent = Instance.new("BindableEvent");
   local dialogueServerChangedEvent = Instance.new("BindableEvent");
@@ -64,7 +64,7 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDial
     self:setTheme(themeModuleScript);
 
     -- Show the dialogue to the player
-    local parent: Instance = dialogueServer.instance;
+    local parent: Instance = module;
     local priorities = {};
     local priorityIndex = 1;
 

@@ -3,17 +3,20 @@ A `DialogueServer` object is used to contain information about your specific cha
 
 When you press "Edit Dialogue" while selecting a model or a base part, a module script named "DialogueServer" is automatically placed into it. The module script has the "DialogueMaker_DialogueServer" tag for easy identification for [triggers](/src/DialogueClientScript/Triggers/README.md) and other types of scripts.
 
+The `DialogueServer` class is called DialogueServer because the object is typically located on an NPC that *serves* dialogue to the player, or the [`DialogueClient`](/src/DialogueClientScript/Classes/DialogueClient/README.md). It's important to note that `DialogueServer` objects are typically used by [client scripts](https://create.roblox.com/docs/reference/engine/classes/LocalScript) instead of [server scripts](https://create.roblox.com/docs/reference/engine/classes/Script).
+
 ## Static properties
 ### defaultSettings
-An object of [DefaultServerSettings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't configured in the [constructor](#newdialogueserversettings) is defined by the default settings.
+An object of [DefaultServerSettings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't configured in the [constructor](#newdialogueserversettings-module) is defined by the default settings.
 
-Here are the current default settings:
+The current default settings are opinionated and aim to best suit the average non-programmer user of. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
+
 ```luau
-defaultSettings = {
+local defaultSettings = {
   general = {
     name = nil;
     theme = nil;
-    shouldFreezePlayer = true; 
+    shouldFreezePlayer = true;
     shouldEndConversationIfOutOfDistance = false;
     maxConversationDistance = 10;
   };
@@ -22,7 +25,7 @@ defaultSettings = {
     canPlayerSkipDelay = true; 
   };
   humanoid = {
-    shouldLookAtPlayer = true; 
+    shouldLookAtPlayer = false; 
     neckRotationMaxX = 0.8726;
     neckRotationMaxY = 1.0472; 
     neckRotationMaxZ = 0.8726; 
@@ -53,7 +56,7 @@ defaultSettings = {
 ```
 
 ## Constructors
-### new(dialogueServerSettings)
+### new(dialogueServerSettings, module)
 Creates and returns a new `DialogueServer` object.
 
 #### Parameters
@@ -61,9 +64,22 @@ Creates and returns a new `DialogueServer` object.
 | :- | :- | :- |
 | dialogueServerSettings | [OptionalDialogueServerSettings](#optionaldialogueserversettings) | Setting overrides for the DialogueServer. Anything that isn't set will be defined by the default settings. |
 
-## Relevant types
+## Properties
+### settings
+The `DialogueServer`'s [settings](#dialogueserversettings). They start out with the [default settings](#defaultsettings), but they can be overwritten by [the constructor](#newdialogueserversettings-module) or direct assignment.
 
+## Relevant types
 ### DialogueServerSettings
+| Name | Type | Description |
+| :- | :- | :- |
+| clickDetector | [ClickDetectorDialogueServerSettings](#clickdetectordialogueserversettings) | Settings intended for the [pre-installed trigger for click detectors](/src/DialogueClientScript/Triggers/ClickDetectorTrigger.client.lua). |
+| general | [GeneralDialogueServerSettings](#generaldialogueserversettings) | General settings for the character. |
+| humanoid | [HumanoidDialogueServerSettings](#humanoiddialogueserversettings) | Humanoid settings for the character. [StandardTheme](/src/DialogueClientScript/Themes/StandardTheme) uses these. |
+| promptRegion | [PromptRegionDialogueServerSettings](#promptregiondialogueserversettings) | |
+| proximityPrompt | [ProximityPromptDialogueServerSettings](#proximitypromptdialogueserversettings) | |
+| speechBubble | [SpeechBubbleDialogueServerSettings](#speechbubbledialogueserversettings) | Settings intended for the [pre-installed trigger for speech bubbles](/src/DialogueClientScript/Triggers/ClickDetectorTrigger.client.lua). |
+| timeout | [TimeoutDialogueServerSettings](#timeoutdialogueserversettings) | Settings for conversation timeouts. |
+| typewriter | [TypewriterDialogueServerSettings](#typewriterdialogueserversettings) | Settings intended for StandardTheme's [typewriter hook](/src/DialogueClientScript/ReactHooks/useTypewriter.lua). |
 
 ### OptionalDialogueServerSettings
 OptionalDialogueServerSettings is used to let developers configure *some* settings that they need, but offer the convenience of not configuring *all* settings. 
