@@ -1,4 +1,8 @@
 --!strict
+-- Automatically triggers the dialogue server when the player activates a proximity prompt.
+--
+-- Programmers: Christian Toney (Christian_Toney)
+-- © 2023 – 2025 Dialogue Maker Group
 
 local CollectionService = game:GetService("CollectionService");
 local StarterPlayer = game:GetService("StarterPlayer");
@@ -13,26 +17,49 @@ local dialogueClient = DialogueClient.getFromSharedObject(true);
 
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
 
-  local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
+  local didInitialize, errorMessage = pcall(function()
 
-  if dialogueServer.settings.proximityPrompt.enabled then
+    -- We're using pcall because require can throw an error if the module is invalid.
+    local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
 
-    local proximityPrompt = dialogueServer.settings.proximityPrompt.location;
-    if dialogueServer.settings.proximityPrompt.autoCreate then
+    local clickDetector = dialogueServer.settings.clickDetector.instance;
+    if dialogueServer.settings.clickDetector.shouldAutoCreate then
 
-      local proximityPromptTemp = Instance.new("ProximityPrompt");
-      proximityPromptTemp.Parent = dialogueServer.instance.Parent;
-      proximityPrompt = proximityPromptTemp;
+      assert(dialogueServer.settings.clickDetector.adornee, "ClickDetector adornee must be set if shouldAutoCreate is enabled.");
+
+      local autoCreatedClickDetector = Instance.new("ClickDetector");
+      autoCreatedClickDetector.Parent = dialogueServer.settings.clickDetector.adornee;
+      clickDetector = autoCreatedClickDetector;
 
     end;
 
-    assert(proximityPrompt and proximityPrompt:IsA("ProximityPrompt"), "[Dialogue Maker] ProximityPrompt location must be a ProximityPrompt.");
+    if clickDetector then
 
-    proximityPrompt.Triggered:Connect(function()
+      local originalParent = clickDetector.Parent;
+      dialogueClient.DialogueServerChanged:Connect(function()
 
-      dialogueClient:interact(dialogueServer);
+        clickDetector.Parent = if dialogueClient.dialogueServer == nil then originalParent else nil;
 
-    end);
+      end);
+
+      clickDetector.MouseClick:Connect(function()
+
+        if dialogueClient.dialogueServer == nil then
+
+          dialogueClient:interact(dialogueServer);
+
+        end;
+
+      end);
+
+    end;
+
+  end);
+
+  if not didInitialize then
+
+    local fullName = dialogueServerModuleScript:GetFullName();
+    warn(`[Dialogue Maker] Failed to initialize proximity prompt for {fullName}: {errorMessage}`);
 
   end;
 

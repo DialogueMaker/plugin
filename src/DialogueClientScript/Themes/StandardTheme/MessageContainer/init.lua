@@ -99,7 +99,7 @@ local function MessageContainer(props: MessageContainerProperties)
             layoutOrder = index;
             textSize = textSize;
             key = index;
-            letterDelay = props.dialogueServer.settings.general.letterDelay;
+            letterDelay = props.dialogueServer.settings.typewriter.characterDelaySeconds;
             onComplete = function()
 
               if index == #page then 

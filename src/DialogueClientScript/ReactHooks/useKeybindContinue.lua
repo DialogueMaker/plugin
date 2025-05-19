@@ -14,14 +14,14 @@ function useKeybindContinue(dialogueClient: DialogueClient, continueDialogueFunc
 
   React.useEffect(function(): ()
   
-    local defaultChatContinueKey = dialogueClient.settings.triggers.defaultChatContinueKey;
-    local defaultChatContinueKeyGamepad = dialogueClient.settings.triggers.defaultChatContinueKeyGamepad;
+    local continueKey = dialogueClient.settings.keybinds.interactKey;
+    local continueKeyGamepad = dialogueClient.settings.keybinds.interactKeyGamepad;
 
-    if dialogueClient.settings.triggers.keybindsEnabled then
+    if continueKey or continueKeyGamepad then
 
       local function checkKeybinds(keybind: Enum.KeyCode)
 
-        if keybind and not UserInputService:IsKeyDown(defaultChatContinueKey) and not UserInputService:IsKeyDown(defaultChatContinueKeyGamepad) then
+        if keybind and not UserInputService:IsKeyDown(continueKey) and not UserInputService:IsKeyDown(continueKeyGamepad) then
 
           continueDialogueFunction();
 
@@ -29,7 +29,7 @@ function useKeybindContinue(dialogueClient: DialogueClient, continueDialogueFunc
 
       end;
 
-      ContextActionService:BindAction("ContinueDialogue", checkKeybinds, false, defaultChatContinueKey, defaultChatContinueKeyGamepad);
+      ContextActionService:BindAction("ContinueDialogue", checkKeybinds, false, continueKey, continueKeyGamepad);
 
       return function()
 

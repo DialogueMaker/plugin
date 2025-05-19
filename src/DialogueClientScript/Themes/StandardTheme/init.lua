@@ -26,7 +26,7 @@ local function StandardTheme(props: ThemeProperties)
   local npc = props.npc;
   local dialogueClient = props.dialogueClient;
   local dialogueServer = props.dialogueServer;
-  local npcName = dialogueServer.settings.general.npcName;
+  local npcName = dialogueServer.settings.general.name;
   local responseContentScripts = props.responseContentScripts;
 
   local clickSoundRef = React.useRef(nil :: Sound?);
@@ -40,7 +40,7 @@ local function StandardTheme(props: ThemeProperties)
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
-    allowPlayerToSkipDelay = dialogueServer.settings.general.allowPlayerToSkipDelay;
+    allowPlayerToSkipDelay = dialogueServer.settings.typewriter.canPlayerSkipDelay;
     currentPageIndex = currentPageIndex;
     setCurrentPageIndex = setCurrentPageIndex;
     onComplete = props.onComplete;
@@ -76,7 +76,7 @@ local function StandardTheme(props: ThemeProperties)
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
     });
-    NPCNameTextLabel = if dialogueServer.settings.general.showName then React.createElement("TextLabel", {
+    NPCNameTextLabel = if npcName then React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
       Text = npcName;
       LayoutOrder = 1;

@@ -14,7 +14,7 @@ local function useLookAtPlayer(npc: Model, dialogueServer: DialogueServer)
   React.useEffect(function(): ()
   
     -- Check if the NPC needs to look at the player.
-    if dialogueServer.settings.general.npcLooksAtPlayerDuringDialogue and dialogueServer.settings.general.npcNeckRotationMaxY then
+    if dialogueServer.settings.humanoid.shouldLookAtPlayer then
 
       -- Handle this in a coroutine because the look shouldn't stop the dialogue.
       local lookTask = task.spawn(function()
@@ -37,9 +37,9 @@ local function useLookAtPlayer(npc: Model, dialogueServer: DialogueServer)
     
           while NPCPrimaryPart and NPCHead and NPCNeck and PlayerHead and task.wait() do
     
-            local maxRotationX = dialogueServer.settings.general.npcNeckRotationMaxX;
-            local maxRotationY = dialogueServer.settings.general.npcNeckRotationMaxY;
-            local maxRotationZ = dialogueServer.settings.general.npcNeckRotationMaxZ;
+            local maxRotationX = dialogueServer.settings.humanoid.neckRotationMaxX;
+            local maxRotationY = dialogueServer.settings.humanoid.neckRotationMaxY;
+            local maxRotationZ = dialogueServer.settings.humanoid.neckRotationMaxZ;
             local goalRotationX, goalRotationY, goalRotationZ = CFrame.new(NPCHead.Position, PlayerHead.Position):ToOrientation();
             local rotationOffsetX = goalRotationX - math.rad(NPCPrimaryPart.Orientation.X);
             local rotationOffsetY = goalRotationY - math.rad(NPCPrimaryPart.Orientation.Y);
