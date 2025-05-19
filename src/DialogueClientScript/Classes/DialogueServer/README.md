@@ -38,13 +38,13 @@ local defaultSettings = {
     shouldWaitForResponse = true; 
   };
   clickDetector = { 
-    shouldAutoCreate = true; 
+    shouldAutoCreate = false; 
     shouldDisappearDuringConversation = true; 
     instance = nil;
   };
   proximityPrompt = { 
     shouldAutoCreate = true; 
-    instance = nil; 
+    instance = nil;
   };
   speechBubble = {
     shouldAutoCreate = false; 
