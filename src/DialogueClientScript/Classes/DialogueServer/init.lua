@@ -14,8 +14,7 @@ local DialogueServer = {
       name = nil;
       theme = nil;
       shouldFreezePlayer = true; 
-      shouldEndConversationIfOutOfDistance = false;
-      maxConversationDistance = 10;
+      maxConversationDistance = nil;
     };
     typewriter = {
       characterDelaySeconds = 0.025; 
@@ -62,7 +61,6 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
       name = if dialogueServerSettings and dialogueServerSettings.general then dialogueServerSettings.general.name else DialogueServer.defaultSettings.general.name;
       theme = if dialogueServerSettings and dialogueServerSettings.general then dialogueServerSettings.general.theme else DialogueServer.defaultSettings.general.theme;
       shouldFreezePlayer = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.shouldFreezePlayer ~= nil then dialogueServerSettings.general.shouldFreezePlayer else DialogueServer.defaultSettings.general.shouldFreezePlayer; 
-      shouldEndConversationIfOutOfDistance = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.shouldEndConversationIfOutOfDistance ~= nil then dialogueServerSettings.general.shouldEndConversationIfOutOfDistance else DialogueServer.defaultSettings.general.shouldEndConversationIfOutOfDistance;
       maxConversationDistance = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.maxConversationDistance ~= nil then dialogueServerSettings.general.maxConversationDistance else DialogueServer.defaultSettings.general.maxConversationDistance;
     };
     typewriter = {

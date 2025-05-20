@@ -9,51 +9,69 @@ The `DialogueServer` class is called DialogueServer because the object is typica
 ### defaultSettings
 An object of [default server settings](#dialogueserversettings) that all `DialogueServer` objects default to. Any setting that isn't explicitly configured in the [constructor](#newdialogueserversettings-module) is defined by the default settings.
 
-The current default settings are opinionated and aim to best suit the average non-programmer. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
+The current default settings aim to best suit the average non-programmer. If you have any recommendations to these settings that may improve users workflow, feel free to [file an issue](https://github.com/).
 
-```luau
-local defaultSettings = {
-  general = {
-    name = nil;
-    theme = nil;
-    shouldFreezePlayer = true;
-    shouldEndConversationIfOutOfDistance = false;
-    maxConversationDistance = 10;
-  };
-  typewriter = {
-    characterDelaySeconds = 0.025; 
-    canPlayerSkipDelay = true; 
-  };
-  humanoid = {
-    shouldLookAtPlayer = false; 
-    neckRotationMaxX = 0.8726;
-    neckRotationMaxY = 1.0472; 
-    neckRotationMaxZ = 0.8726; 
-  };
-  promptRegion = {
-    basePart = nil; 
-  };
-  timeout = {	
-    seconds = nil; 
-    shouldWaitForResponse = true; 
-  };
-  clickDetector = { 
-    shouldAutoCreate = false; 
-    shouldDisappearDuringConversation = true; 
-    instance = nil;
-  };
-  proximityPrompt = { 
-    shouldAutoCreate = true; 
-    instance = nil;
-  };
-  speechBubble = {
-    shouldAutoCreate = false; 
-    button = nil;
-    billboardGUI = nil;
-    adornee = nil;
-  };
-}
-```
+#### clickDetector
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| adornee | nil | nil | This property is for developers to manage a ClickDetector that they created, so there is no need for a default value. |
+| instance | nil | nil | This property is for developers to manage a ClickDetector that they created, so there is no need for a default value. |
+| shouldAutoCreate | boolean | false | Proximity prompts are more visible and accessible for players. |
+| shouldDisappearDuringConversation | boolean | true | Hiding the click detector trigger during a conversation improves accessibility by hiding the hand pointer. |
+
+#### general
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| maxConversationDistance | nil | nil | Setting this value by default may not be helpful for *all* games, as some games may want to have long-distance conversations. |
+| name | nil | nil | It is not feasible to automatically determine what the developer may want to call their character. Using a model name or a part name may not be helpful, as it can include internal information in some names. | 
+| shouldFreezePlayer | boolean | true | Freezing the player improves accessibility because they can only focus on one thing: the conversation. |
+| theme | nil | nil | This property is for developers to override the `DialogueClient` theme, so there is no need for a default value. |
+
+#### humanoid
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| neckRotationMaxX | number | 0.8726 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
+| neckRotationMaxY | number | 1.0472 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
+| neckRotationMaxZ | number | 0.8726 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
+| shouldLookAtPlayer | boolean | false | Moving the head with the Dialogue Maker may seem like unexpected behavior for some developers if it is enabled by default. This can also conflict with other scripts in the game. |
+
+#### promptRegion
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| basePart | nil | nil | Prompt regions may wildly vary across games, so it is best to keep this empty by default. |
+
+#### proximityPrompt
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| adornee | nil | nil | If shouldAutoCreate is enabled, then this is automatically decided based on the parent of the ModuleScript that was set by the [constructor](#newdialogueserversettings-module). |
+| instance | nil | nil | This property is for developers to manage a ProximityPrompt that they created, so there is no need for a default value. |
+| shouldAutoCreate | boolean | true | Creating proximity prompts by default to trigger conversations helps Dialogue Maker out-of-the-box. A proximity prompt is generally the most accessible trigger across all devices when compared to other triggers. |
+
+#### speechBubble
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| adornee | nil | nil | If shouldAutoCreate is enabled, then this is automatically decided based on the parent of the ModuleScript that was set by the [constructor](#newdialogueserversettings-module). |
+| billboardGUI | nil | nil | This property is for developers to manage a BillboardGui that they created, so there is no need for a default value. |
+| button | nil | nil | This property is for developers to manage a GuiButton that they created, so there is no need for a default value. |
+| shouldAutoCreate | boolean | false | Proximity prompts are more visible and accessible for players across devices. |
+
+#### timeout
+> [!WARNING]
+> This feature will soon be replaced by per-dialogue timeouts.
+
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| seconds | nil | nil | Setting a default timeout can lead to unexpected behavior, especially during cutscenes. |
+| shouldWaitForResponse | boolean | true | Ending the conversation abruptly can lead to unexpected behavior, especially during cutscenes. |
+
+#### typewriter
+> [!WARNING]
+> This feature will soon be replaced by per-dialogue typewriting.
+
+| Key | Default type | Default value | Rationale |
+| :- | :- | :- | :- |
+| characterDelaySeconds | number | 0.025 | Opinionated based on personal experiences, so this value may not work for everyone; however, it seems to be a good general base value based on the lack of negative feedback on this. |
+| canPlayerSkipDelay | boolean | true | Allowing players to skip dialogue by default can help people who have already read the messages and accidentally started another conversation. |
 
 ## Constructors
 ### new(dialogueServerSettings, module)
@@ -70,7 +88,7 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 
 ## Relevant types
 ### ClickDetectorDialogueServerSettings
-| Name | Type | Description |
+| Key | Type | Description |
 | :- | :- | :- |
 | shouldAutoCreate | boolean |  |
 | shouldDisappearDuringConversation | boolean |  |
@@ -78,7 +96,7 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 | adornee | [Instance](https://create.roblox.com/docs/en-us/reference/engine/classes/Instance)? |  |
 
 ### DialogueServerSettings
-| Name | Type | Description |
+| Key | Type | Description |
 | :- | :- | :- |
 | clickDetector | [ClickDetectorDialogueServerSettings](#clickdetectordialogueserversettings) | Settings intended for the [pre-installed trigger for click detectors](/src/DialogueClientScript/Triggers/ClickDetectorTrigger.client.lua). |
 | general | [GeneralDialogueServerSettings](#generaldialogueserversettings) | General settings for the character. |
@@ -90,10 +108,20 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 | typewriter | [TypewriterDialogueServerSettings](#typewriterdialogueserversettings) | Settings intended for StandardTheme's [typewriter hook](/src/DialogueClientScript/ReactHooks/useTypewriter.lua). |
 
 ### GeneralDialogueServerSettings
-TBA
+| Key | Type | Description |
+| :- | :- | :- |
+| name | string? |  |
+| theme | ModuleScript? |  |
+| shouldFreezePlayer | boolean |  |
+| maxConversationDistance | number? |  |
 
 ### HumanoidDialogueServerSettings
-TBA
+| Key | Type | Description |
+| :- | :- | :- |
+| shouldLookAtPlayer | boolean |  |
+| neckRotationMaxX | number |  |
+| neckRotationMaxY | number |  |
+| neckRotationMaxZ | number |  |
 
 ### OptionalDialogueServerSettings
 OptionalDialogueServerSettings is used to let developers configure *some* [settings](#dialogueserversettings) that they need, but offer the convenience of not configuring *all* settings. 
@@ -101,18 +129,18 @@ OptionalDialogueServerSettings is used to let developers configure *some* [setti
 As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recursive partial types](https://stackoverflow.com/a/47914631), so we created a new type where every property in DialogueServerSettings is optional. Refer to DialogueServerSettings for property documentation.
 
 ### PromptRegionDialogueServerSettings
-| Name | Type | Description |
+| Key | Type | Description |
 | :- | :- | :- |
 | basePart | [BasePart](https://create.roblox.com/docs/en-us/reference/engine/classes/BasePart)? |  |
 
 ### ProximityPromptDialogueServerSettings
-| Name | Type | Description |
+| Key | Type | Description |
 | :- | :- | :- |
 | shouldAutoCreate | boolean |  |
 | instance | [ProximityPrompt](https://create.roblox.com/docs/en-us/reference/engine/classes/ProximityPrompt)? |  |
 
 ### SpeechBubbleDialogueServerSettings
-| Name | Type | Description |
+| Key | Type | Description |
 | :- | :- | :- |
 | shouldAutoCreate | boolean |  |
 | billboardGUI | [BillboardGui](https://create.roblox.com/docs/en-us/reference/engine/classes/BillboardGui)? |  |
@@ -120,10 +148,16 @@ As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recur
 | adornee | [Instance](https://create.roblox.com/docs/en-us/reference/engine/classes/Instance)? |  |
 
 ### TimeoutDialogueServerSettings
-TBA
+| Key | Type | Description |
+| :- | :- | :- |
+| seconds | number? |  |
+| shouldWaitForResponse | boolean |  |
 
 ### TypewriterDialogueServerSettings
-TBA
+| Key | Type | Description |
+| :- | :- | :- |
+| characterDelaySeconds | number |  |
+| canPlayerSkipDelay | boolean |  |
 
 ---
 

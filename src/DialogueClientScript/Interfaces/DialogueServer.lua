@@ -35,9 +35,8 @@ export type GeneralDialogueServerSettings = {
   -- If true, the player will freeze when the dialogue starts and will be unfrozen when the dialogue ends.
   shouldFreezePlayer: boolean; 
   -- If true, the conversation will end if the PrimaryParts of the NPC and the player exceed the MaximumConversationDistance.
-  shouldEndConversationIfOutOfDistance: boolean;
   -- Maximum magnitude between the NPC's HumanoidRootPart and the player's PrimaryPart before the conversation ends. Requires EndConversationIfOutOfDistance to be true.
-  maxConversationDistance: number;
+  maxConversationDistance: number?;
 }
 
 export type HumanoidDialogueServerSettings = {
