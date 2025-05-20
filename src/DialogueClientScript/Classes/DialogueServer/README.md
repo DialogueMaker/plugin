@@ -70,7 +70,12 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 
 ## Relevant types
 ### ClickDetectorDialogueServerSettings
-TBA
+| Name | Type | Description |
+| :- | :- | :- |
+| shouldAutoCreate | boolean |  |
+| shouldDisappearDuringConversation | boolean |  |
+| instance | [ClickDetector](https://create.roblox.com/docs/en-us/reference/engine/classes/ClickDetector)? |  |
+| adornee | [Instance](https://create.roblox.com/docs/en-us/reference/engine/classes/Instance)? |  |
 
 ### DialogueServerSettings
 | Name | Type | Description |
@@ -96,13 +101,23 @@ OptionalDialogueServerSettings is used to let developers configure *some* [setti
 As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recursive partial types](https://stackoverflow.com/a/47914631), so we created a new type where every property in DialogueServerSettings is optional. Refer to DialogueServerSettings for property documentation.
 
 ### PromptRegionDialogueServerSettings
-TBA
+| Name | Type | Description |
+| :- | :- | :- |
+| basePart | [BasePart](https://create.roblox.com/docs/en-us/reference/engine/classes/BasePart)? |  |
 
 ### ProximityPromptDialogueServerSettings
-TBA
+| Name | Type | Description |
+| :- | :- | :- |
+| shouldAutoCreate | boolean |  |
+| instance | [ProximityPrompt](https://create.roblox.com/docs/en-us/reference/engine/classes/ProximityPrompt)? |  |
 
 ### SpeechBubbleDialogueServerSettings
-TBA
+| Name | Type | Description |
+| :- | :- | :- |
+| shouldAutoCreate | boolean |  |
+| billboardGUI | [BillboardGui](https://create.roblox.com/docs/en-us/reference/engine/classes/BillboardGui)? |  |
+| button | [GuiButton](https://create.roblox.com/docs/en-us/reference/engine/classes/GuiButton)? |  |
+| adornee | [Instance](https://create.roblox.com/docs/en-us/reference/engine/classes/Instance)? |  |
 
 ### TimeoutDialogueServerSettings
 TBA
