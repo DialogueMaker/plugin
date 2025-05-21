@@ -19,7 +19,7 @@ local DialogueClient = {
   sharedDialogueClient = nil :: DialogueClient?;
   defaultSettings = {
     general = {
-      theme = script.Themes.StandardTheme;
+      theme = DialogueClientScript.Themes.StandardTheme;
       shouldEndConversationOnCharacterRemoval = true;
     };
     responses = {
@@ -55,7 +55,7 @@ function DialogueClient:setSharedDialogueClient(dialogueClient: DialogueClient?)
 
 end;
 
-function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettings?, moduleScript: ModuleScript): DialogueClient
+function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettings?): DialogueClient
 
   local player = Players.LocalPlayer;
   local settings: DialogueClientSettings = {
@@ -116,7 +116,7 @@ function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettin
     dialogueGUI.Parent = player.PlayerGui;
 
     -- Start the dialogue loop.
-    local queue = self:getChildren();
+    local queue = dialogueServer:getChildren();
     local priorityIndex = 1;
 
     while self.dialogueServer and task.wait() do
@@ -232,24 +232,6 @@ function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettin
 
   end;
 
-  local function getChildren(self: DialogueClient): {Dialogue}
-
-    local children = {};
-    for _, child in moduleScript:GetChildren() do
-
-      if child:IsA("ModuleScript") and tonumber(child.Name) then
-
-        local dialogue = require(child) :: Dialogue;
-        table.insert(children, dialogue);
-
-      end;
-
-    end;
-
-    return children;
-
-  end;
-
   local function unfreezePlayer(self: DialogueClient): ()
 
     (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Enable();
@@ -273,7 +255,6 @@ function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettin
     freezePlayer = freezePlayer;
     interact = interact;
     getSettings = getSettings;
-    getChildren = getChildren;
     setSettings = setSettings;
     unfreezePlayer = unfreezePlayer;
     getDialogueServer = getDialogueServer;

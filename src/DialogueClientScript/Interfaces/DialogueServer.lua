@@ -1,5 +1,9 @@
 --!strict
 
+local IDialogue = require(script.Parent.Dialogue);
+
+type Dialogue = IDialogue.Dialogue;
+
 export type ClickDetectorDialogueServerSettings = {
   -- If true, this automatically creates a ClickDetector inside of the NPC's model. 
   shouldAutoCreate: boolean; 
@@ -10,8 +14,15 @@ export type ClickDetectorDialogueServerSettings = {
   adornee: Instance?;
 }
 
+export type DistanceDialogueServerSettings = {
+  -- Maximum magnitude between the NPC's HumanoidRootPart and the player's PrimaryPart before the conversation ends. Requires EndConversationIfOutOfDistance to be true.
+  maxConversationDistance: number?;
+  relativePart: BasePart?;
+}
+
 export type DialogueServerSettings = {
   clickDetector: ClickDetectorDialogueServerSettings;
+  distance: DistanceDialogueServerSettings;
   general: GeneralDialogueServerSettings;
   promptRegion: PromptRegionDialogueServerSettings;
   proximityPrompt: ProximityPromptDialogueServerSettings;
@@ -31,9 +42,6 @@ export type GeneralDialogueServerSettings = {
 
   -- If true, the player will freeze when the dialogue starts and will be unfrozen when the dialogue ends.
   shouldFreezePlayer: boolean; 
-  -- If true, the conversation will end if the PrimaryParts of the NPC and the player exceed the MaximumConversationDistance.
-  -- Maximum magnitude between the NPC's HumanoidRootPart and the player's PrimaryPart before the conversation ends. Requires EndConversationIfOutOfDistance to be true.
-  maxConversationDistance: number?;
 }
 
 export type OptionalDialogueServerSettings = {
@@ -50,10 +58,11 @@ export type OptionalDialogueServerSettings = {
 
     -- If true, the player will freeze when the dialogue starts and will be unfrozen when the dialogue ends.
     shouldFreezePlayer: boolean?; 
-    -- If true, the conversation will end if the PrimaryParts of the NPC and the player exceed the MaximumConversationDistance.
-    shouldEndConversationIfOutOfDistance: boolean?;
+  }?;
+  distance: {
     -- Maximum magnitude between the NPC's HumanoidRootPart and the player's PrimaryPart before the conversation ends. Requires EndConversationIfOutOfDistance to be true.
     maxConversationDistance: number?;
+    relativePart: BasePart?;
   }?;
   typewriter: {
     -- The delay between each letter being typed. 
@@ -131,6 +140,7 @@ export type DialogueServerProperties = {
 };
 
 export type DialogueServerMethods = {
+  getChildren: (self: DialogueServer) -> {Dialogue};
   getSettings: (self: DialogueServer) -> DialogueServerSettings;
   setSettings: (self: DialogueServer, settings: DialogueServerSettings) -> ();
 };

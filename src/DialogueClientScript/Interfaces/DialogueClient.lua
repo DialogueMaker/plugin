@@ -1,9 +1,7 @@
 --!strict
 
 local IDialogueServer = require(script.Parent.DialogueServer);
-local IDialogue = require(script.Parent.Dialogue);
 
-type Dialogue = IDialogue.Dialogue;
 type DialogueServer = IDialogueServer.DialogueServer;
 
 export type DialogueClientSettings = {
@@ -78,7 +76,6 @@ export type DialogueClientMethods = {
   unfreezePlayer: (self: DialogueClient) -> ();
   interact: (self: DialogueClient, dialogueServer: DialogueServer) -> ();
   getSettings: (self: DialogueClient) -> DialogueClientSettings;
-  getChildren: (self: DialogueClient) -> {Dialogue};
   setSettings: (self: DialogueClient, newSettings: DialogueClientSettings) -> ();
   getDialogueServer: (self: DialogueClient) -> DialogueServer?;
   setDialogueServer: (self: DialogueClient, newDialogueServer: DialogueServer?) -> ();

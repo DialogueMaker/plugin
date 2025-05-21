@@ -2,8 +2,10 @@
 
 local DialogueClientScript = script.Parent.Parent;
 
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
 
+type Dialogue = IDialogue.Dialogue;
 type DialogueServer = IDialogueServer.DialogueServer;
 type DialogueServerSettings = IDialogueServer.DialogueServerSettings;
 type OptionalDialogueServerSettings = IDialogueServer.OptionalDialogueServerSettings;
@@ -13,7 +15,10 @@ local DialogueServer = {
     general = {
       name = nil;
       theme = nil;
-      shouldFreezePlayer = true; 
+      shouldFreezePlayer = true;
+    };
+    distance = {
+      relativePart = nil;
       maxConversationDistance = nil;
     };
     promptRegion = {
@@ -45,7 +50,10 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
       name = if dialogueServerSettings and dialogueServerSettings.general then dialogueServerSettings.general.name else DialogueServer.defaultSettings.general.name;
       theme = if dialogueServerSettings and dialogueServerSettings.general then dialogueServerSettings.general.theme else DialogueServer.defaultSettings.general.theme;
       shouldFreezePlayer = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.shouldFreezePlayer ~= nil then dialogueServerSettings.general.shouldFreezePlayer else DialogueServer.defaultSettings.general.shouldFreezePlayer; 
-      maxConversationDistance = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.maxConversationDistance ~= nil then dialogueServerSettings.general.maxConversationDistance else DialogueServer.defaultSettings.general.maxConversationDistance;
+    };
+    distance = {
+      relativePart = if dialogueServerSettings and dialogueServerSettings.distance and dialogueServerSettings.distance.relativePart then dialogueServerSettings.distance.relativePart else DialogueServer.defaultSettings.distance.relativePart; 
+      maxConversationDistance = if dialogueServerSettings and dialogueServerSettings.distance and dialogueServerSettings.distance.maxConversationDistance then dialogueServerSettings.distance.maxConversationDistance else DialogueServer.defaultSettings.distance.maxConversationDistance; 
     };
     promptRegion = {
       basePart = if dialogueServerSettings and dialogueServerSettings.promptRegion then dialogueServerSettings.promptRegion.basePart else DialogueServer.defaultSettings.promptRegion.basePart; 
@@ -73,6 +81,24 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
 
   end;
 
+  local function getChildren(self: DialogueServer): {Dialogue}
+
+    local children = {};
+    for _, child in moduleScript:GetChildren() do
+
+      if child:IsA("ModuleScript") and tonumber(child.Name) then
+
+        local dialogue = require(child) :: Dialogue;
+        table.insert(children, dialogue);
+
+      end;
+
+    end;
+
+    return children;
+
+  end;
+
   local function setSettings(self: DialogueServer, newSettings: DialogueServerSettings): ()
 
     settings = newSettings;
@@ -81,6 +107,7 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
   end;
 
   local dialogueServer: DialogueServer = {
+    getChildren = getChildren;
     getSettings = getSettings;
     setSettings = setSettings;
     moduleScript = moduleScript;
