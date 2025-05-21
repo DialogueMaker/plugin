@@ -253,18 +253,25 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
 
                 end;
 
+                if uiListLayout.AbsoluteContentSize.Y ~= originalAbsoluteContentSize.Y then
+
+                  uiListLayout.Wraps = false;
+                  uiListLayout.Wraps = true;
+
+                end
+
                 -- From here, we can guess for a line break because the Y axis of 
                 -- the UIListLayout's content size will change if the character causes a line break.
-                print(textLabel.Text, uiListLayout.AbsoluteContentSize.Y);
                 if uiListLayout.AbsoluteContentSize.Y > originalAbsoluteContentSize.Y then
 
                   -- We should check again with unwrapped text to ensure that 
                   -- rich text didn't cause the line break.
                   local wrappedAbsoluteContentSize = uiListLayout.AbsoluteContentSize;
+
                   textLabel.TextWrapped = false;
 
                   if uiListLayout.AbsoluteContentSize.Y < wrappedAbsoluteContentSize.Y then
-
+                    
                     table.insert(breakpoints, lastSpaceIndex);
                     textLabel.Text = text:sub(lastSpaceIndex + 1, index);
 
@@ -352,7 +359,6 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
       useNewPage();
       
     end
-    print(components);
 
     textContainerClone:Destroy();
     
