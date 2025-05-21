@@ -95,6 +95,12 @@ local function DialogueItem(props: DialogueItemProperties)
       layoutOrder = 3;
       size = UDim2.new(0, 0, 1, 0);
       text = props.type :: string;
+      iconImage = if props.type == "Message" then 
+        "rbxassetid://14099768265" 
+      elseif props.type == "Response" then 
+        "rbxassetid://14099769224" 
+      else 
+        "rbxassetid://14099768484";
       toggleButtonChildren = {
         UIFlexItem = React.createElement("UIFlexItem", {
           FlexMode = Enum.UIFlexMode.Fill;

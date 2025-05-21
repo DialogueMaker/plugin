@@ -13,6 +13,7 @@ export type DropdownProps = {
   isDisabled: boolean?;
   isOpen: boolean;
   setIsOpen: (boolean) -> ();
+  iconImage: string?;
 }
 
 local function Dropdown(props: DropdownProps)
@@ -51,13 +52,35 @@ local function Dropdown(props: DropdownProps)
         PaddingLeft = UDim.new(0, 5);
         PaddingRight = UDim.new(0, 5);
       });
-      TextLabel = if props.text == "" then nil else React.createElement("TextLabel", {
+      SelectionFrame = React.createElement("Frame", {
+        BackgroundTransparency = 1;
+        Size = UDim2.new(1, 0, 0, 25);
+        AutomaticSize = Enum.AutomaticSize.XY;
         LayoutOrder = 1;
-        Text = props.text;
-        TextXAlignment = if props.text == "" then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left;
-        TextColor3 = colors.text;
-        FontFace = Font.fromId(11702779517);
-        TextSize = 14;
+      }, {
+        UIListLayout = React.createElement("UIListLayout", {
+          SortOrder = Enum.SortOrder.LayoutOrder;
+          FillDirection = Enum.FillDirection.Horizontal;
+          VerticalAlignment = Enum.VerticalAlignment.Center;
+          Padding = UDim.new(0, 5);
+        });
+        Icon = if props.iconImage then
+          React.createElement("ImageLabel", {
+            LayoutOrder = 1;
+            Image = props.iconImage;
+            Size = UDim2.new(0, 20, 0, 20);
+            BackgroundTransparency = 1;
+            ImageColor3 = colors.text;
+          })
+        else nil;
+        TextLabel = if props.text == "" then nil else React.createElement("TextLabel", {
+          LayoutOrder = 2;
+          Text = props.text;
+          TextXAlignment = if props.text == "" then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left;
+          TextColor3 = colors.text;
+          FontFace = Font.fromId(11702779517);
+          TextSize = 14;
+        });
       });
       DropdownArrowIconContainer = React.createElement("Frame", {
         BackgroundTransparency = 1;
