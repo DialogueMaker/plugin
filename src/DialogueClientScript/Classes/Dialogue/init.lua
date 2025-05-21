@@ -74,26 +74,27 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
 
   local function getPages(self: Dialogue, textLabel: TextLabel): {Page}
   
-    local pages: {Page} = {};
-    local currentPage: Page = {};
+    -- Initialize the text instances.
     local textContainer = textLabel.Parent;
     assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
 
     local textContainerClone = textContainer:Clone();
+    textContainerClone.Visible = false;
+    textContainerClone.Parent = textContainer.Parent;
+    
     local textLabelClone = textLabel:Clone();
     textLabelClone.AutomaticSize = Enum.AutomaticSize.XY;
     textLabelClone.Size = UDim2.fromScale(0, 0);
     textLabelClone.MaxVisibleGraphemes = -1;
     
-    textContainerClone.Visible = false;
-    textContainerClone.Parent = textContainer.Parent;
-    
-    local function newPage()
+    local pages: {Page} = {};
+    local components: Page = {};
+    local function useNewPage()
       
-      assert(#currentPage > 0, "[Dialogue Maker] Current page is empty, so a new page cannot be created.");
+      assert(#components > 0, "[Dialogue Maker] Current page is empty, so a new page cannot be created. This error prevents a potential infinite loop.");
 
-      table.insert(pages, currentPage);
-      currentPage = {};
+      table.insert(pages, components);
+      components = {};
       textLabelClone = textLabelClone:Clone();
       
       for _, child in textContainerClone:GetChildren() do
@@ -116,7 +117,6 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
       
       if contentArrayItemType == "string" then
         
-        -- Calculate the X size offset.
         local uiListLayout = textContainerClone:FindFirstChildOfClass("UIListLayout");
         assert(uiListLayout, "[Dialogue Maker] UIListLayout not found.");
         
@@ -126,7 +126,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
           
           local function addTextLabelToPage(TextLabel: TextLabel)
 
-            table.insert(currentPage, {
+            table.insert(components, {
               type = "Text";
               text = TextLabel.Text;
             });
@@ -139,10 +139,10 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
           textLabelClone.Parent = textContainerClone;
           
           -- Check if we should add a new page.
-          if not textLabelClone.TextFits and uiListLayout.AbsoluteContentSize.Y > textContainerClone.AbsoluteSize.Y then
+          local isContainerOverflowing = uiListLayout.AbsoluteContentSize.Y > textContainerClone.AbsoluteSize.Y;
+          if not textLabelClone.TextFits and isContainerOverflowing then
 
-            -- Add the current page to the page list.
-            newPage();
+            useNewPage();
             
           end
           
@@ -318,21 +318,20 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
             end
 
             local originalText = textLabelClone.Text;
-            local breakpoints = getLineBreakPositions(originalText);
-            local lastBreakpointIndex = breakpoints[#breakpoints];
+            local lineBreaks = getLineBreakPositions(originalText);
+            local lastLineBreakIndex = lineBreaks[#lineBreaks];
             
-            if lastBreakpointIndex then
+            if lastLineBreakIndex then
               
               -- Create another TextLabel to replace the last line of text.
-              -- This will allow the TextWrapper to accurately calculate 
-              -- how much space is available on the X-axis.
+              -- Otherwise, the TextLabel might take up too much space on the Y axis.
               local paragraphTextLabel = textLabelClone:Clone();
-              paragraphTextLabel.Text = originalText:sub(1, lastBreakpointIndex);
+              paragraphTextLabel.Text = originalText:sub(1, lastLineBreakIndex);
               paragraphTextLabel.Parent = textLabelClone.Parent;
               addTextLabelToPage(paragraphTextLabel);
               
-              -- Fix the textLabelClone's text back.
-              textLabelClone.Text = originalText:sub(lastBreakpointIndex + 1);
+              -- Put the remaining text in the original TextLabel.
+              textLabelClone.Text = originalText:sub(lastLineBreakIndex + 1);
               
             end;
 
@@ -351,8 +350,8 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
               if not lastSpaceIndex and textLabelClone.TextBounds.Y < textLabelClone.TextSize * textLabelClone.LineHeight then
                 
                 -- The given area is too small. Add this to a new page.
-                newPage();
-                continue;              
+                useNewPage();
+                continue;
                 
               end
               
@@ -376,14 +375,14 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
       
     end
     
-    textContainerClone:Destroy();
-    
-    -- Return all pages for this message.
-    if currentPage[1] then
+    -- Add any remaining text to a new page.
+    if #components > 0 then
       
-      newPage();
+      useNewPage();
       
     end
+
+    textContainerClone:Destroy();
     
     return pages;
 
