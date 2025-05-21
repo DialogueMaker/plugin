@@ -13,12 +13,9 @@ export type ClickDetectorDialogueServerSettings = {
 export type DialogueServerSettings = {
   clickDetector: ClickDetectorDialogueServerSettings;
   general: GeneralDialogueServerSettings;
-  humanoid: HumanoidDialogueServerSettings;
   promptRegion: PromptRegionDialogueServerSettings;
   proximityPrompt: ProximityPromptDialogueServerSettings;
   speechBubble: SpeechBubbleDialogueServerSettings;
-  timeout: TimeoutDialogueServerSettings;
-  typewriter: TypewriterDialogueServerSettings;
 }
 
 export type GeneralDialogueServerSettings = {
@@ -37,17 +34,6 @@ export type GeneralDialogueServerSettings = {
   -- If true, the conversation will end if the PrimaryParts of the NPC and the player exceed the MaximumConversationDistance.
   -- Maximum magnitude between the NPC's HumanoidRootPart and the player's PrimaryPart before the conversation ends. Requires EndConversationIfOutOfDistance to be true.
   maxConversationDistance: number?;
-}
-
-export type HumanoidDialogueServerSettings = {
-  -- If true, the NPC will look at the player during the conversation.
-  shouldLookAtPlayer: boolean; 
-  -- The maximum angle of the NPC's neck on the X axis. Requires NPCLooksAtPlayerDuringDialogue to be true. 
-  neckRotationMaxX: number;
-  -- The maximum angle of the NPC's neck on the Y axis. Requires NPCLooksAtPlayerDuringDialogue to be true. 
-  neckRotationMaxY: number; 
-  -- The maximum angle of the NPC's neck on the Z axis. Requires NPCLooksAtPlayerDuringDialogue to be true.
-  neckRotationMaxZ: number; 
 }
 
 export type OptionalDialogueServerSettings = {
@@ -140,25 +126,13 @@ export type SpeechBubbleDialogueServerSettings = {
   billboardGUI: BillboardGui?;
 }
 
-export type TimeoutDialogueServerSettings = {
-  -- Set this to the amount of seconds you want to wait before closing the dialogue.
-  seconds: number?; 
-  -- If true, this causes dialogue to ignore the set timeout in order to wait for the player's response. 
-  shouldWaitForResponse: boolean; 
-}
-
-export type TypewriterDialogueServerSettings = {
-  -- The delay between each letter being typed. 
-  characterDelaySeconds: number; 
-  -- If true, the player can skip the typing delay by pressing a keybind or clicking the theme. 
-  canPlayerSkipDelay: boolean; 
-}
-
 export type DialogueServerProperties = {
-  settings: DialogueServerSettings;
+  moduleScript: ModuleScript;
 };
 
 export type DialogueServerMethods = {
+  getSettings: (self: DialogueServer) -> DialogueServerSettings;
+  setSettings: (self: DialogueServer, settings: DialogueServerSettings) -> ();
 };
 
 export type DialogueServer = DialogueServerProperties & DialogueServerMethods;

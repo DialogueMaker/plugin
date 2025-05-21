@@ -16,22 +16,8 @@ local DialogueServer = {
       shouldFreezePlayer = true; 
       maxConversationDistance = nil;
     };
-    typewriter = {
-      characterDelaySeconds = 0.025; 
-      canPlayerSkipDelay = true; 
-    };
-    humanoid = {
-      shouldLookAtPlayer = true; 
-      neckRotationMaxX = 0.8726;
-      neckRotationMaxY = 1.0472; 
-      neckRotationMaxZ = 0.8726; 
-    };
     promptRegion = {
       basePart = nil; 
-    };
-    timeout = {	
-      seconds = nil; 
-      shouldWaitForResponse = true; 
     };
     clickDetector = { 
       shouldAutoCreate = false; 
@@ -51,11 +37,9 @@ local DialogueServer = {
   } :: DialogueServerSettings;
 };
 
-export type ConstructorProperties = {
-}
+function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettings?, moduleScript: ModuleScript): DialogueServer
 
-function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettings?): DialogueServer
-
+  local settingsChangedEvent = Instance.new("BindableEvent");
   local settings: DialogueServerSettings = {
     general = {
       name = if dialogueServerSettings and dialogueServerSettings.general then dialogueServerSettings.general.name else DialogueServer.defaultSettings.general.name;
@@ -63,22 +47,8 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
       shouldFreezePlayer = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.shouldFreezePlayer ~= nil then dialogueServerSettings.general.shouldFreezePlayer else DialogueServer.defaultSettings.general.shouldFreezePlayer; 
       maxConversationDistance = if dialogueServerSettings and dialogueServerSettings.general and dialogueServerSettings.general.maxConversationDistance ~= nil then dialogueServerSettings.general.maxConversationDistance else DialogueServer.defaultSettings.general.maxConversationDistance;
     };
-    typewriter = {
-      characterDelaySeconds = if dialogueServerSettings and dialogueServerSettings.typewriter and dialogueServerSettings.typewriter.characterDelaySeconds ~= nil then dialogueServerSettings.typewriter.characterDelaySeconds else DialogueServer.defaultSettings.typewriter.characterDelaySeconds; 
-      canPlayerSkipDelay = if dialogueServerSettings and dialogueServerSettings.typewriter and dialogueServerSettings.typewriter.canPlayerSkipDelay ~= nil then dialogueServerSettings.typewriter.canPlayerSkipDelay else DialogueServer.defaultSettings.typewriter.canPlayerSkipDelay; 
-    };
-    humanoid = {
-      shouldLookAtPlayer = if dialogueServerSettings and dialogueServerSettings.humanoid and dialogueServerSettings.humanoid.shouldLookAtPlayer ~= nil then dialogueServerSettings.humanoid.shouldLookAtPlayer else DialogueServer.defaultSettings.humanoid.shouldLookAtPlayer; 
-      neckRotationMaxX = if dialogueServerSettings and dialogueServerSettings.humanoid and dialogueServerSettings.humanoid.neckRotationMaxX ~= nil then dialogueServerSettings.humanoid.neckRotationMaxX else DialogueServer.defaultSettings.humanoid.neckRotationMaxX;
-      neckRotationMaxY = if dialogueServerSettings and dialogueServerSettings.humanoid and dialogueServerSettings.humanoid.neckRotationMaxY ~= nil then dialogueServerSettings.humanoid.neckRotationMaxY else DialogueServer.defaultSettings.humanoid.neckRotationMaxY; 
-      neckRotationMaxZ = if dialogueServerSettings and dialogueServerSettings.humanoid and dialogueServerSettings.humanoid.neckRotationMaxZ ~= nil then dialogueServerSettings.humanoid.neckRotationMaxZ else DialogueServer.defaultSettings.humanoid.neckRotationMaxZ; 
-    };
     promptRegion = {
       basePart = if dialogueServerSettings and dialogueServerSettings.promptRegion then dialogueServerSettings.promptRegion.basePart else DialogueServer.defaultSettings.promptRegion.basePart; 
-    };
-    timeout = {	
-      seconds = if dialogueServerSettings and dialogueServerSettings.timeout and dialogueServerSettings.timeout.seconds ~= nil then dialogueServerSettings.timeout.seconds else DialogueServer.defaultSettings.timeout.seconds; 
-      shouldWaitForResponse = if dialogueServerSettings and dialogueServerSettings.timeout and dialogueServerSettings.timeout.shouldWaitForResponse ~= nil then dialogueServerSettings.timeout.shouldWaitForResponse else DialogueServer.defaultSettings.timeout.shouldWaitForResponse; 
     };
     clickDetector = { 
       shouldAutoCreate = if dialogueServerSettings and dialogueServerSettings.clickDetector and dialogueServerSettings.clickDetector.shouldAutoCreate ~= nil then dialogueServerSettings.clickDetector.shouldAutoCreate else DialogueServer.defaultSettings.clickDetector.shouldAutoCreate; 
@@ -97,8 +67,23 @@ function DialogueServer.new(dialogueServerSettings: OptionalDialogueServerSettin
     }
   };
 
+  local function getSettings(self: DialogueServer): DialogueServerSettings
+
+    return table.clone(settings);
+
+  end;
+
+  local function setSettings(self: DialogueServer, newSettings: DialogueServerSettings): ()
+
+    settings = newSettings;
+    settingsChangedEvent:Fire(newSettings);
+
+  end;
+
   local dialogueServer: DialogueServer = {
-    settings = settings;
+    getSettings = getSettings;
+    setSettings = setSettings;
+    moduleScript = moduleScript;
   };
 
   return dialogueServer;

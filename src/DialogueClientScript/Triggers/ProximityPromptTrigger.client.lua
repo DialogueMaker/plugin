@@ -13,7 +13,7 @@ local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interf
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueClient = DialogueClient.getFromSharedObject(true);
+local dialogueClient = DialogueClient:waitForSharedDialogueClient();
 
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
 
@@ -21,14 +21,14 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
 
     -- We're using pcall because require can throw an error if the module is invalid.
     local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
+    local dialogueServerSettings = dialogueServer:getSettings();
+    local clickDetector = dialogueServerSettings.clickDetector.instance;
+    if dialogueServerSettings.clickDetector.shouldAutoCreate then
 
-    local clickDetector = dialogueServer.settings.clickDetector.instance;
-    if dialogueServer.settings.clickDetector.shouldAutoCreate then
-
-      assert(dialogueServer.settings.clickDetector.adornee, "ClickDetector adornee must be set if shouldAutoCreate is enabled.");
+      assert(dialogueServerSettings.clickDetector.adornee, "ClickDetector adornee must be set if shouldAutoCreate is enabled.");
 
       local autoCreatedClickDetector = Instance.new("ClickDetector");
-      autoCreatedClickDetector.Parent = dialogueServer.settings.clickDetector.adornee;
+      autoCreatedClickDetector.Parent = dialogueServerSettings.clickDetector.adornee;
       clickDetector = autoCreatedClickDetector;
 
     end;

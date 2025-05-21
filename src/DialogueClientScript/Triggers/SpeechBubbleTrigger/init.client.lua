@@ -13,7 +13,7 @@ local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interf
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueClient = DialogueClient.getFromSharedObject(true);
+local dialogueClient = DialogueClient:waitForSharedDialogueClient();
 
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
 
@@ -21,16 +21,17 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
 
     -- We're using pcall because require can throw an error if the module is invalid.
     local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
-
-    local speechBubbleGUI: BillboardGui? = dialogueServer.settings.speechBubble.billboardGUI;
+    local dialogueServerSettings = dialogueServer:getSettings();
+    local speechBubbleGUI: BillboardGui? = dialogueServerSettings.speechBubble.billboardGUI;
     local autoCreatedButton: GuiButton? = nil;
-    if not speechBubbleGUI and dialogueServer.settings.speechBubble.shouldAutoCreate then
+    
+    if not speechBubbleGUI and dialogueServerSettings.speechBubble.shouldAutoCreate then
       
-      assert(dialogueServer.settings.speechBubble.adornee, "SpeechBubble adornee must be set if shouldAutoCreate is enabled.");
+      assert(dialogueServerSettings.speechBubble.adornee, "SpeechBubble adornee must be set if shouldAutoCreate is enabled.");
 
       local autoCreatedSpeechBubbleGUI = script.SpeechBubbleGUI:Clone();
-      autoCreatedSpeechBubbleGUI.Adornee = dialogueServer.settings.speechBubble.adornee;
-      autoCreatedSpeechBubbleGUI.Parent = dialogueServer.settings.speechBubble.adornee;
+      autoCreatedSpeechBubbleGUI.Adornee = dialogueServerSettings.speechBubble.adornee;
+      autoCreatedSpeechBubbleGUI.Parent = dialogueServerSettings.speechBubble.adornee;
       autoCreatedButton = autoCreatedSpeechBubbleGUI.Button;
 
     end;
@@ -39,7 +40,7 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
 
       assert(speechBubbleGUI:IsA("BillboardGui"), "SpeechBubble instance must be a BillboardGui.");
 
-      local button = dialogueServer.settings.speechBubble.button or autoCreatedButton;
+      local button = dialogueServerSettings.speechBubble.button or autoCreatedButton;
       assert(button and button:IsA("GuiButton"), "SpeechBubble button must be a GuiButton.");
 
       dialogueClient.DialogueServerChanged:Connect(function()

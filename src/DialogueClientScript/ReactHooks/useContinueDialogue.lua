@@ -12,7 +12,7 @@ export type ContinueDialogueProperties = {
   setCurrentPageIndex: (number) -> ();
   onComplete: () -> ();
   skipPageEvent: BindableEvent;
-  responseContentScripts: {ModuleScript};
+  hasResponses: boolean;
 }
 
 local function useContinueDialogue(props: ContinueDialogueProperties)
@@ -38,7 +38,7 @@ local function useContinueDialogue(props: ContinueDialogueProperties)
   
       props.setCurrentPageIndex(props.currentPageIndex + 1);
   
-    elseif #props.responseContentScripts == 0 then	
+    elseif not props.hasResponses then	
   
       props.onComplete();
   

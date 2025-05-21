@@ -13,9 +13,9 @@ local Types = require(DialogueClientScript.Types);
 local MessageContainer = require(script.MessageContainer);
 local ResponseContainer = require(script.ResponseContainer);
 local useKeybindContinue = require(ReactHooks.useKeybindContinue);
-local useLookAtPlayer = require(ReactHooks.useLookAtPlayer);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
+local useResponses = require(ReactHooks.useResponses);
 
 type ThemeProperties = Types.ThemeProperties;
 
@@ -26,8 +26,9 @@ local function StandardTheme(props: ThemeProperties)
   local npc = props.npc;
   local dialogueClient = props.dialogueClient;
   local dialogueServer = props.dialogueServer;
-  local npcName = dialogueServer.settings.general.name;
-  local responseContentScripts = props.responseContentScripts;
+  local dialogueServerSettings = dialogueServer:getSettings();
+  local dialogueSettings = props.dialogue:getSettings();
+  local npcName = dialogueServerSettings.general.name;
 
   local clickSoundRef = React.useRef(nil :: Sound?);
 
@@ -37,19 +38,19 @@ local function StandardTheme(props: ThemeProperties)
 
   -- Hooks
   local pages, setPages = React.useState({});
+  local responses = useResponses(props.dialogue);
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
-    allowPlayerToSkipDelay = dialogueServer.settings.typewriter.canPlayerSkipDelay;
+    allowPlayerToSkipDelay = dialogueSettings.typewriter.canPlayerSkipDelay;
     currentPageIndex = currentPageIndex;
     setCurrentPageIndex = setCurrentPageIndex;
     onComplete = props.onComplete;
     skipPageEvent = skipPageEvent;
     isNPCTalking = isNPCTalking;
-    responseContentScripts = responseContentScripts;
+    hasResponses = #responses > 0;
   });
   useKeybindContinue(dialogueClient, continueDialogue);
-  useLookAtPlayer(npc, dialogueServer);
   useOutOfDistanceDetection(npc, dialogueServer, props.onTimeout);
 
   React.useEffect(function()
@@ -93,23 +94,21 @@ local function StandardTheme(props: ThemeProperties)
       });
       MessageContainer = React.createElement(MessageContainer, {
         pages = pages, 
-        currentPageIndex = currentPageIndex, 
+        currentPageIndex = currentPageIndex; 
         skipPageEvent = skipPageEvent;
-        dialogueServer = dialogueServer;
-        responseContentScripts = responseContentScripts;
         setIsNPCTalking = setIsNPCTalking;
         continueDialogue = continueDialogue;
         onPagesUpdated = setPages;
         dialogue = props.dialogue;
       });
-      ResponseContainer = if #responseContentScripts > 0 then React.createElement("ScrollingFrame", {
+      ResponseContainer = if #responses > 0 then React.createElement("ScrollingFrame", {
         BackgroundTransparency = 1;
       }, {
         UIListLayout = React.createElement("UIListLayout", {
           SortOrder = Enum.SortOrder.LayoutOrder;
         });
         ResponseContainer = React.createElement(ResponseContainer, {
-          responseContentScripts = props.responseContentScripts;
+          responses = responses;
           onComplete = props.onComplete;
         });
       }) else nil;

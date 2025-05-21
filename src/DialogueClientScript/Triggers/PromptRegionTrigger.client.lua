@@ -14,7 +14,7 @@ local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interf
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueClient = DialogueClient.getFromSharedObject(true);
+local dialogueClient = DialogueClient:waitForSharedDialogueClient();
 
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
 
@@ -22,8 +22,8 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
 
     -- We're using pcall because require can throw an error if the module is invalid.
     local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
-
-    local promptRegionPart = dialogueServer.settings.promptRegion.basePart;
+    local dialogueServerSettings = dialogueServer:getSettings();
+    local promptRegionPart = dialogueServerSettings.promptRegion.basePart;
     if promptRegionPart then
 
       promptRegionPart.Touched:Connect(function(part)

@@ -1,6 +1,9 @@
 --!strict
 
 local IDialogueServer = require(script.Parent.DialogueServer);
+local IDialogue = require(script.Parent.Dialogue);
+
+type Dialogue = IDialogue.Dialogue;
 type DialogueServer = IDialogueServer.DialogueServer;
 
 export type DialogueClientSettings = {
@@ -9,6 +12,8 @@ export type DialogueClientSettings = {
 
     -- This is the default theme that will be used when talking with NPCs
     theme: ModuleScript;
+
+    shouldEndConversationOnCharacterRemoval: boolean;
 
   };
   responses: {
@@ -39,6 +44,8 @@ export type OptionalDialogueClientSettings = {
     -- This is the default theme that will be used when talking with NPCs
     theme: ModuleScript?;
 
+    shouldEndConversationOnCharacterRemoval: boolean?;
+
   }?;
   responses: {
 
@@ -64,18 +71,21 @@ export type OptionalDialogueClientSettings = {
 export type DialogueClientProperties = {
   theme: ModuleScript?;
   dialogueServer: DialogueServer?;
-  settings: DialogueClientSettings;
 }
 
 export type DialogueClientMethods = {
   freezePlayer: (self: DialogueClient) -> ();
   unfreezePlayer: (self: DialogueClient) -> ();
   interact: (self: DialogueClient, dialogueServer: DialogueServer) -> ();
-  setTheme: (self: DialogueClient, theme: ModuleScript) -> ();
+  getSettings: (self: DialogueClient) -> DialogueClientSettings;
+  getChildren: (self: DialogueClient) -> {Dialogue};
+  setSettings: (self: DialogueClient, newSettings: DialogueClientSettings) -> ();
+  getDialogueServer: (self: DialogueClient) -> DialogueServer?;
+  setDialogueServer: (self: DialogueClient, newDialogueServer: DialogueServer?) -> ();
 }
 
 export type DialogueClientEvents = {
-  ThemeChanged: RBXScriptSignal<ModuleScript>;
+  SettingsChanged: RBXScriptSignal<DialogueClientSettings>;
   DialogueServerChanged: RBXScriptSignal;
 }
 

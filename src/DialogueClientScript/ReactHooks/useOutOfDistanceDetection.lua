@@ -13,13 +13,14 @@ local function useOutOfDistanceDetection(npc: Model, dialogueServer: DialogueSer
   React.useEffect(function(): ()
   
     local primaryPart = npc.PrimaryPart;
-    if dialogueServer.settings.general.shouldEndConversationIfOutOfDistance and primaryPart then
+    local dialogueServerSettings = dialogueServer:getSettings();
+    if dialogueServerSettings.general.maxConversationDistance and primaryPart then
 
       local detectionTask = task.spawn(function() 
 
         while task.wait() do
 
-          if math.abs(primaryPart.Position.Magnitude - Players.LocalPlayer.Character.PrimaryPart.Position.Magnitude) > dialogueServer.settings.general.maxConversationDistance then
+          if math.abs(primaryPart.Position.Magnitude - Players.LocalPlayer.Character.PrimaryPart.Position.Magnitude) > dialogueServerSettings.general.maxConversationDistance then
 
             endConversation();
             break;

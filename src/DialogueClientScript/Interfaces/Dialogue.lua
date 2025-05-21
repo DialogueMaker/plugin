@@ -4,15 +4,11 @@ local IEffect = require(script.Parent.Effect);
 
 type Effect = IEffect.Effect;
 
-export type Page = {
-  {
-    type: "text"; 
-    text: string; 
-    size: Vector2;
-  } | Effect
-};
-
 export type Dialogue = {
+
+  type: "Message" | "Response" | "Redirect";
+
+  redirectModuleScript: ModuleScript?;
 
   --[[
     ]]
@@ -41,13 +37,67 @@ export type Dialogue = {
 
     This function does not run if the dialogue is a redirect.
   ]]
-  runAction: (self: Dialogue) -> ();
+  runAction: (self: Dialogue, actionID: number) -> ();
   
   --[[
     Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
   ]]
   getPages: (self: Dialogue, textLabel: TextLabel) -> {Page};
+
+  getSettings: (self: Dialogue) -> DialogueSettings;
+
+  setSettings: (self: Dialogue, newSettings: DialogueSettings) -> ();
+
+  getChildren: (self: Dialogue) -> {Dialogue};
+
+  moduleScript: ModuleScript;
   
 };
+
+export type DialogueSettings = {
+  timeout: TimeoutDialogueSettings;
+  typewriter: TypewriterDialogueSettings;
+}
+
+export type OptionalDialogueSettings = {
+  timeout: OptionalTimeoutDialogueSettings?;
+  typewriter: OptionalTypewriterDialogueSettings?;
+}
+
+export type OptionalTimeoutDialogueSettings = {
+  -- Set this to the amount of seconds you want to wait before closing the dialogue.
+  seconds: number?;
+  -- If true, this causes dialogue to ignore the set timeout in order to wait for the player's response. 
+  shouldWaitForResponse: boolean?;
+}
+
+export type OptionalTypewriterDialogueSettings = {
+  -- The delay between each letter being typed. 
+  characterDelaySeconds: number?;
+  -- If true, the player can skip the typing delay by pressing a keybind or clicking the theme. 
+  canPlayerSkipDelay: boolean?;
+}
+
+export type Page = {
+  {
+    type: "text"; 
+    text: string; 
+    size: Vector2;
+  } | Effect
+};
+
+export type TimeoutDialogueSettings = {
+  -- Set this to the amount of seconds you want to wait before closing the dialogue.
+  seconds: number?; 
+  -- If true, this causes dialogue to ignore the set timeout in order to wait for the player's response. 
+  shouldWaitForResponse: boolean; 
+}
+
+export type TypewriterDialogueSettings = {
+  -- The delay between each letter being typed. 
+  characterDelaySeconds: number; 
+  -- If true, the player can skip the typing delay by pressing a keybind or clicking the theme. 
+  canPlayerSkipDelay: boolean; 
+}
 
 return {};

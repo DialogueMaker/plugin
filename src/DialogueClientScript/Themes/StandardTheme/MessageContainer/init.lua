@@ -4,7 +4,6 @@ local ReactHooks = DialogueClientScript.ReactHooks;
 
 local React = require(DialogueClientScript.Packages.react);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
-local IDialogueServer = require(DialogueClientScript.Interfaces.DialogueServer);
 
 local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
@@ -12,12 +11,10 @@ local useDynamicSize = require(ReactHooks.useDynamicSize);
 
 type Page = IDialogue.Page;
 type Dialogue = IDialogue.Dialogue;
-type DialogueServer = IDialogueServer.DialogueServer;
 
 export type MessageContainerProperties = {
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
-  dialogueServer: DialogueServer;
   setIsNPCTalking: (boolean) -> ();
   continueDialogue: () -> ();
   onPagesUpdated: (pages: {Page}) -> ();
@@ -92,14 +89,14 @@ local function MessageContainer(props: MessageContainerProperties)
 
         elseif dialogueContentItem.type == "text" then
           
-          -- Determine new offset.
+          local dialogueSettings = props.dialogue:getSettings();
           table.insert(messageComponentList, React.createElement(MessageTextSegment, {
             text = dialogueContentItem.text;
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
             textSize = textSize;
             key = index;
-            letterDelay = props.dialogueServer.settings.typewriter.characterDelaySeconds;
+            letterDelay = dialogueSettings.typewriter.characterDelaySeconds;
             onComplete = function()
 
               if index == #page then 

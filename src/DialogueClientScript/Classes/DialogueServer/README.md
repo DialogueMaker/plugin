@@ -27,14 +27,6 @@ The current default settings aim to best suit the average non-programmer. If you
 | shouldFreezePlayer | boolean | true | Freezing the player improves accessibility because they can only focus on one thing: the conversation. |
 | theme | nil | nil | This property is for developers to override the `DialogueClient` theme, so there is no need for a default value. |
 
-#### humanoid
-| Key | Default type | Default value | Rationale |
-| :- | :- | :- | :- |
-| neckRotationMaxX | number | 0.8726 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
-| neckRotationMaxY | number | 1.0472 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
-| neckRotationMaxZ | number | 0.8726 | Opinionated max rotation based on testing a basic R15 rig. This value may not work for everyone, but it is generally a good base value. |
-| shouldLookAtPlayer | boolean | false | Moving the head with the Dialogue Maker may seem like unexpected behavior for some developers if it is enabled by default. This can also conflict with other scripts in the game. |
-
 #### promptRegion
 | Key | Default type | Default value | Rationale |
 | :- | :- | :- | :- |
@@ -86,6 +78,9 @@ Creates and returns a new `DialogueServer` object.
 ### settings
 The `DialogueServer`'s [settings](#dialogueserversettings). They start out with the [default settings](#defaultsettings), but they can be overwritten by [the constructor](#newdialogueserversettings-module) or direct assignment.
 
+## Methods
+
+
 ## Relevant types
 ### ClickDetectorDialogueServerSettings
 | Key | Type | Description |
@@ -100,12 +95,11 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 | :- | :- | :- |
 | clickDetector | [ClickDetectorDialogueServerSettings](#clickdetectordialogueserversettings) | Settings intended for the [pre-installed trigger for click detectors](/src/DialogueClientScript/Triggers/ClickDetectorTrigger.client.lua). |
 | general | [GeneralDialogueServerSettings](#generaldialogueserversettings) | General settings for the character. |
-| humanoid | [HumanoidDialogueServerSettings](#humanoiddialogueserversettings) | Humanoid settings for the character. [StandardTheme](/src/DialogueClientScript/Themes/StandardTheme) uses these. |
 | promptRegion | [PromptRegionDialogueServerSettings](#promptregiondialogueserversettings) | |
 | proximityPrompt | [ProximityPromptDialogueServerSettings](#proximitypromptdialogueserversettings) | |
 | speechBubble | [SpeechBubbleDialogueServerSettings](#speechbubbledialogueserversettings) | Settings intended for the [pre-installed trigger for speech bubbles](/src/DialogueClientScript/Triggers/ClickDetectorTrigger.client.lua). |
-| timeout | [TimeoutDialogueServerSettings](#timeoutdialogueserversettings) | Settings for conversation timeouts. |
-| typewriter | [TypewriterDialogueServerSettings](#typewriterdialogueserversettings) | Settings intended for StandardTheme's [typewriter hook](/src/DialogueClientScript/ReactHooks/useTypewriter.lua). |
+<!-- | timeout | [TimeoutDialogueServerSettings](#timeoutdialogueserversettings) | Settings for conversation timeouts. |
+| typewriter | [TypewriterDialogueServerSettings](#typewriterdialogueserversettings) | Settings intended for StandardTheme's [typewriter hook](/src/DialogueClientScript/ReactHooks/useTypewriter.lua). | -->
 
 ### GeneralDialogueServerSettings
 | Key | Type | Description |
@@ -114,14 +108,6 @@ The `DialogueServer`'s [settings](#dialogueserversettings). They start out with 
 | theme | ModuleScript? |  |
 | shouldFreezePlayer | boolean |  |
 | maxConversationDistance | number? |  |
-
-### HumanoidDialogueServerSettings
-| Key | Type | Description |
-| :- | :- | :- |
-| shouldLookAtPlayer | boolean |  |
-| neckRotationMaxX | number |  |
-| neckRotationMaxY | number |  |
-| neckRotationMaxZ | number |  |
 
 ### OptionalDialogueServerSettings
 OptionalDialogueServerSettings is used to let developers configure *some* [settings](#dialogueserversettings) that they need, but offer the convenience of not configuring *all* settings. 
@@ -146,18 +132,6 @@ As of May 19, 2025, Roblox's current typechecker lacks a way to implement [recur
 | billboardGUI | [BillboardGui](https://create.roblox.com/docs/en-us/reference/engine/classes/BillboardGui)? |  |
 | button | [GuiButton](https://create.roblox.com/docs/en-us/reference/engine/classes/GuiButton)? |  |
 | adornee | [Instance](https://create.roblox.com/docs/en-us/reference/engine/classes/Instance)? |  |
-
-### TimeoutDialogueServerSettings
-| Key | Type | Description |
-| :- | :- | :- |
-| seconds | number? |  |
-| shouldWaitForResponse | boolean |  |
-
-### TypewriterDialogueServerSettings
-| Key | Type | Description |
-| :- | :- | :- |
-| characterDelaySeconds | number |  |
-| canPlayerSkipDelay | boolean |  |
 
 ---
 

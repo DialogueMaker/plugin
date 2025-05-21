@@ -5,26 +5,44 @@ local StarterPlayer = game:GetService("StarterPlayer");
 
 local DialogueClientScript = StarterPlayer.StarterPlayerScripts.DialogueClientScript;
 local Dialogue = require(DialogueClientScript.Classes.Dialogue);
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 
-function verifyCondition(): boolean
+type Dialogue = IDialogue.Dialogue;
+type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
+
+local function verifyCondition(self: Dialogue): boolean
 
   return true;
 
 end;
 
-function getContent(): {string}
+local function getContent(self: Dialogue): {string}
 
   local player = Players.LocalPlayer;
   return {`Hi {player.Name}!`};
 
 end;
 
-function runAction(): ()
+local function runAction(self: Dialogue, actionID: number): ()
+
+  if actionID == 1 then
+
+    -- This runs before the current message is displayed.
+
+  elseif actionID == 2 then
+
+    -- This runs before the next message is displayed.
+
+  end;
 
 end;
 
-return Dialogue.new({
-  getContent = getContent,
-  verifyCondition = verifyCondition,
-  runAction = runAction,
-});
+local dialogueSettings: OptionalDialogueSettings = {};
+local dialogue = Dialogue.new({
+  getContent = getContent;
+  verifyCondition = verifyCondition;
+  runAction = runAction;
+  settings = dialogueSettings;
+}, script);
+
+return dialogue;

@@ -13,12 +13,14 @@ type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
 type DialogueClientSettings = IDialogueClient.DialogueClientSettings;
 type DialogueServer = IDialogueServer.DialogueServer;
+type OptionalDialogueClientSettings = IDialogueClient.OptionalDialogueClientSettings;
 
 local DialogueClient = {
   sharedDialogueClient = nil :: DialogueClient?;
   defaultSettings = {
     general = {
       theme = script.Themes.StandardTheme;
+      shouldEndConversationOnCharacterRemoval = true;
     };
     responses = {
       clickSound = nil;
@@ -30,213 +32,36 @@ local DialogueClient = {
   } :: DialogueClientSettings;
 };
 
-function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDialogueClientSettings?, module: ModuleScript): DialogueClient
+function DialogueClient:waitForSharedDialogueClient(): DialogueClient
 
-  local themeChangedEvent = Instance.new("BindableEvent");
-  local dialogueServerChangedEvent = Instance.new("BindableEvent");
+  repeat task.wait() until DialogueClient.sharedDialogueClient;
+
+  return self:getSharedDialogueClient();
+
+end;
+
+function DialogueClient:getSharedDialogueClient(): DialogueClient
+
+  assert(DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client not set.");
+
+  return DialogueClient.sharedDialogueClient;
+
+end;
+
+function DialogueClient:setSharedDialogueClient(dialogueClient: DialogueClient?): ()
+
+  assert(not DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client already set.");
+  DialogueClient.sharedDialogueClient = dialogueClient;
+
+end;
+
+function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettings?, moduleScript: ModuleScript): DialogueClient
+
   local player = Players.LocalPlayer;
-
-  local function freezePlayer(): ()
-  
-    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Disable();
-    
-  end;
-
-  local function interact(self: DialogueClient, dialogueServer: DialogueServer)
-
-    -- Make sure we aren't already talking to an NPC
-    assert(not self.dialogueServer, "[Dialogue Maker] Cannot read dialogue because player is currently talking with another NPC.");
-    self.dialogueServer = dialogueServer;
-    dialogueServerChangedEvent:Fire();
-    
-    local freezePlayer = dialogueServer.settings.general.shouldFreezePlayer;
-    if freezePlayer then 
-
-      self:freezePlayer(); 
-
-    end;
-
-    -- Initialize the theme, then listen for changes
-    local themeModuleScript = dialogueServer.settings.general.theme or self.settings.general.theme;
-    local dialogueGUI = Instance.new("ScreenGui");
-    dialogueGUI.Parent = player.PlayerGui;
-    local root = ReactRoblox.createRoot(dialogueGUI);
-    self:setTheme(themeModuleScript);
-
-    -- Show the dialogue to the player
-    local parent: Instance = module;
-    local priorities = {};
-    local priorityIndex = 1;
-
-    local function updatePriorities()
-
-      priorities = {};
-
-      for _, possibleContentScript in parent:GetChildren() do
-    
-        local possibleDialogueType = possibleContentScript:GetAttribute("DialogueType");
-        if possibleContentScript:IsA("ModuleScript") and tonumber(possibleContentScript.Name) and (possibleDialogueType == "Message" or possibleDialogueType == "Redirect") then
-
-          table.insert(priorities, possibleContentScript.Name);
-
-        end
-
-      end
-
-    end;
-
-    updatePriorities();
-
-    while self.dialogueServer and task.wait() do
-
-      local priority = priorities[priorityIndex];
-      local contentScript = if priority then parent:FindFirstChild(priority) else nil;
-      if not contentScript then
-
-        -- No more content scripts available. Let's free the player.
-        break;
-
-      end
-
-      local dialogueType = contentScript:GetAttribute("DialogueType");
-      local dialogue = require(contentScript) :: Dialogue;
-
-      if dialogue:verifyCondition() then
-        
-        if dialogueType == "Redirect" then
-
-          -- A redirect is available, so let's switch priorities.
-          local redirectObjectValue = contentScript:FindFirstChild("Redirect");
-          assert(redirectObjectValue and redirectObjectValue:IsA("ObjectValue"), "[Dialogue Maker] Redirect object value not found.");
-
-          local goalRedirect = redirectObjectValue.Value;
-          assert(goalRedirect and goalRedirect:IsA("ModuleScript"), "[Dialogue Maker] Redirect object value is not a ModuleScript.");
-          assert(goalRedirect.Parent, "[Dialogue Maker] Redirect object value has no parent.");
-
-          parent = goalRedirect.Parent;
-          updatePriorities();
-          local index = table.find(priorities, goalRedirect.Name);
-          assert(index, "[Dialogue Maker] Redirect object value not found in priorities.");
-          priorityIndex = index;
-          
-          continue;
-
-        end;
-
-        -- Get a list of responses from the dialogue.
-        local responses: {ModuleScript} = {};
-        for _, possibleResponse in contentScript:GetChildren() do
-
-          if possibleResponse:IsA("ModuleScript") and tonumber(possibleResponse.Name) and possibleResponse:GetAttribute("DialogueType") == "Response" then
-
-            local response = require(possibleResponse) :: any;
-
-            if response:verifyCondition() then
-
-              table.insert(responses, possibleResponse);
-
-            end;
-
-          end
-
-        end
-
-        -- Sort responses because :GetChildren() doesn't guarantee it
-        table.sort(responses, function(responseScript1, responseScript2)
-
-          return responseScript1.Name < responseScript2.Name;
-    
-        end);
-
-        local completionSignal = Instance.new("BindableEvent");
-        local function renderRoot()
-
-          root:render(React.createElement(require(themeModuleScript) :: any, {
-            responseContentScripts = responses;
-            dialogue = dialogue;
-            onComplete = function(selectedResponseContentScript: ModuleScript?)
-        
-              dialogue:runAction();
-    
-              -- Check if there is more dialogue.
-              parent = if selectedResponseContentScript then selectedResponseContentScript else contentScript;
-              updatePriorities();
-    
-              if self.dialogueServer then
-    
-                priorityIndex = 1;
-    
-              end;
-    
-              completionSignal:Fire(false);
-        
-            end;
-            onTimeout = function()
-    
-              completionSignal:Fire(true);
-    
-            end;
-            dialogueClient = self;
-            dialogueServer = dialogueServer;
-          }));
-
-        end;
-
-        local themeChangedSignal = self.ThemeChanged:Connect(function()
-
-          renderRoot();
-      
-        end);
-
-        renderRoot();
-        local didTimeout = completionSignal.Event:Wait();
-        if didTimeout then
-
-          break;
-
-        end;
-        themeChangedSignal:Disconnect();
-
-      elseif self.dialogueServer then
-
-        -- There is a message; however, the player failed the condition.
-        -- Let's check if there's something else available.
-        priorityIndex += 1;
-
-      end;
-
-    end;
-
-    self.dialogueServer = nil;
-    dialogueServerChangedEvent:Fire();
-
-    if freezePlayer then 
-
-      self:unfreezePlayer(); 
-
-    end;
-
-    root:unmount();
-    dialogueGUI:Destroy();
-
-  end;
-
-  local function setTheme(self: DialogueClient, theme: ModuleScript)
-
-    self.theme = theme;
-    themeChangedEvent:Fire(theme);
-
-  end;
-
-  local function unfreezePlayer(): ()
-
-    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Enable();
-    
-  end;
-
   local settings: DialogueClientSettings = {
     general = {
-      theme = (if dialogueClientSettings and dialogueClientSettings.general then dialogueClientSettings.general.theme else nil) or DialogueClient.defaultSettings.general.theme;
+      theme = if dialogueClientSettings and dialogueClientSettings.general and dialogueClientSettings.general.theme then dialogueClientSettings.general.theme else DialogueClient.defaultSettings.general.theme;
+      shouldEndConversationOnCharacterRemoval = if dialogueClientSettings and dialogueClientSettings.general and dialogueClientSettings.general.shouldEndConversationOnCharacterRemoval then dialogueClientSettings.general.shouldEndConversationOnCharacterRemoval else DialogueClient.defaultSettings.general.shouldEndConversationOnCharacterRemoval;
     };
     responses = {
       clickSound = if dialogueClientSettings and dialogueClientSettings.responses then dialogueClientSettings.responses.clickSound else DialogueClient.defaultSettings.responses.clickSound;
@@ -247,14 +72,213 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDial
     };
   };
 
+  local settingsChangedEvent = Instance.new("BindableEvent");
+  local dialogueServerChangedEvent = Instance.new("BindableEvent");
+
+  local function freezePlayer(self: DialogueClient): ()
+  
+    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Disable();
+    
+  end;
+
+  local function getDialogueServer(self: DialogueClient): DialogueServer?
+
+    return self.dialogueServer;
+
+  end;
+
+  local function setDialogueServer(self: DialogueClient, dialogueServer: DialogueServer?): ()
+
+    self.dialogueServer = dialogueServer;
+    dialogueServerChangedEvent:Fire();
+
+  end;
+
+  local function interact(self: DialogueClient, dialogueServer: DialogueServer)
+
+    -- Make sure we aren't already talking to an NPC
+    assert(not self.dialogueServer, "[Dialogue Maker] Cannot read dialogue because player is currently talking with another NPC.");
+    self:setDialogueServer(dialogueServer);
+    
+    -- Freeze the player if the dialogue server has a setting for it.
+    local dialogueServerSettings = dialogueServer:getSettings();
+    local shouldFreezePlayer = dialogueServerSettings.general.shouldFreezePlayer;
+    if shouldFreezePlayer then 
+
+      self:freezePlayer(); 
+
+    end;
+
+    -- Initialize the theme, then listen for changes
+    local themeModuleScript = dialogueServerSettings.general.theme or settings.general.theme;
+    local dialogueGUI = Instance.new("ScreenGui");
+    local root = ReactRoblox.createRoot(dialogueGUI);
+    dialogueGUI.Parent = player.PlayerGui;
+
+    -- Start the dialogue loop.
+    local queue = self:getChildren();
+    local priorityIndex = 1;
+
+    while self.dialogueServer and task.wait() do
+
+      local dialogue = queue[priorityIndex];
+      if not dialogue then
+
+        break;
+
+      end
+
+      if dialogue:verifyCondition() then
+        
+        if dialogue.redirectModuleScript then
+
+          local parent = dialogue.redirectModuleScript.Parent;
+          local parentDialogue = require(parent) :: Dialogue;
+          queue = parentDialogue:getChildren();
+          local newPriorityIndex: number? = nil;
+
+          for index, childDialogue in queue do
+
+            if childDialogue.moduleScript == dialogue.redirectModuleScript then
+
+              newPriorityIndex = index;
+              break;
+
+            end;
+
+          end;
+
+          assert(newPriorityIndex, "[Dialogue Maker] Could not find redirect dialogue in queue.");
+          priorityIndex = newPriorityIndex;
+          
+          continue;
+
+        end;
+        
+        -- Run the dialogue's initialization action.
+        dialogue:runAction(1);
+
+        -- Show the dialogue to the player.
+        local completionEvent = Instance.new("BindableEvent");
+        local function renderRoot()
+
+          root:render(React.createElement(require(themeModuleScript) :: any, {
+            dialogue = dialogue;
+            onComplete = function(newParent: Dialogue?)
+        
+              -- Run the dialogue's completion action.
+              dialogue:runAction(2);
+    
+              -- Continue through the dialogue tree.
+              local parent = newParent or dialogue;
+              queue = parent:getChildren();
+              priorityIndex = 1;
+              completionEvent:Fire(false);
+        
+            end;
+            onTimeout = function()
+    
+              completionEvent:Fire(true);
+    
+            end;
+            dialogueClient = self;
+            dialogueServer = dialogueServer;
+          }));
+
+        end;
+
+        local settingsChangedSignal = self.SettingsChanged:Connect(function()
+
+          if settings.general.theme ~= themeModuleScript then
+
+            themeModuleScript = settings.general.theme;
+            renderRoot();
+
+          end;
+      
+        end);
+
+        renderRoot();
+        
+        local didTimeout = completionEvent.Event:Wait();
+        if didTimeout then
+
+          break;
+
+        end;
+
+        settingsChangedSignal:Disconnect();
+
+      else
+
+        -- There is a message; however, the player failed the condition.
+        -- Let's check if there's something else available.
+        priorityIndex += 1;
+
+      end;
+
+    end;
+
+    -- No more dialogue to show, so let's clean up.
+    if freezePlayer then 
+
+      self:unfreezePlayer(); 
+
+    end;
+
+    root:unmount();
+    dialogueGUI:Destroy();
+    self:setDialogueServer();
+
+  end;
+
+  local function getChildren(self: DialogueClient): {Dialogue}
+
+    local children = {};
+    for _, child in moduleScript:GetChildren() do
+
+      if child:IsA("ModuleScript") and tonumber(child.Name) then
+
+        local dialogue = require(child) :: Dialogue;
+        table.insert(children, dialogue);
+
+      end;
+
+    end;
+
+    return children;
+
+  end;
+
+  local function unfreezePlayer(self: DialogueClient): ()
+
+    (require(player.PlayerScripts:WaitForChild("PlayerModule")) :: any):GetControls():Enable();
+    
+  end;
+
+  local function getSettings(self: DialogueClient): DialogueClientSettings
+
+    return table.clone(settings);
+
+  end;
+
+  local function setSettings(self: DialogueClient, newSettings: DialogueClientSettings): ()
+
+    dialogueClientSettings = newSettings;
+    settingsChangedEvent:Fire();
+
+  end;
+
   local dialogueClient: DialogueClient = {
-    dialogueServer = nil;
-    settings = settings;
     freezePlayer = freezePlayer;
     interact = interact;
-    setTheme = setTheme;
+    getSettings = getSettings;
+    getChildren = getChildren;
+    setSettings = setSettings;
     unfreezePlayer = unfreezePlayer;
-    ThemeChanged = themeChangedEvent.Event;
+    getDialogueServer = getDialogueServer;
+    setDialogueServer = setDialogueServer;
+    SettingsChanged = settingsChangedEvent.Event;
     DialogueServerChanged = dialogueServerChangedEvent.Event;
   };
 
@@ -264,32 +288,11 @@ function DialogueClient.new(dialogueClientSettings: IDialogueClient.OptionalDial
 
   end);
 
+  dialogueClient.SettingsChanged:Connect(function()
+  
+  end);
+
   return dialogueClient;
-
-end;
-
-function DialogueClient:getFromSharedObject(shouldWaitForObject: boolean?): DialogueClient
-
-  if not DialogueClient.sharedDialogueClient then
-
-    if shouldWaitForObject then
-
-      repeat task.wait() until DialogueClient.sharedDialogueClient;
-
-    end;
-
-  end;
-
-  assert(DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client not set. Please call DialogueClient:setSharedObject() before calling this function.");
-
-  return DialogueClient.sharedDialogueClient;
-
-end;
-
-function DialogueClient:setSharedObject(dialogueClient: DialogueClient?): ()
-
-  assert(not DialogueClient.sharedDialogueClient, "[Dialogue Maker] Shared dialogue client already set.");
-  DialogueClient.sharedDialogueClient = dialogueClient;
 
 end;
 

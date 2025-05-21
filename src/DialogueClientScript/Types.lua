@@ -16,12 +16,11 @@ export type RichTextTagInformation = {
 }
 
 export type ThemeProperties = {
-  responseContentScripts: {ModuleScript};
   dialogueClient: DialogueClient;
   dialogueServer: DialogueServer;
   dialogue: Dialogue;
   npc: Model;
-  onComplete: (selectedResponseContentScript: ModuleScript?) -> ();
+  onComplete: (newParent: Dialogue?) -> ();
   onTimeout: () -> ();
 }
 

@@ -13,7 +13,7 @@ local IDialogueServer = require(StarterPlayerScripts.DialogueClientScript.Interf
 
 type DialogueServer = IDialogueServer.DialogueServer;
 
-local dialogueClient = DialogueClient.getFromSharedObject(true);
+local dialogueClient = DialogueClient:waitForSharedDialogueClient();
 
 for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
 
@@ -21,12 +21,12 @@ for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_
 
     -- We're using pcall because require can throw an error if the module is invalid.
     local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
-
-    local proximityPrompt = dialogueServer.settings.proximityPrompt.instance;
-    if dialogueServer.settings.proximityPrompt.shouldAutoCreate then
+    local dialogueServerSettings = dialogueServer:getSettings();
+    local proximityPrompt = dialogueServerSettings.proximityPrompt.instance;
+    if dialogueServerSettings.proximityPrompt.shouldAutoCreate then
 
       local autoCreatedProximityPrompt = Instance.new("ProximityPrompt");
-      autoCreatedProximityPrompt.Parent = dialogueServer.instance.Parent;
+      autoCreatedProximityPrompt.Parent = dialogueServer.moduleScript.Parent;
       proximityPrompt = autoCreatedProximityPrompt;
 
     end;
