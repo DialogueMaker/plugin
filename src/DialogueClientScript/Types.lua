@@ -24,7 +24,7 @@ export type TextSegmentProperties = {
   layoutOrder: number;
   textSize: number;
   onComplete: () -> ();
-
+  dialogue: Dialogue;
   --[[
      TODO: Use ref instead of ref2. Right now, ref is a reserved property. (https://github.com/jsdotlua/react-lua/issues/46) 
   ]]

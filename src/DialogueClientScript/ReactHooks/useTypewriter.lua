@@ -1,8 +1,13 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
+local DialogueClientScript = script.Parent.Parent;
+local React = require(DialogueClientScript.Packages.react);
+local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+
+type Dialogue = IDialogue.Dialogue;
 
 export type TypewriterProperties = {
   text: string;
+  dialogue: Dialogue;
   letterDelay: number;
   skipPageEvent: RBXScriptSignal?;
   shouldUseRichText: boolean?;
@@ -12,12 +17,18 @@ export type TypewriterProperties = {
 local function useTypewriter(properties: TypewriterProperties): number
   
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
+  local typewriterTask, setTypewriterTask = React.useState(nil :: thread?);
 
   React.useEffect(function()
   
     setMaxVisibleGraphemes(0);
+    if typewriterTask then
 
-  end, {properties.text});
+      task.cancel(typewriterTask);
+
+    end;
+
+  end, {properties.dialogue});
 
   React.useEffect(function(): ()
 
@@ -41,6 +52,8 @@ local function useTypewriter(properties: TypewriterProperties): number
       end;
 
     end);
+
+    setTypewriterTask(typewriterTask);
 
     if properties.skipPageEvent then
 

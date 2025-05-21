@@ -30,7 +30,20 @@ local function ResponseComponentList(props: ResponseComponentListProperties)
 
   end;
 
-  return React.createElement(React.Fragment, {}, responseComponents);
+  return React.createElement("Frame", {
+    AutomaticSize = Enum.AutomaticSize.XY;
+    Size = UDim2.fromScale(0, 0);
+    BackgroundTransparency = 1;
+    LayoutOrder = 3;
+  }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      Padding = UDim.new(0, 5);
+      SortOrder = Enum.SortOrder.LayoutOrder;
+      Wraps = true;
+      FillDirection = Enum.FillDirection.Horizontal;
+    });
+    Responses = React.createElement(React.Fragment, {}, responseComponents);
+  });
 
 end;
 

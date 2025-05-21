@@ -4,54 +4,49 @@ local React = require(script.Parent.Parent.Packages.react);
 export type DynamicSizeProperties = {
   minimumHeight: number?;
   minimumWidth: number?;
-  sizeX: number;
-  sizeY: number;
-  textSize: number;
 }
 
 local function useDynamicSize(array: {DynamicSizeProperties})
 
-  local function getSizeBasedOnViewport(): (number, number, number)
+  local function getSizeBasedOnViewport(): number?
 
     local viewportSize = workspace.CurrentCamera.ViewportSize;
-    local selectedProperties;
-    for _, properties in array do
+    local selectedIndex;
+    for index, properties in array do
 
-      local isDefault = not properties.minimumHeight and not properties.minimumWidth;
       local isAtOrAboveMinimumHeight = not properties.minimumHeight or viewportSize.Y >= properties.minimumHeight;
       local isAtOrAboveMinimumWidth = not properties.minimumWidth or viewportSize.X >= properties.minimumWidth;
-      if isDefault or (isAtOrAboveMinimumHeight and isAtOrAboveMinimumWidth) then
+      if isAtOrAboveMinimumHeight and isAtOrAboveMinimumWidth then
 
-        selectedProperties = properties;
+        selectedIndex = index;
 
       end;
 
     end;
 
-    assert(selectedProperties, "No sizes available for current viewport.");
-
-    return selectedProperties.sizeX, selectedProperties.sizeY, selectedProperties.textSize;
+    return selectedIndex;
 
   end;
 
-  local defaultX, defaultY, defaultTextSize = getSizeBasedOnViewport();
-  local sizeX, setSizeX = React.useState(defaultX);
-  local sizeY, setSizeY = React.useState(defaultY);
-  local textSize, setTextSize = React.useState(defaultTextSize);
+  
+  local selectedIndex, setSelectedIndex = React.useState(getSizeBasedOnViewport());
 
   React.useEffect(function()
 
-    local function updateSize()
+    local function updateSelectedIndex()
 
-      local newX, newY, newTextSize = getSizeBasedOnViewport();
+      local newSelectedIndex = getSizeBasedOnViewport();
+      if newSelectedIndex ~= selectedIndex then
 
-      setSizeX(newX);
-      setSizeY(newY);
-      setTextSize(newTextSize);
+        setSelectedIndex(newSelectedIndex);
+
+      end;
 
     end;
 
-    local viewportChangedEvent = workspace.CurrentCamera:GetAttributeChangedSignal("ViewportChanged"):Connect(updateSize);    
+    local viewportChangedEvent = workspace.CurrentCamera:GetAttributeChangedSignal("ViewportChanged"):Connect(updateSelectedIndex);    
+
+    task.spawn(updateSelectedIndex);
 
     return function()
 
@@ -61,7 +56,7 @@ local function useDynamicSize(array: {DynamicSizeProperties})
 
   end, {});
 
-  return sizeX, sizeY, textSize;
+  return selectedIndex;
 
 end
 

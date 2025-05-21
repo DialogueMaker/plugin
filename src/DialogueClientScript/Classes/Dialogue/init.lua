@@ -18,7 +18,8 @@ local Dialogue = {
   defaultSettings = {
     typewriter = {
       characterDelaySeconds = 0.025; 
-      canPlayerSkipDelay = true; 
+      canPlayerSkipDelay = true;
+      shouldShowResponseWhileTyping = false;
     };
     timeout = {	
       seconds = nil; 
@@ -36,6 +37,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
     typewriter = {
       characterDelaySeconds = if properties.settings and properties.settings.typewriter and properties.settings.typewriter.characterDelaySeconds ~= nil then properties.settings.typewriter.characterDelaySeconds else Dialogue.defaultSettings.typewriter.characterDelaySeconds; 
       canPlayerSkipDelay = if properties.settings and properties.settings.typewriter and properties.settings.typewriter.canPlayerSkipDelay ~= nil then properties.settings.typewriter.canPlayerSkipDelay else Dialogue.defaultSettings.typewriter.canPlayerSkipDelay; 
+      shouldShowResponseWhileTyping = if properties.settings and properties.settings.typewriter and properties.settings.typewriter.shouldShowResponseWhileTyping ~= nil then properties.settings.typewriter.shouldShowResponseWhileTyping else Dialogue.defaultSettings.typewriter.shouldShowResponseWhileTyping;
     };
     timeout = {	
       seconds = if properties.settings and properties.settings.timeout and properties.settings.timeout.seconds ~= nil then properties.settings.timeout.seconds else Dialogue.defaultSettings.timeout.seconds; 

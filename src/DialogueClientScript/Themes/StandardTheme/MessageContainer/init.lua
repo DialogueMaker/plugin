@@ -8,7 +8,6 @@ local IDialogueContentFitter = require(DialogueClientScript.Interfaces.DialogueC
 
 local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
-local useDynamicSize = require(ReactHooks.useDynamicSize);
 
 type Page = IDialogueContentFitter.Page;
 type Dialogue = IDialogue.Dialogue;
@@ -16,9 +15,9 @@ type Dialogue = IDialogue.Dialogue;
 export type MessageContainerProperties = {
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
-  setIsNPCTalking: (boolean) -> ();
   continueDialogue: () -> ();
   onPagesUpdated: (pages: {Page}) -> ();
+  setIsTypingFinished: (boolean) -> ();
   dialogue: Dialogue;
 }
 
@@ -26,20 +25,7 @@ local function MessageContainer(props: MessageContainerProperties)
 
   local componentIndex, setComponentIndex = React.useState(1);
   local textContainerRef = React.useRef(nil :: GuiObject?);
-  local sizeX, sizeY, textSize = useDynamicSize({
-    {
-      sizeX = 310;
-      sizeY = 117;
-      textSize = 14;
-    }, 
-    {
-      sizeX = 500;
-      sizeY = 117;
-      textSize = 14;
-      minimumWidth = 736;
-    }
-  });
-  local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment, textSize);
+  local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment, 14);
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
 
@@ -57,7 +43,7 @@ local function MessageContainer(props: MessageContainerProperties)
 
   React.useEffect(function(): ()
 
-    props.setIsNPCTalking(true);
+    props.setIsTypingFinished(false);
 
   end, {pages :: any, currentPageIndex});
     
@@ -93,16 +79,17 @@ local function MessageContainer(props: MessageContainerProperties)
           local dialogueSettings = props.dialogue:getSettings();
           local textSegment = React.createElement(MessageTextSegment, {
             text = dialogueContentItem.text;
+            dialogue = props.dialogue;
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
-            textSize = textSize;
+            textSize = 14;
             key = index;
             letterDelay = dialogueSettings.typewriter.characterDelaySeconds;
             onComplete = function()
 
               if index == #page then 
                 
-                props.setIsNPCTalking(false);
+                props.setIsTypingFinished(true);
 
               else
 
@@ -124,7 +111,7 @@ local function MessageContainer(props: MessageContainerProperties)
   end;
 
   return React.createElement("Frame", {
-    Size = UDim2.new(0, sizeX, 0, sizeY);
+    Size = UDim2.new(1, 0, 0, 117);
     BackgroundColor3 = Color3.fromHex("#202020");
     BackgroundTransparency = 0.2;
     ref = textContainerRef;

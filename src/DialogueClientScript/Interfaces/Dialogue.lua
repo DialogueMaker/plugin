@@ -69,9 +69,8 @@ export type OptionalTypewriterDialogueSettings = {
   characterDelaySeconds: number?;
   -- If true, the player can skip the typing delay by pressing a keybind or clicking the theme. 
   canPlayerSkipDelay: boolean?;
+  shouldShowResponseWhileTyping: boolean?;
 }
-
-
 
 export type TimeoutDialogueSettings = {
   -- Set this to the amount of seconds you want to wait before closing the dialogue.
@@ -84,7 +83,8 @@ export type TypewriterDialogueSettings = {
   -- The delay between each letter being typed. 
   characterDelaySeconds: number; 
   -- If true, the player can skip the typing delay by pressing a keybind or clicking the theme. 
-  canPlayerSkipDelay: boolean; 
+  canPlayerSkipDelay: boolean;
+  shouldShowResponseWhileTyping: boolean;
 }
 
 return {};

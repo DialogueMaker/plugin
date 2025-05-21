@@ -16,6 +16,7 @@ local useKeybindContinue = require(ReactHooks.useKeybindContinue);
 local useOutOfDistanceDetection = require(ReactHooks.useOutOfDistanceDetection);
 local useContinueDialogue = require(ReactHooks.useContinueDialogue);
 local useResponses = require(ReactHooks.useResponses);
+local useDynamicSize = require(ReactHooks.useDynamicSize);
 
 type ThemeProperties = Types.ThemeProperties;
 
@@ -32,13 +33,28 @@ local function StandardTheme(props: ThemeProperties)
 
   local clickSoundRef = React.useRef(nil :: Sound?);
 
+  local dynamicSizeIndex = useDynamicSize({
+    {
+      minimumWidth = 736;
+    }
+  });
+  local sizes = {
+    {
+      width = 500;
+    },
+    {
+      width = 310;
+    }
+  };
+  local size = sizes[dynamicSizeIndex or #sizes];
+
   -- States
   local currentPageIndex, setCurrentPageIndex = React.useState(1);
-  local isNPCTalking, setIsNPCTalking = React.useState(false);
 
   -- Hooks
   local pages, setPages = React.useState({});
   local responses = useResponses(props.dialogue);
+  local isTypingFinished, setIsTypingFinished = React.useState(false);
   local continueDialogue = useContinueDialogue({
     pages = pages;
     clickSoundRef = clickSoundRef;
@@ -47,22 +63,19 @@ local function StandardTheme(props: ThemeProperties)
     setCurrentPageIndex = setCurrentPageIndex;
     onComplete = props.onComplete;
     skipPageEvent = skipPageEvent;
-    isNPCTalking = isNPCTalking;
+    isNPCTalking = not isTypingFinished;
     hasResponses = #responses > 0;
   });
   useKeybindContinue(dialogueClient, continueDialogue);
   useOutOfDistanceDetection(npc, dialogueServer, props.onTimeout);
 
-  React.useEffect(function()
+  -- TODO: Implement timeout.
   
-    -- TODO: Implement timeout
-
-  end, {isNPCTalking});
-
   return React.createElement("Frame", {
     AnchorPoint = Vector2.new(0.5, 1);
     Position = UDim2.new(0.5, 0, 1, -15);
-    AutomaticSize = Enum.AutomaticSize.XY;
+    AutomaticSize = Enum.AutomaticSize.Y;
+    Size = UDim2.fromOffset(size.width, 0);
     BackgroundTransparency = 1;
     [React.Event.InputBegan] = function(self: Frame, input: InputObject)
 
@@ -76,59 +89,47 @@ local function StandardTheme(props: ThemeProperties)
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 5);
+      FillDirection = Enum.FillDirection.Vertical;
     });
     NPCNameTextLabel = if npcName then React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
       Text = npcName;
       LayoutOrder = 1;
     }) else nil;
-    HorizontalContent = React.createElement("Frame", {
-      AutomaticSize = Enum.AutomaticSize.XY;
-      BackgroundTransparency = 1;
-    }, {
-      UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
-        FillDirection = Enum.FillDirection.Horizontal;
-        Padding = UDim.new(0, 5);
-        VerticalAlignment = Enum.VerticalAlignment.Bottom;
-      });
-      MessageContainer = React.createElement(MessageContainer, {
-        pages = pages, 
-        currentPageIndex = currentPageIndex; 
-        skipPageEvent = skipPageEvent;
-        setIsNPCTalking = setIsNPCTalking;
-        continueDialogue = continueDialogue;
-        onPagesUpdated = setPages;
-        dialogue = props.dialogue;
-      });
-      ResponseContainer = if #responses > 0 then React.createElement("ScrollingFrame", {
-        BackgroundTransparency = 1;
-      }, {
-        UIListLayout = React.createElement("UIListLayout", {
-          SortOrder = Enum.SortOrder.LayoutOrder;
-        });
-        ResponseContainer = React.createElement(ResponseContainer, {
-          responses = responses;
-          onComplete = props.onComplete;
-        });
-      }) else nil;
-      -- ContinueButton = React.createElement("ImageButton", {
-      --   Size = UDim2.new(0, 20, 0, 20);
-      --   LayoutOrder = 3;
-      --   Image = "rbxassetid://90966430453504";
-      --   BackgroundColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.705882, 0.705882, 0.705882) else Color3.new(1, 1, 1);
-      --   ImageColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.486275, 0.486275, 0.486275) else Color3.new(1, 1, 1);
-      --   [React.Event.Activated] = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then nil else function()
-
-      --     continueDialogue()
-
-      --   end;
-      -- });
-      -- ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
-      --   SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
-      --   ref = clickSoundRef;
-      -- }) else nil;
+    MessageContainer = React.createElement(MessageContainer, {
+      pages = pages, 
+      currentPageIndex = currentPageIndex; 
+      skipPageEvent = skipPageEvent;
+      continueDialogue = continueDialogue;
+      onPagesUpdated = setPages;
+      dialogue = props.dialogue;
+      setIsTypingFinished = setIsTypingFinished;
     });
+    ResponseContainer = if #responses > 0 and (not dialogueSettings.typewriter.shouldShowResponseWhileTyping or isTypingFinished) then React.createElement(ResponseContainer, {
+      responses = responses;
+      onComplete = function(newParent)
+
+        props.onComplete(newParent);
+
+      end;
+    }) else nil;
+    -- ContinueButton = React.createElement("ImageButton", {
+    --   Size = UDim2.new(0, 20, 0, 20);
+    --   LayoutOrder = 3;
+    --   Image = "rbxassetid://90966430453504";
+    --   BackgroundColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.705882, 0.705882, 0.705882) else Color3.new(1, 1, 1);
+    --   ImageColor3 = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then Color3.new(0.486275, 0.486275, 0.486275) else Color3.new(1, 1, 1);
+    --   [React.Event.Activated] = if isNPCTalking and not npcSettings.general.allowPlayerToSkipDelay then nil else function()
+
+    --     continueDialogue()
+
+    --   end;
+    -- });
+    -- ClickSound = if clientSettings.defaultClickSound then React.createElement("Sound", {
+    --   SoundId = `rbxassetid://{clientSettings.defaultClickSound}`;
+    --   ref = clickSoundRef;
+    -- }) else nil;
   })
 
 end;

@@ -22,6 +22,7 @@ local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObjec
     skipPageEvent = nil;
     letterDelay = 0;
     layoutOrder = 1;
+    dialogue = dialogue;
     textSize = textSize;
     ref2 = testTextSegmentRef; 
     onComplete = function() end;

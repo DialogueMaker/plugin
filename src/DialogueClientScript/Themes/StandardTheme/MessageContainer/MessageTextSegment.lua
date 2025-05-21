@@ -12,6 +12,7 @@ local function TextSegment(props: TextSegmentProperties)
   local text = props.text;
   local maxVisibleGraphemes = useTypewriter({
     text = text;
+    dialogue = props.dialogue;
     letterDelay = props.letterDelay;
     onComplete = props.onComplete;
     skipPageEvent = props.skipPageEvent;
