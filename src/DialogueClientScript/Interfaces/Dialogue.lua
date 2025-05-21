@@ -80,9 +80,8 @@ export type OptionalTypewriterDialogueSettings = {
 
 export type Page = {
   {
-    type: "text"; 
+    type: "Text"; 
     text: string; 
-    size: Vector2;
   } | Effect
 };
 

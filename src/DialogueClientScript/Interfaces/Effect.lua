@@ -2,7 +2,7 @@
 
 export type Effect = {
   
-  type: "effect";
+  type: "Effect";
   
   run: (skipPageEvent: BindableEvent?) -> any;
 

@@ -75,7 +75,7 @@ local function MessageContainer(props: MessageContainerProperties)
 
         end;
 
-        if dialogueContentItem.type == "effect" then
+        if dialogueContentItem.type == "Effect" then
 
           if componentIndex == index then
 
@@ -87,10 +87,10 @@ local function MessageContainer(props: MessageContainerProperties)
             key = index;
           }));
 
-        elseif dialogueContentItem.type == "text" then
+        elseif dialogueContentItem.type == "Text" then
           
           local dialogueSettings = props.dialogue:getSettings();
-          table.insert(messageComponentList, React.createElement(MessageTextSegment, {
+          local textSegment = React.createElement(MessageTextSegment, {
             text = dialogueContentItem.text;
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
@@ -110,7 +110,9 @@ local function MessageContainer(props: MessageContainerProperties)
               end;
 
             end;
-          }));
+          });
+
+          table.insert(messageComponentList, textSegment);
 
         end;
 

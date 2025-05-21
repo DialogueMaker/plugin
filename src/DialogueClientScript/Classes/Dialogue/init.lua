@@ -79,21 +79,14 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
     local textContainer = textLabel.Parent;
     assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
 
-    local TextContainerClone = textContainer:Clone();
+    local textContainerClone = textContainer:Clone();
     local textLabelClone = textLabel:Clone();
+    textLabelClone.AutomaticSize = Enum.AutomaticSize.XY;
+    textLabelClone.Size = UDim2.fromScale(0, 0);
     textLabelClone.MaxVisibleGraphemes = -1;
     
-    TextContainerClone.Visible = false;
-    TextContainerClone.Parent = textContainer.Parent;
-    
-    local segment = TextContainerClone:FindFirstChild("Segment");
-    if segment then
-      
-      segment:Destroy();
-      
-    end
-
-    local xSizeOffset = 0;
+    textContainerClone.Visible = false;
+    textContainerClone.Parent = textContainer.Parent;
     
     local function newPage()
       
@@ -101,9 +94,9 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
       currentPage = {};
       textLabelClone = textLabelClone:Clone();
       
-      for _, child in TextContainerClone:GetChildren() do
+      for _, child in textContainerClone:GetChildren() do
     
-        if child.Name ~= "TextWrapper" then
+        if not child:IsA("UIListLayout") then
     
           child:Destroy();
     
@@ -111,8 +104,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
     
       end
       
-      textLabelClone.Parent = TextContainerClone;
-      xSizeOffset = 0;
+      textLabelClone.Parent = textContainerClone;
       
     end
     
@@ -123,8 +115,8 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
       if contentArrayItemType == "string" then
         
         -- Calculate the X size offset.
-        local uiListLayout = TextContainerClone:FindFirstChild("UIListLayout");
-        assert(uiListLayout and uiListLayout:IsA("UIListLayout"), "[Dialogue Maker] UIListLayout not found");
+        local uiListLayout = textContainerClone:FindFirstChildOfClass("UIListLayout");
+        assert(uiListLayout, "[Dialogue Maker] UIListLayout not found");
         
         local lastSpaceIndex: number? = nil;
         
@@ -133,9 +125,8 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
           local function addTextLabelToPage(TextLabel: TextLabel)
 
             table.insert(currentPage, {
-              type = "text";
+              type = "Text";
               text = TextLabel.Text;
-              size = TextLabel.AbsoluteSize;
             });
 
           end
@@ -143,10 +134,10 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
           textLabelClone = textLabelClone:Clone();
           textLabelClone.Visible = true;
           textLabelClone.Text = if lastSpaceIndex then contentArrayItem:sub(lastSpaceIndex + 1) else contentArrayItem;
-          textLabelClone.Parent = TextContainerClone;
+          textLabelClone.Parent = textContainerClone;
           
           -- Check if we should add a new page.
-          if not textLabelClone.TextFits and uiListLayout.AbsoluteContentSize.Y > TextContainerClone.AbsoluteSize.Y then
+          if not textLabelClone.TextFits and uiListLayout.AbsoluteContentSize.Y > textContainerClone.AbsoluteSize.Y then
 
             -- Add the current page to the page list.
             newPage();
@@ -223,37 +214,36 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
 
             end
 
-            local function getLineBreakPositions(text: string, TextLabel: TextLabel, isRichText: boolean): {number}
+            local function getLineBreakPositions(text: string): {number}
 
               -- Iterate through each character.
               local breakpoints: {number} = {};
-              local originalTextLabelText = TextLabel.Text;
-              TextLabel.Text = "";
+              textLabel.Text = "";
               local lastSpaceIndex: number = 1;
               local skipCounter = 0;
               local remainingRichTextTags = getRichTextIndices(text);
               for index, character in text:split("") do
 
                 -- Check if this is an offset.
-                if skipCounter ~= 0 then
+                if skipCounter > 0 then
 
                   skipCounter -= 1;
                   continue;
 
                 end
 
-                if isRichText then
+                if textLabelClone.RichText then
 
                   for _, richTextTagIndex in remainingRichTextTags do
 
                     if richTextTagIndex.startOffset == index then
 
-                      skipCounter = ("<" .. richTextTagIndex.name .. (if richTextTagIndex.attributes and richTextTagIndex.attributes ~= "" then " " .. richTextTagIndex.attributes else "") .. ">"):len() - 1;
+                      skipCounter = (`<{richTextTagIndex.name}{if richTextTagIndex.attributes and richTextTagIndex.attributes ~= "" then ` {richTextTagIndex.attributes}` else ""}>`):len() - 1;
                       break;
 
-                    elseif richTextTagIndex.endOffset :: number - ("</" .. richTextTagIndex.name .. ">"):len() == index then
+                    elseif richTextTagIndex.endOffset :: number - (`</{richTextTagIndex.name}>`):len() == index then
 
-                      skipCounter = ("</" .. richTextTagIndex.name .. ">"):len() - 1;
+                      skipCounter = (`</{richTextTagIndex.name}>`):len() - 1;
                       break;
 
                     end
@@ -276,11 +266,11 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
                 end
 
                 -- Keep track of the original text bounds.
-                local originalTextBoundsY = TextLabel.TextBounds.Y;
+                local originalTextBoundsY = textLabelClone.TextBounds.Y;
 
                 -- Add the character and applicable rich text tags.
-                TextLabel.Text = TextLabel.ContentText .. character;
-                if isRichText then
+                textLabelClone.Text = textLabelClone.ContentText .. character;
+                if textLabelClone.RichText then
 
                   for _, richTextTagInfo in remainingRichTextTags do
                     
@@ -288,11 +278,11 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
                     local tagEndOffset = richTextTagInfo.endOffset :: number;
                     if index >= tagStartOffset and tagEndOffset > (breakpoints[#breakpoints] or 0) then
 
-                      local prefix = "<" .. richTextTagInfo.name .. (if richTextTagInfo.attributes and richTextTagInfo.attributes ~= "" then " " .. richTextTagInfo.attributes else "") .. ">";
-                      local suffix = "</" .. richTextTagInfo.name .. ">";
+                      local prefix = `<{richTextTagInfo.name}{if richTextTagInfo.attributes and richTextTagInfo.attributes ~= "" then ` {richTextTagInfo.attributes}` else ""}>`;
+                      local suffix = `</{richTextTagInfo.name}>`;
                       local startOffset = tagStartOffset - (breakpoints[#breakpoints] or 0);
                       local endOffset = (tagEndOffset - (breakpoints[#breakpoints] or 0)) - prefix:len() - suffix:len();
-                      TextLabel.Text = TextLabel.ContentText:sub(1, startOffset - 1) .. prefix .. TextLabel.ContentText:sub(startOffset, endOffset - 1) .. suffix .. TextLabel.ContentText:sub(endOffset);
+                      textLabelClone.Text = textLabelClone.ContentText:sub(1, startOffset - 1) .. prefix .. textLabelClone.ContentText:sub(startOffset, endOffset - 1) .. suffix .. textLabelClone.ContentText:sub(endOffset);
 
                     end
 
@@ -300,25 +290,25 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
 
                 end;
 
-                if TextLabel.TextBounds.Y > originalTextBoundsY then
+                if textLabelClone.TextBounds.Y > originalTextBoundsY then
 
-                  local currentTextBoundsY = TextLabel.TextBounds.Y;
-                  TextLabel.TextWrapped = false;
+                  local currentTextBoundsY = textLabelClone.TextBounds.Y;
+                  textLabelClone.TextWrapped = false;
 
-                  if TextLabel.TextBounds.Y < currentTextBoundsY then
+                  if textLabelClone.TextBounds.Y < currentTextBoundsY then
 
                     table.insert(breakpoints, lastSpaceIndex);
-                    TextLabel.Text = text:sub(lastSpaceIndex + 1, index);
+                    textLabelClone.Text = text:sub(lastSpaceIndex + 1, index);
 
                   end
 
-                  TextLabel.TextWrapped = true;
+                  textLabelClone.TextWrapped = true;
 
                 end
 
               end
               
-              TextLabel.Text = originalTextLabelText;
+              textLabelClone.Text = text;
 
               -- Return breakpoints.
               return breakpoints;
@@ -326,7 +316,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
             end
 
             local originalText = textLabelClone.Text;
-            local breakpoints = getLineBreakPositions(originalText, textLabelClone, textLabelClone.RichText);
+            local breakpoints = getLineBreakPositions(originalText);
             local lastBreakpointIndex = breakpoints[#breakpoints];
             
             if lastBreakpointIndex then
@@ -334,21 +324,17 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
               -- Create another TextLabel to replace the last line of text.
               -- This will allow the TextWrapper to accurately calculate 
               -- how much space is available on the X-axis.
-              local ParagraphTextLabel = textLabelClone:Clone();
-              ParagraphTextLabel.Text = originalText:sub(1, lastBreakpointIndex);
-              ParagraphTextLabel.Parent = textLabelClone.Parent;
-              addTextLabelToPage(ParagraphTextLabel);
+              local paragraphTextLabel = textLabelClone:Clone();
+              paragraphTextLabel.Text = originalText:sub(1, lastBreakpointIndex);
+              paragraphTextLabel.Parent = textLabelClone.Parent;
+              addTextLabelToPage(paragraphTextLabel);
               
               -- Fix the textLabelClone's text back.
-              textLabelClone.Parent = nil;
-              textLabelClone.Parent = ParagraphTextLabel.Parent;
               textLabelClone.Text = originalText:sub(lastBreakpointIndex + 1);
               
             end;
 
             addTextLabelToPage(textLabelClone);
-            
-            xSizeOffset += textLabelClone.TextBounds.X;
             
             lastSpaceIndex = nil;
             
@@ -376,8 +362,6 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
             -- Add the remaining text to a new page.
             addTextLabelToPage(textLabelClone);
             
-            xSizeOffset = 0;
-            
           end
 
         until not lastSpaceIndex;
@@ -390,7 +374,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
       
     end
     
-    TextContainerClone:Destroy();
+    textContainerClone:Destroy();
     
     -- Return all pages for this message.
     if currentPage[1] then
