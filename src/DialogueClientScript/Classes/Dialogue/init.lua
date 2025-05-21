@@ -90,6 +90,8 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
     
     local function newPage()
       
+      assert(#currentPage > 0, "[Dialogue Maker] Current page is empty, so a new page cannot be created.");
+
       table.insert(pages, currentPage);
       currentPage = {};
       textLabelClone = textLabelClone:Clone();
@@ -116,7 +118,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
         
         -- Calculate the X size offset.
         local uiListLayout = textContainerClone:FindFirstChildOfClass("UIListLayout");
-        assert(uiListLayout, "[Dialogue Maker] UIListLayout not found");
+        assert(uiListLayout, "[Dialogue Maker] UIListLayout not found.");
         
         local lastSpaceIndex: number? = nil;
         
@@ -354,7 +356,7 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
                 
               end
               
-              assert(lastSpaceIndex, "[Dialogue Maker] Unable to fit text in text container even after removing the spaces. Is the text too big?");
+              assert(lastSpaceIndex, "[Dialogue Maker] Unable to fit text in text container even after removing the spaces. The text might be too big or the text container might be too small.");
               textLabelClone.Text = textLabelClone.Text:sub(1, lastSpaceIndex - 1);
               
             until textLabelClone.TextFits;
