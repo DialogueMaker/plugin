@@ -9,13 +9,14 @@ type Page = IDialogue.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(dialogue: Dialogue, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
+local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
+  local testTextSegment: TextLabel?, setTestTextSegment = React.useState(nil :: TextLabel?);
 
   local testTextSegmentRef: React.Ref<TextLabel> = React.useRef(nil :: TextLabel?);
-  local testTextSegment: TextSegmentElement = React.createElement(TextSegment, {
+  local testTextSegmentComponent: TextSegmentElement = React.createElement(TextSegment, {
     text = "";
     skipPageEvent = nil;
     letterDelay = 0;
@@ -28,24 +29,34 @@ local function usePages(dialogue: Dialogue, TextSegment: (TextSegmentProperties)
   React.useEffect(function()
   
     assert(typeof(testTextSegmentRef) ~= "function", "textContainerRef must be a ref to a GuiObject");
-    local testTextSegment = testTextSegmentRef.current;
-    if testTextSegment then
+    if testTextSegmentRef.current then
 
-      local pages = dialogue:getPages(testTextSegment);
-      setPages(pages);
+      setTestTextSegment(testTextSegmentRef.current:Clone());
       setShouldShowTestSegment(false);
 
-    end;
+    else
 
-    return function()
-
+      setTestTextSegment(nil);
       setShouldShowTestSegment(true);
 
     end;
 
-  end, {dialogue :: unknown, TextSegment});
+  end, {TextSegment});
 
-  return pages, if shouldShowTestSegment then testTextSegment else nil;
+  React.useEffect(function()
+  
+    assert(typeof(textContainerRef) ~= "function", "textContainerRef must be a ref to a GuiObject");
+    local textContainer = textContainerRef.current;
+    if testTextSegment and textContainer then
+
+      local pages = dialogue:getPages(textContainer, testTextSegment);
+      setPages(pages);
+
+    end;
+
+  end, {dialogue :: unknown, testTextSegment});
+
+  return pages, if shouldShowTestSegment then testTextSegmentComponent else nil;
 
 end;
 

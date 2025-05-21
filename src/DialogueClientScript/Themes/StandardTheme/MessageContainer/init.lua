@@ -24,7 +24,8 @@ export type MessageContainerProperties = {
 local function MessageContainer(props: MessageContainerProperties)
 
   local componentIndex, setComponentIndex = React.useState(1);
-  local pages, testTextSegment = usePages(props.dialogue, MessageTextSegment);
+  local textContainerRef = React.useRef(nil :: GuiObject?);
+  local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment);
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
 
@@ -126,6 +127,7 @@ local function MessageContainer(props: MessageContainerProperties)
     Size = UDim2.new(0, sizeX, 0, sizeY);
     BackgroundColor3 = Color3.fromHex("#202020");
     BackgroundTransparency = 0.2;
+    ref = textContainerRef;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;

@@ -42,7 +42,7 @@ export type Dialogue = {
   --[[
     Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
   ]]
-  getPages: (self: Dialogue, textLabel: TextLabel) -> {Page};
+  getPages: (self: Dialogue, textContainer: GuiObject, textLabel: TextLabel) -> {Page};
 
   getSettings: (self: Dialogue) -> DialogueSettings;
 

@@ -72,12 +72,9 @@ function Dialogue.new(properties: ConstructorProperties, moduleScript: ModuleScr
 
   end;
 
-  local function getPages(self: Dialogue, textLabel: TextLabel): {Page}
+  local function getPages(self: Dialogue, textContainer: GuiObject, textLabel: TextLabel): {Page}
   
     -- Initialize the text instances.
-    local textContainer = textLabel.Parent;
-    assert(textContainer and textContainer:IsA("GuiObject"), "TextLabel must be in a text container.");
-
     local textContainerClone = textContainer:Clone();
     textContainerClone.Visible = false;
     textContainerClone.Parent = textContainer.Parent;
