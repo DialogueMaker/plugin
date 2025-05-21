@@ -4,12 +4,13 @@ local ReactHooks = DialogueClientScript.ReactHooks;
 
 local React = require(DialogueClientScript.Packages.react);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local IDialogueContentFitter = require(DialogueClientScript.Interfaces.DialogueContentFitter);
 
 local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
 local useDynamicSize = require(ReactHooks.useDynamicSize);
 
-type Page = IDialogue.Page;
+type Page = IDialogueContentFitter.Page;
 type Dialogue = IDialogue.Dialogue;
 
 export type MessageContainerProperties = {
@@ -25,10 +26,6 @@ local function MessageContainer(props: MessageContainerProperties)
 
   local componentIndex, setComponentIndex = React.useState(1);
   local textContainerRef = React.useRef(nil :: GuiObject?);
-  local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment);
-  local currentPageIndex = props.currentPageIndex;
-  local skipPageEvent = props.skipPageEvent;
-
   local sizeX, sizeY, textSize = useDynamicSize({
     {
       sizeX = 310;
@@ -42,6 +39,9 @@ local function MessageContainer(props: MessageContainerProperties)
       minimumWidth = 736;
     }
   });
+  local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment, textSize);
+  local currentPageIndex = props.currentPageIndex;
+  local skipPageEvent = props.skipPageEvent;
 
   React.useEffect(function()
   

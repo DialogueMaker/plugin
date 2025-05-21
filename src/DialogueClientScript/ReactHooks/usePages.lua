@@ -1,27 +1,28 @@
 --!strict
 local DialogueClientScript = script.Parent.Parent;
+local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local React = require(DialogueClientScript.Packages.react);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local IDialogueContentFitter = require(DialogueClientScript.Interfaces.DialogueContentFitter);
 local Types = require(DialogueClientScript.Types);
 
 type Dialogue = IDialogue.Dialogue;
-type Page = IDialogue.Page;
+type Page = IDialogueContentFitter.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextSegmentProperties) -> TextSegmentElement): ({Page}, TextSegmentElement?)
+local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextSegmentProperties) -> TextSegmentElement, textSize: number): ({Page}, TextSegmentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
   local testTextSegment: TextLabel?, setTestTextSegment = React.useState(nil :: TextLabel?);
-
   local testTextSegmentRef: React.Ref<TextLabel> = React.useRef(nil :: TextLabel?);
   local testTextSegmentComponent: TextSegmentElement = React.createElement(TextSegment, {
     text = "";
     skipPageEvent = nil;
     letterDelay = 0;
     layoutOrder = 1;
-    textSize = 14;
+    textSize = textSize;
     ref2 = testTextSegmentRef; 
     onComplete = function() end;
   });
@@ -41,7 +42,7 @@ local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObjec
 
     end;
 
-  end, {TextSegment});
+  end, {TextSegment :: unknown, textSize});
 
   React.useEffect(function()
   
@@ -49,7 +50,9 @@ local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObjec
     local textContainer = textContainerRef.current;
     if testTextSegment and textContainer then
 
-      local pages = dialogue:getPages(textContainer, testTextSegment);
+      local dialogueContentFitter = DialogueContentFitter.new(textContainer, testTextSegment);
+      local dialogueContent = dialogue:getContent();
+      local pages = dialogueContentFitter:getPages(dialogueContent);
       setPages(pages);
 
     end;

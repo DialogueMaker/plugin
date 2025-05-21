@@ -162,8 +162,6 @@ function DialogueClient.new(dialogueClientSettings: OptionalDialogueClientSettin
         local completionEvent = Instance.new("BindableEvent");
         local function renderRoot()
 
-          print(dialogue:getContent())
-
           root:render(React.createElement(require(themeModuleScript) :: any, {
             dialogue = dialogue;
             onComplete = function(newParent: Dialogue?)

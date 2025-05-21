@@ -8,13 +8,6 @@ type Dialogue = IDialogue.Dialogue;
 type DialogueClient = IDialogueClient.DialogueClient;
 type DialogueServer = IDialogueServer.DialogueServer;
 
-export type RichTextTagInformation = {
-  attributes: string?;
-  endOffset: number?;
-  name: string;
-  startOffset: number;
-}
-
 export type ThemeProperties = {
   dialogueClient: DialogueClient;
   dialogueServer: DialogueServer;

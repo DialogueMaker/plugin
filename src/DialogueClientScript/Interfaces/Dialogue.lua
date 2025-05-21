@@ -1,8 +1,6 @@
 --!strict
 
-local IEffect = require(script.Parent.Effect);
-
-type Effect = IEffect.Effect;
+export type Content = string;
 
 export type Dialogue = {
 
@@ -24,7 +22,7 @@ export type Dialogue = {
 
     This function does not run if the dialogue is a redirect.
   ]]
-  getContent: (self: Dialogue) -> {string};
+  getContent: (self: Dialogue) -> {Content};
 
   --[[
     In order for this dialogue to show, the condition must pass by returning true. 
@@ -38,11 +36,6 @@ export type Dialogue = {
     This function does not run if the dialogue is a redirect.
   ]]
   runAction: (self: Dialogue, actionID: number) -> ();
-  
-  --[[
-    Returns a list of Page objects based on the given content array by fitting it in a given text label in a given text container.
-  ]]
-  getPages: (self: Dialogue, textContainer: GuiObject, textLabel: TextLabel) -> {Page};
 
   getSettings: (self: Dialogue) -> DialogueSettings;
 
@@ -78,12 +71,7 @@ export type OptionalTypewriterDialogueSettings = {
   canPlayerSkipDelay: boolean?;
 }
 
-export type Page = {
-  {
-    type: "Text"; 
-    text: string; 
-  } | Effect
-};
+
 
 export type TimeoutDialogueSettings = {
   -- Set this to the amount of seconds you want to wait before closing the dialogue.
