@@ -12,15 +12,25 @@ local Window = require(script.Window);
 local EditDialogueButton: PluginToolbarButton;
 local pluginGUI: DockWidgetPluginGui?;
 
-local function getSelectedModel(): Model?
+local function getSelectedInstance(): BasePart | Model?
 
   local selectedObjects = Selection:Get();
   if #selectedObjects ~= 1 then return nil; end;
   
-  local model = selectedObjects[1];
-  if not model:IsA("Model") then return nil; end;
+  local instance = selectedObjects[1];
+  if not instance:IsA("Model") and not instance:IsA("BasePart") then 
   
-  return model;
+    local possibleDialogueServerParent = instance:FindFirstAncestorWhichIsA("Model") or instance:FindFirstAncestorWhichIsA("BasePart");
+    local possibleDialogueServer = possibleDialogueServerParent and possibleDialogueServerParent:FindFirstChild("DialogueServer");
+    if possibleDialogueServer and possibleDialogueServer:HasTag("DialogueMaker_DialogueServer") then
+
+      instance = possibleDialogueServerParent;
+
+    end;
+
+  end;
+  
+  return instance;
 
 end;
 
@@ -35,19 +45,19 @@ local function closeDialogueEditor(): ()
 
   end;
   EditDialogueButton:SetActive(false);
-  EditDialogueButton.Enabled = getSelectedModel() ~= nil;
+  EditDialogueButton.Enabled = getSelectedInstance() ~= nil;
 
 end;
 
-local function repairNPC(model: Model): ()
+local function repairDialogueServerParent(dialogueServerParent: Model | BasePart): ()
   
-  if not model:FindFirstChild("DialogueServer") then
+  if not dialogueServerParent:FindFirstChild("DialogueServer") then
 
-    print(`[Dialogue Maker] Adding settings script to {model.Name}...`);
+    print(`[Dialogue Maker] Adding settings script to {dialogueServerParent.Name}...`);
 
     local SettingsScript = script.Templates.DialogueServerTemplate:Clone();
     SettingsScript.Name = "DialogueServer";
-    SettingsScript.Parent = model;
+    SettingsScript.Parent = dialogueServerParent;
 
   end;
 
@@ -70,7 +80,7 @@ local function openDialogueEditor(): ()
     pluginGUIRoot:render(React.createElement(Window, {
       plugin = plugin;
       pluginGUI = pluginGUI;
-      repairNPC = repairNPC;
+      repairDialogueServerParent = repairDialogueServerParent;
       closeDialogueEditor = function()
 
         pluginGUIRoot:unmount();
@@ -96,43 +106,17 @@ EditDialogueButton.Click:Connect(function()
     
   end;
 
-  local model: Model;
-  local isTestSuccessful, errorMessage = pcall(function()
-    
-    -- Check if the user is selecting an object.
-    local SelectedObjects = Selection:Get();
-    assert(#SelectedObjects ~= 0, "You didn't select an model.");
-    assert(#SelectedObjects == 1, "You must select one model; not multiple models.");
-
-    -- Check if the model has a part
-    model = SelectedObjects[1]
-    assert(model:IsA("Model"), `You must select a model, not a {model.ClassName}.`);
-
-    local ModelHasPart = false;
-    for _, object in model:GetChildren() do
-      
-      if object:IsA("BasePart") then
-        
-        ModelHasPart = true;
-        break;
-        
-      end
-      
-    end;
-
-    assert(ModelHasPart, "Your selected model doesn't have a part inside of it.");
-    
-  end);
+  local selectedInstance = getSelectedInstance();
   
-  if not isTestSuccessful then
+  if not selectedInstance then
 
     EditDialogueButton:SetActive(false);
-    error("[Dialogue Maker] " .. errorMessage, 0);
+    return;
     
   end
 
   -- Verify NPC dialogue folder
-  repairNPC(model);
+  repairDialogueServerParent(selectedInstance);
 
   -- Add the chat receiver script in the StarterPlayerScripts.
   if not StarterPlayerScripts:FindFirstChild("DialogueClientScript") then
@@ -154,7 +138,7 @@ EditDialogueButton:SetActive(pluginGUI ~= nil);
 
 Selection.SelectionChanged:Connect(function()
 
-  EditDialogueButton.Enabled = pluginGUI ~= nil or getSelectedModel() ~= nil;
+  EditDialogueButton.Enabled = pluginGUI ~= nil or getSelectedInstance() ~= nil;
 
 end);
 

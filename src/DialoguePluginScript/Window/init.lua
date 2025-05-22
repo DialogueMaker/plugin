@@ -6,7 +6,7 @@ local Toolbar = require(script.Toolbar);
 local DialogueTable = require(script.DialogueTable);
 
 export type WindowProperties = {
-  repairNPC: (model: Model) -> ();
+  repairDialogueServerParent: (dialogueServerParent: Model | BasePart) -> ();
   plugin: Plugin;
   pluginGUI: DockWidgetPluginGui;
   closeDialogueEditor: () -> ();
@@ -14,7 +14,7 @@ export type WindowProperties = {
 
 local function Window(props: WindowProperties)
 
-  local model: Model?, setModel = React.useState(nil :: Model?);
+  local dialogueServerParent: (Model | BasePart)?, setDialogueServerParent = React.useState(nil :: (Model | BasePart)?);
   local dialogueParent: ModuleScript?, setDialogueParent = React.useState(nil :: ModuleScript?);
 
   React.useEffect(function()
@@ -25,13 +25,23 @@ local function Window(props: WindowProperties)
       if #selection == 1 then
 
         local selectedInstance = selection[1];
-        local model = if selectedInstance:IsA("Model") then selectedInstance else selectedInstance:FindFirstAncestorWhichIsA("Model");
-        props.pluginGUI.Title = `Dialogue Maker • {model.Name}`;
-        setModel(model);
-        setDialogueParent(if selectedInstance == model then model:FindFirstChild("DialogueServer") else selectedInstance);
+        local dialogueServerParent = if selectedInstance:IsA("Model") or selectedInstance:IsA("BasePart") then selectedInstance else selectedInstance:FindFirstAncestorWhichIsA("Model") or selectedInstance:FindFirstAncestorWhichIsA("BasePart");
+        setDialogueServerParent(dialogueServerParent);
+        setDialogueParent(if selectedInstance == dialogueServerParent then dialogueServerParent:FindFirstChild("DialogueServer") else selectedInstance);
+
+        if dialogueServerParent and dialogueServerParent:FindFirstChild("DialogueServer") then
+
+          props.pluginGUI.Title = `Dialogue Maker • {dialogueServerParent.Name}`;
+
+        else
+
+          props.closeDialogueEditor();
+
+        end;
 
       elseif #selection == 0 then
 
+        print("closing due to empty selection");
         props.closeDialogueEditor();
 
       end
@@ -47,9 +57,9 @@ local function Window(props: WindowProperties)
 
     end;
 
-  end, {model});
+  end, {dialogueServerParent});
 
-  return if model and dialogueParent then
+  return if dialogueServerParent and dialogueParent then
     React.createElement("Frame", {
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 1;
@@ -58,30 +68,18 @@ local function Window(props: WindowProperties)
         SortOrder = Enum.SortOrder.LayoutOrder;
         Padding = UDim.new(0, 0);
       });
-      Editor = if model:HasTag("DialogueMakerNPC") then 
-        React.createElement(React.Fragment, {}, {
-          Toolbar = React.createElement(Toolbar, {
-            dialogueParent = dialogueParent;
-            plugin = props.plugin;
-            repairNPC = props.repairNPC;
-            model = model;
-          });
-          DialogueTable = React.createElement(DialogueTable, {
-            dialogueParent = dialogueParent;
-            plugin = props.plugin;
-          });
-        })
-      else (
-        React.createElement("TextButton", {
-          Text = "Initialize NPC";
-          [React.Event.Activated] = function()
-
-            props.repairNPC(model);
-            setDialogueParent(model:FindFirstChild("DialogueServer") :: ModuleScript);
-
-          end;
-        })
-      )
+      Editor = React.createElement(React.Fragment, {}, {
+        Toolbar = React.createElement(Toolbar, {
+          dialogueParent = dialogueParent;
+          plugin = props.plugin;
+          repairDialogueServerParent = props.repairDialogueServerParent;
+          dialogueServerParent = dialogueServerParent;
+        });
+        DialogueTable = React.createElement(DialogueTable, {
+          dialogueParent = dialogueParent;
+          plugin = props.plugin;
+        });
+      })
     })
   else nil;
 

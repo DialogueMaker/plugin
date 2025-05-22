@@ -2,14 +2,15 @@
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
-local React = require(script.Parent.Parent.Packages.react);
+local DialoguePluginScript = script.Parent.Parent;
+local React = require(DialoguePluginScript.Packages.react);
 local ToolbarButton = require(script.ToolbarButton);
-local useStudioColors = require(script.Parent.Parent.useStudioColors);
+local useStudioColors = require(DialoguePluginScript.useStudioColors);
 
 type ToolbarProps = {
   dialogueParent: ModuleScript;
-  model: Model;
-  repairNPC: (model: Model) -> ();
+  dialogueServerParent: Model | BasePart;
+  repairDialogueServerParent: (dialogueServerParent: Model | BasePart) -> ();
   plugin: Plugin;
 }
 
@@ -45,17 +46,16 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 2;
       onClick = function()
 
-        local identifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
-        if ChangeHistoryService:IsRecordingInProgress(identifier) then
+        if ChangeHistoryService:IsRecordingInProgress() then
 
-          ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
-          identifier = ChangeHistoryService:TryBeginRecording("Delete dialogue item");
-          assert(identifier, "[Dialogue Maker] ChangeHistoryService failed to begin recording.");
+          ChangeHistoryService:FinishRecording(nil, Enum.FinishRecordingOperation.Cancel);
 
         end;
 
+        local identifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
+
         -- Ensure the NPC is properly configured.
-        props.repairNPC(props.model);
+        props.repairDialogueServerParent(props.dialogueServerParent);
 
         -- Find a name for the content script.
         local targetPriority = 1;
@@ -71,7 +71,7 @@ local function Toolbar(props: ToolbarProps)
         end;
 
         -- Create the content script.
-        local newContentScript = script.Parent.Parent.Templates.DialogueTemplate:Clone();
+        local newContentScript = DialoguePluginScript.Templates.DialogueTemplate:Clone();
         newContentScript.Name = targetPriority;
         newContentScript:SetAttribute("DialogueType", "Message");
         newContentScript.Parent = dialogueParent;
@@ -86,9 +86,9 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.repairNPC(props.model);
+        props.repairDialogueServerParent(props.dialogueServerParent);
 
-        local npcDialogueSettingsScript = props.model:FindFirstChild("DialogueServer") :: ModuleScript;
+        local npcDialogueSettingsScript = props.dialogueServerParent:FindFirstChild("DialogueServer") :: ModuleScript;
         props.plugin:OpenScript(npcDialogueSettingsScript);
 
       end;
