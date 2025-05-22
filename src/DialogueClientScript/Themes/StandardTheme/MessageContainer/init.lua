@@ -16,6 +16,7 @@ export type MessageContainerProperties = {
   currentPageIndex: number;
   skipPageEvent: BindableEvent?;
   continueDialogue: () -> ();
+  setCurrentPageIndex: (number) -> ();
   onPagesUpdated: (pages: {Page}) -> ();
   setIsTypingFinished: (boolean) -> ();
   dialogue: Dialogue;
@@ -28,6 +29,7 @@ local function MessageContainer(props: MessageContainerProperties)
   local pages, testTextSegment = usePages(props.dialogue, textContainerRef, MessageTextSegment, 14);
   local currentPageIndex = props.currentPageIndex;
   local skipPageEvent = props.skipPageEvent;
+  local shouldSkip, setShouldSkip = React.useState(false);
 
   React.useEffect(function()
   
@@ -35,11 +37,25 @@ local function MessageContainer(props: MessageContainerProperties)
 
   end, {pages :: unknown, props.onPagesUpdated});
 
-  React.useEffect(function()
-  
-    setComponentIndex(1);
+  React.useEffect(function(): ()
 
-  end, {pages});
+    if skipPageEvent then
+
+      local skipPageSignal = skipPageEvent.Event:Once(function()
+
+        setShouldSkip(true);
+
+      end);
+
+      return function()
+        
+        skipPageSignal:Disconnect();
+
+      end;
+
+    end;
+
+  end, {pages :: unknown, skipPageEvent});
 
   React.useEffect(function(): ()
 
@@ -66,13 +82,22 @@ local function MessageContainer(props: MessageContainerProperties)
 
           if componentIndex == index then
 
-            dialogueContentItem.run(skipPageEvent);
+            dialogueContentItem:run({
+              shouldSkip = shouldSkip;
+              skipPageEvent = skipPageEvent;
+            });
+            if index == #page then
+              
+              setShouldSkip(false);
+              props.setIsTypingFinished(true);
+
+            else
+
+              setComponentIndex(componentIndex + 1);
+
+            end;
 
           end;
-
-          table.insert(messageComponentList, React.createElement(React.Fragment, {
-            key = index;
-          }));
 
         elseif dialogueContentItem.type == "Text" then
           
@@ -84,11 +109,12 @@ local function MessageContainer(props: MessageContainerProperties)
             layoutOrder = index;
             textSize = 14;
             key = index;
-            letterDelay = dialogueSettings.typewriter.characterDelaySeconds;
+            letterDelay = if shouldSkip then 0 else dialogueSettings.typewriter.characterDelaySeconds;
             onComplete = function()
 
               if index == #page then 
                 
+                setShouldSkip(false);
                 props.setIsTypingFinished(true);
 
               else

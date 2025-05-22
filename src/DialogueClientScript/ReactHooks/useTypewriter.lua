@@ -32,47 +32,56 @@ local function useTypewriter(properties: TypewriterProperties): number
 
   React.useEffect(function(): ()
 
-    local typewriterTask = task.delay(properties.letterDelay, function()
+    if properties.letterDelay == 0 then
 
-      local textLabel = Instance.new("TextLabel");
-      textLabel.Text = properties.text;
-      textLabel.RichText = not not properties.shouldUseRichText;
+      setMaxVisibleGraphemes(-1);
+      properties.onComplete();
 
-      local contentText = textLabel.ContentText;
-      textLabel:Destroy();
+    else
 
-      if maxVisibleGraphemes ~= -1 and maxVisibleGraphemes < #contentText then
+      local typewriterTask = task.delay(properties.letterDelay, function()
 
-        setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
+        local textLabel = Instance.new("TextLabel");
+        textLabel.Text = properties.text;
+        textLabel.RichText = not not properties.shouldUseRichText;
 
-      else
+        local contentText = textLabel.ContentText;
+        textLabel:Destroy();
 
-        properties.onComplete();
+        if maxVisibleGraphemes ~= -1 and maxVisibleGraphemes < #contentText then
 
-      end;
+          setMaxVisibleGraphemes(maxVisibleGraphemes + 1);
 
-    end);
+        else
 
-    setTypewriterTask(typewriterTask);
+          properties.onComplete();
 
-    if properties.skipPageEvent then
-
-      local skipConnection = properties.skipPageEvent:Once(function()
-      
-        task.cancel(typewriterTask);
-        setMaxVisibleGraphemes(-1);
+        end;
 
       end);
 
-      return function()
+      setTypewriterTask(typewriterTask);
 
-        skipConnection:Disconnect();
+      if properties.skipPageEvent then
+
+        local skipConnection = properties.skipPageEvent:Once(function()
+        
+          task.cancel(typewriterTask);
+          setMaxVisibleGraphemes(-1);
+
+        end);
+
+        return function()
+
+          skipConnection:Disconnect();
+
+        end;
 
       end;
-
+      
     end;
 
-  end, {properties.text :: unknown, maxVisibleGraphemes});
+  end, {properties.text :: unknown, maxVisibleGraphemes, properties.letterDelay});
 
   return maxVisibleGraphemes;
 

@@ -1,16 +1,26 @@
 --!strict
 
+export type Bounds = {
+  width: number,
+  height: number,
+};
+
+export type SkipProperties = {
+  skipPageEvent: BindableEvent?;
+  shouldSkip: boolean;
+}
+
+export type RunEffectFunction = (self: Effect, skipProperties: SkipProperties) -> ();
+
+export type GetBoundsFunction = (self: Effect, initialWidth: number, maximumWidth: number) -> {Bounds};
+
 export type Effect = {
   
   type: "Effect";
   
-  run: (skipPageEvent: BindableEvent?) -> any;
+  run: RunEffectFunction;
 
-  getMaxDimensions: () -> {x: number, y: number};
-
-  getBreakpoints: () -> {number};
-
-  onSkip: () -> any;
+  getBounds: GetBoundsFunction;
   
   name: string;
 

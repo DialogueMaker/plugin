@@ -18,7 +18,7 @@ local function ResponseComponentList(props: ResponseComponentListProperties)
   for index, response in props.responses do
 
     table.insert(responseComponents, React.createElement(ResponseButton, {
-      text = response:getContent()[1]; -- The response's text is always at the first index.
+      text = response:getContent()[1] :: string; -- The response's text is always at the first index.
       layoutOrder = index;
       key = index;
       onClick = function()

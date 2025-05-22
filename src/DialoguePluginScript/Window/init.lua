@@ -25,7 +25,7 @@ local function Window(props: WindowProperties)
       if #selection == 1 then
 
         local selectedInstance = selection[1];
-        local dialogueServerParent = if selectedInstance:IsA("Model") or selectedInstance:IsA("BasePart") then selectedInstance else selectedInstance:FindFirstAncestorWhichIsA("Model") or selectedInstance:FindFirstAncestorWhichIsA("BasePart");
+        local dialogueServerParent = if selectedInstance.ClassName == "Model" or selectedInstance:IsA("BasePart") then selectedInstance else selectedInstance:FindFirstAncestorOfClass("Model") or selectedInstance:FindFirstAncestorWhichIsA("BasePart");
         setDialogueServerParent(dialogueServerParent);
         setDialogueParent(if selectedInstance == dialogueServerParent then dialogueServerParent:FindFirstChild("DialogueServer") else selectedInstance);
 

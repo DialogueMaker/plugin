@@ -1,6 +1,10 @@
 --!strict
 
-export type Content = string;
+local IEffect = require(script.Parent.Effect);
+
+type Effect = IEffect.Effect;
+
+export type Content = string | Effect;
 
 export type Dialogue = {
 
