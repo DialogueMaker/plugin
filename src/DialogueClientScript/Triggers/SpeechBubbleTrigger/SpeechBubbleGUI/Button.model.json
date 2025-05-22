@@ -1,0 +1,11 @@
+{
+  "className": "ImageButton",
+  "properties": {
+    "BackgroundTransparency": 1,
+    "BorderSizePixel": 0,
+    "Size": {
+      "UDim2": [[1, 0], [1, 0]]
+    },
+    "Image": "rbxassetid://4883127463"
+  }
+}

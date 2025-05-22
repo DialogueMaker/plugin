@@ -1,0 +1,11 @@
+# Project place file
+/roblox-dialogue-maker.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+# Note to developers: Use Wally to locally install packages. 
+# Do not include Packages in commits.
+Packages
+sourcemap.json

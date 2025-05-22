@@ -1,0 +1,11 @@
+{
+  "className": "BillboardGui",
+  "properties": {
+    "Active": true,
+    "LightInfluence": 0,
+    "ResetOnSpawn": false,
+    "StudsOffset": {
+      "Vector3": [0, 2, 0]
+    }
+  }
+}

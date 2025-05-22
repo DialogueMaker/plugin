@@ -1,0 +1,16 @@
+{
+  "name": "Dialogue Maker",
+  "tree": {
+    "$className": "DataModel",
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "DialogueClientScript": {
+          "$path": "src/DialogueClientScript",
+          "Packages": {
+            "$path": "Packages"
+          }
+        }
+      }
+    }
+  }
+}
