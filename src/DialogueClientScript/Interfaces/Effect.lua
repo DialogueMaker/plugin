@@ -11,7 +11,7 @@ export type Effect = {
   
   run: (self: Effect, skipPageEvent: BindableEvent?) -> ();
 
-  getBounds: (self: Effect) -> Bounds;
+  getBounds: (self: Effect) -> {Bounds};
   
   name: string;
 
