@@ -5,13 +5,15 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type Effect = IEffect.Effect;
 type Bounds = IEffect.Bounds;
+type RunEffectFunction = IEffect.RunEffectFunction;
+type GetBoundsFunction = IEffect.GetBoundsFunction;
 
 local Effect = {};
 
 export type ConstructorProperties = {
   name: string;
-  run: (self: Effect, skipPageEvent: BindableEvent?) -> ();
-  getBounds: (self: Effect, initialWidth: number, maximumWidth: number) -> {Bounds};
+  run: RunEffectFunction;
+  getBounds: GetBoundsFunction;
 }
 
 function Effect.new(properties: ConstructorProperties): Effect

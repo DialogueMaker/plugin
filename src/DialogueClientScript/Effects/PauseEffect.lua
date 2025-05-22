@@ -11,6 +11,7 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type Bounds = IEffect.Bounds;
 type Effect = IEffect.Effect;
+type SkipProperties = IEffect.SkipProperties;
 
 local PauseEffect = {};
 
@@ -22,8 +23,14 @@ function PauseEffect.new(timeSeconds: number): Effect
     
   end;
 
-  local function run(self: Effect, skipPageEvent: BindableEvent?)
+  local function run(self: Effect, skipProperties: SkipProperties)
 
+    if skipProperties.shouldSkip then
+
+      return;
+      
+    end;
+      
     local continueEvent = Instance.new("BindableEvent");
     local skipPageThread: thread? = nil;
     local timeExpiredThread = task.delay(timeSeconds, function()
@@ -37,11 +44,11 @@ function PauseEffect.new(timeSeconds: number): Effect
 
     end);
 
-    if skipPageEvent then
+    if skipProperties.skipPageEvent then
 
       skipPageThread = task.spawn(function()
       
-        skipPageEvent.Event:Wait();
+        skipProperties.skipPageEvent.Event:Wait();
         task.cancel(timeExpiredThread);
         continueEvent:Fire();
 

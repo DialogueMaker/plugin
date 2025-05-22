@@ -105,6 +105,7 @@ local function StandardTheme(props: ThemeProperties)
       onPagesUpdated = setPages;
       dialogue = props.dialogue;
       setIsTypingFinished = setIsTypingFinished;
+      setCurrentPageIndex = setCurrentPageIndex;
     });
     ResponseContainer = if #responses > 0 and (not dialogueSettings.typewriter.shouldShowResponseWhileTyping or isTypingFinished) then React.createElement(ResponseContainer, {
       responses = responses;
