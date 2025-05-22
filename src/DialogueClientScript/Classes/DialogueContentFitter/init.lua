@@ -345,8 +345,8 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
         
       else
         
-        local bounds = contentItem:getBounds();
-        if bounds.width == 0 and bounds.height == 0 then
+        local bounds = contentItem:getBounds(0, 0); -- TODO: Get actual initial width and maximum width
+        if #bounds == 0 then
           
           -- This is a special case where the effect doesn't have any bounds.
           -- We can just add it to the page.
