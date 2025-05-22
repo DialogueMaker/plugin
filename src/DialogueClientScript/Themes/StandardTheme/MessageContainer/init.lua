@@ -86,7 +86,16 @@ local function MessageContainer(props: MessageContainerProperties)
               shouldSkip = shouldSkip;
               skipPageEvent = skipPageEvent;
             });
-            setComponentIndex(componentIndex + 1);
+            if index == #page then
+              
+              setShouldSkip(false);
+              props.setIsTypingFinished(true);
+
+            else
+
+              setComponentIndex(componentIndex + 1);
+
+            end;
 
           end;
 
@@ -105,6 +114,7 @@ local function MessageContainer(props: MessageContainerProperties)
 
               if index == #page then 
                 
+                setShouldSkip(false);
                 props.setIsTypingFinished(true);
 
               else
