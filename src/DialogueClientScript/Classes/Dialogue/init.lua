@@ -2,13 +2,15 @@
 
 local DialogueClientScript = script.Parent.Parent;
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type Dialogue = IDialogue.Dialogue;
 type DialogueSettings = IDialogue.DialogueSettings;
+type Effect = IEffect.Effect;
 type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
 
 export type ConstructorProperties = {
-  getContent: (self: Dialogue) -> {string};
+  getContent: (self: Dialogue) -> {string | Effect};
   runAction: (self: Dialogue, actionID: number) -> ();
   verifyCondition: (self: Dialogue) -> boolean;
   settings: OptionalDialogueSettings?;

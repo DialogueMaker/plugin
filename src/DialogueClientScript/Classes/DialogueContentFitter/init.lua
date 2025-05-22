@@ -57,11 +57,9 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
       
     end
     
-    for contentArrayIndex, contentArrayItem in content do
-
-      local contentArrayItemType = typeof(contentArrayItem);
+    for contentArrayIndex, contentItem in content do
       
-      if contentArrayItemType == "string" then
+      if typeof(contentItem) == "string" then
         
         local uiListLayout = textContainerClone:FindFirstChildOfClass("UIListLayout");
         assert(uiListLayout, "[Dialogue Maker] UIListLayout not found.");
@@ -81,7 +79,7 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
           
           textLabel = textLabel:Clone();
           textLabel.Visible = true;
-          textLabel.Text = if lastSpaceIndex then contentArrayItem:sub(lastSpaceIndex + 1) else contentArrayItem;
+          textLabel.Text = if lastSpaceIndex then contentItem:sub(lastSpaceIndex + 1) else contentItem;
           textLabel.Parent = textContainerClone;
           
           -- Check if we should add a new page.
@@ -345,9 +343,16 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
 
         until not lastSpaceIndex;
         
-      elseif contentArrayItemType == "table" then
+      else
         
-        -- TODO: Add effects
+        local bounds = contentItem:getBounds();
+        if bounds.width == 0 and bounds.height == 0 then
+          
+          -- This is a special case where the effect doesn't have any bounds.
+          -- We can just add it to the page.
+          table.insert(components, contentItem);
+          
+        end
         
       end;
       

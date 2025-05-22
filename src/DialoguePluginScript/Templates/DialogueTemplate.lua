@@ -8,6 +8,7 @@ local Dialogue = require(DialogueClientScript.Classes.Dialogue);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
 
 type Dialogue = IDialogue.Dialogue;
+type Content = IDialogue.Content;
 type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
 
 local function verifyCondition(self: Dialogue): boolean
@@ -16,7 +17,7 @@ local function verifyCondition(self: Dialogue): boolean
 
 end;
 
-local function getContent(self: Dialogue): {string}
+local function getContent(self: Dialogue): {Content}
 
   local player = Players.LocalPlayer;
   return {`Hi {player.Name}!`};

@@ -66,13 +66,10 @@ local function MessageContainer(props: MessageContainerProperties)
 
           if componentIndex == index then
 
-            dialogueContentItem.run(skipPageEvent);
+            dialogueContentItem:run(skipPageEvent);
+            setComponentIndex(componentIndex + 1);
 
           end;
-
-          table.insert(messageComponentList, React.createElement(React.Fragment, {
-            key = index;
-          }));
 
         elseif dialogueContentItem.type == "Text" then
           
