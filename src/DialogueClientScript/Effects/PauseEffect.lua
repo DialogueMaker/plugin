@@ -16,12 +16,9 @@ local PauseEffect = {};
 
 function PauseEffect.new(timeSeconds: number): Effect
   
-  local function getBounds(self: Effect): Bounds
+  local function getBounds(self: Effect, initialWidth: number, maximumWidth: number): {Bounds}
     
-    return {
-      width = 0;
-      height = 0;
-    };
+    return {};
     
   end;
 
