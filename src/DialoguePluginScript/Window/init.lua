@@ -41,7 +41,6 @@ local function Window(props: WindowProperties)
 
       elseif #selection == 0 then
 
-        print("closing due to empty selection");
         props.closeDialogueEditor();
 
       end
