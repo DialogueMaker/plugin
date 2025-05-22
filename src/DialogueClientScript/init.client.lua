@@ -1,5 +1,7 @@
 --!strict
 
+local Players = game:GetService("Players");
+
 local DialogueClient = require(script.Classes.DialogueClient);
 local IDialogueClient = require(script.Interfaces.DialogueClient);
 local IDialogueServer = require(script.Interfaces.DialogueServer);
@@ -15,6 +17,14 @@ type OptionalDialogueClientSettings = IDialogueClient.OptionalDialogueClientSett
 local dialogueClientSettings: OptionalDialogueClientSettings = {};
 local dialogueClient = DialogueClient.new(dialogueClientSettings);
 DialogueClient:setSharedDialogueClient(dialogueClient);
+
+-- CollectionService:GetTagged seems to not work without this.
+local player = Players.LocalPlayer;
+if workspace.StreamingEnabled and not player.Character then
+
+  player.CharacterAdded:Wait();
+
+end;
 
 for _, initialize in {initializeClickDetectorTrigger, initializePromptRegionTrigger, initializeProximityPromptTrigger, initializeSpeechBubbleTrigger} do
 
