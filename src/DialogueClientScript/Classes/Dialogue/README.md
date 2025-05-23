@@ -1,8 +1,7 @@
 # Dialogue
 A `Dialogue` object contains all of the information needed for a message, a response, or a redirect.
 
-> [!NOTE]
-> Unfortunately, it is currently not feasible to modify most dialogue properties and methods within the plugin because they can be dynamic, meaning that the values of them can change during runtime. Running these scripts in Studio's edit mode can also pose a security risk, as someone malicious could edit them before the plugin runs them. As such, you can only edit the content within Roblox's script editor or your favorite external editor using other plugins.
+Some Dialogue properties can be edited using the [dialogue editor window](/src/DialoguePluginScript/Window/README.md) of the plugin.
 
 ## Static properties
 ### defaultSettings
