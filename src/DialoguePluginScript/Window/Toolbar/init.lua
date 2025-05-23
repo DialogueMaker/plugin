@@ -48,7 +48,7 @@ local function Toolbar(props: ToolbarProps)
 
         if ChangeHistoryService:IsRecordingInProgress() then
 
-          ChangeHistoryService:FinishRecording(nil, Enum.FinishRecordingOperation.Cancel);
+          ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
 
         end;
 

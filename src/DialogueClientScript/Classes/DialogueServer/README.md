@@ -47,24 +47,6 @@ The current default settings aim to best suit the average non-programmer. If you
 | button | nil | nil | This property is for developers to manage a GuiButton that they created, so there is no need for a default value. |
 | shouldAutoCreate | boolean | false | Proximity prompts are more visible and accessible for players across devices. |
 
-#### timeout
-> [!WARNING]
-> This feature will soon be replaced by per-dialogue timeouts.
-
-| Key | Default type | Default value | Rationale |
-| :- | :- | :- | :- |
-| seconds | nil | nil | Setting a default timeout can lead to unexpected behavior, especially during cutscenes. |
-| shouldWaitForResponse | boolean | true | Ending the conversation abruptly can lead to unexpected behavior, especially during cutscenes. |
-
-#### typewriter
-> [!WARNING]
-> This feature will soon be replaced by per-dialogue typewriting.
-
-| Key | Default type | Default value | Rationale |
-| :- | :- | :- | :- |
-| characterDelaySeconds | number | 0.025 | Opinionated based on personal experiences, so this value may not work for everyone; however, it seems to be a good general base value based on the lack of negative feedback on this. |
-| canPlayerSkipDelay | boolean | true | Allowing players to skip dialogue by default can help people who have already read the messages and accidentally started another conversation. |
-
 ## Constructors
 ### new(dialogueServerSettings, module)
 Creates and returns a new `DialogueServer` object.
