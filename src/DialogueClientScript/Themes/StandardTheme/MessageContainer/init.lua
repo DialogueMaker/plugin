@@ -78,6 +78,21 @@ local function MessageContainer(props: MessageContainerProperties)
 
         end;
 
+        local function onComplete()
+
+          if index == #page then
+            
+            setShouldSkip(false);
+            props.setIsTypingFinished(true);
+
+          else
+
+            setComponentIndex(componentIndex + 1);
+
+          end;
+
+        end;
+
         if dialogueContentItem.type == "Effect" then
 
           if componentIndex == index then
@@ -85,17 +100,8 @@ local function MessageContainer(props: MessageContainerProperties)
             dialogueContentItem:run({
               shouldSkip = shouldSkip;
               skipPageEvent = skipPageEvent;
+              onComplete = onComplete;
             });
-            if index == #page then
-              
-              setShouldSkip(false);
-              props.setIsTypingFinished(true);
-
-            else
-
-              setComponentIndex(componentIndex + 1);
-
-            end;
 
           end;
 
@@ -110,20 +116,7 @@ local function MessageContainer(props: MessageContainerProperties)
             textSize = 14;
             key = index;
             letterDelay = if shouldSkip then 0 else dialogueSettings.typewriter.characterDelaySeconds;
-            onComplete = function()
-
-              if index == #page then 
-                
-                setShouldSkip(false);
-                props.setIsTypingFinished(true);
-
-              else
-
-                setComponentIndex(componentIndex + 1);
-              
-              end;
-
-            end;
+            onComplete = onComplete;
           });
 
           table.insert(messageComponentList, textSegment);

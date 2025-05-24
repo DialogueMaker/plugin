@@ -11,7 +11,8 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type Bounds = IEffect.Bounds;
 type Effect = IEffect.Effect;
-type SkipProperties = IEffect.SkipProperties;
+type ContinuePageFunction = IEffect.ContinuePageFunction;
+type ExecutionProperties = IEffect.ExecutionProperties;
 
 local PauseEffect = {};
 
@@ -23,10 +24,11 @@ function PauseEffect.new(timeSeconds: number): Effect
     
   end;
 
-  local function run(self: Effect, skipProperties: SkipProperties)
+  local function run(self: Effect, executionProperties: ExecutionProperties)
 
-    if skipProperties.shouldSkip then
+    if executionProperties.shouldSkip then
 
+      executionProperties.continuePage();
       return;
       
     end;
@@ -44,11 +46,11 @@ function PauseEffect.new(timeSeconds: number): Effect
 
     end);
 
-    if skipProperties.skipPageEvent then
+    if executionProperties.skipPageEvent then
 
       skipPageThread = task.spawn(function()
       
-        skipProperties.skipPageEvent.Event:Wait();
+        executionProperties.skipPageEvent.Event:Wait();
         task.cancel(timeExpiredThread);
         continueEvent:Fire();
 
@@ -57,6 +59,7 @@ function PauseEffect.new(timeSeconds: number): Effect
     end;
 
     continueEvent.Event:Wait();
+    executionProperties.continuePage();
 
   end;
   
