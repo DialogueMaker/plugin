@@ -57,9 +57,9 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
       
     end
     
-    for contentArrayIndex, contentItem in content do
+    for _, component in content do
       
-      if typeof(contentItem) == "string" then
+      if typeof(component) == "string" then
         
         local uiListLayout = textContainerClone:FindFirstChildOfClass("UIListLayout");
         assert(uiListLayout, "[Dialogue Maker] UIListLayout not found.");
@@ -70,16 +70,13 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
           
           local function addTextLabelToPage(TextLabel: TextLabel)
 
-            table.insert(components, {
-              type = "Text";
-              text = TextLabel.Text;
-            });
+            table.insert(components, TextLabel.Text);
 
           end
           
           textLabel = textLabel:Clone();
           textLabel.Visible = true;
-          textLabel.Text = if lastSpaceIndex then contentItem:sub(lastSpaceIndex + 1) else contentItem;
+          textLabel.Text = if lastSpaceIndex then component:sub(lastSpaceIndex + 1) else component;
           textLabel.Parent = textContainerClone;
           
           -- Check if we should add a new page.
@@ -165,10 +162,10 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
               local restoredComponents = {};
               for _, component in components do
 
-                if component.type == "Text" then
+                if typeof(component) == "string" then
 
                   local TextLabel = textLabel:Clone();
-                  TextLabel.Text = component.text;
+                  TextLabel.Text = component;
                   TextLabel.Parent = textContainerClone;
                   table.insert(restoredComponents, TextLabel);
 
@@ -345,12 +342,12 @@ function DialogueContentFitter.new(textContainer: GuiObject, textLabel: TextLabe
         
       else
         
-        local bounds = contentItem:getBounds(0, 0); -- TODO: Get actual initial width and maximum width
+        local bounds = component:getBounds(0, 0); -- TODO: Get actual initial width and maximum width
         if #bounds == 0 then
           
           -- This is a special case where the effect doesn't have any bounds.
           -- We can just add it to the page.
-          table.insert(components, contentItem);
+          table.insert(components, component);
           
         end
         

@@ -93,23 +93,11 @@ local function MessageContainer(props: MessageContainerProperties)
 
         end;
 
-        if dialogueContentItem.type == "Effect" then
-
-          if componentIndex == index then
-
-            dialogueContentItem:run({
-              shouldSkip = shouldSkip;
-              skipPageEvent = skipPageEvent;
-              onComplete = onComplete;
-            });
-
-          end;
-
-        elseif dialogueContentItem.type == "Text" then
+        if typeof(dialogueContentItem) == "string" then
           
           local dialogueSettings = props.dialogue:getSettings();
           local textSegment = React.createElement(MessageTextSegment, {
-            text = dialogueContentItem.text;
+            text = dialogueContentItem;
             dialogue = props.dialogue;
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
@@ -120,6 +108,18 @@ local function MessageContainer(props: MessageContainerProperties)
           });
 
           table.insert(messageComponentList, textSegment);
+
+        else
+
+          if componentIndex == index then
+
+            dialogueContentItem:run({
+              shouldSkip = shouldSkip;
+              skipPageEvent = skipPageEvent;
+              continuePage = onComplete;
+            });
+
+          end;
 
         end;
 

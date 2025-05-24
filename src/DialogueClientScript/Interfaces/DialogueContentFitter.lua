@@ -17,12 +17,7 @@ export type DialogueContentFitterProperties = {
   textContainer: GuiObject;
 }
 
-export type Page = {
-  {
-    type: "Text"; 
-    text: string; 
-  } | Effect
-};
+export type Page = {Content};
 
 export type RichTextTag = {
   attributes: string?;
