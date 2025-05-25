@@ -3,11 +3,11 @@ local DialogueClientScript = script.Parent.Parent;
 local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local React = require(DialogueClientScript.Packages.react);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
-local IDialogueContentFitter = require(DialogueClientScript.Interfaces.DialogueContentFitter);
+local IEffect = require(DialogueClientScript.Interfaces.Effect);
 local Types = require(DialogueClientScript.Types);
 
 type Dialogue = IDialogue.Dialogue;
-type Page = IDialogueContentFitter.Page;
+type Page = IEffect.Page;
 type TextSegmentProperties = Types.TextSegmentProperties;
 type TextSegmentElement = React.ReactElement<any, TextLabel>;
 

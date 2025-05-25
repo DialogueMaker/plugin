@@ -14,11 +14,13 @@ export type ExecutionProperties = {
   continuePage: ContinuePageFunction;
 }
 
+export type Page = {string | Effect};
+
 export type ContinuePageFunction = () -> ();
 
 export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> React.ReactElement<any, any>?;
 
-export type GetPagesFunction = (self: Effect, initialWidth: number, maximumWidth: number) -> {string | Effect};
+export type FitFunction = (self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}) -> (GuiObject, {Page});
 
 export type Effect = {
   
@@ -26,7 +28,7 @@ export type Effect = {
   
   run: RunEffectFunction;
 
-  getPages: GetPagesFunction;
+  fit: FitFunction;
   
   name: string;
 

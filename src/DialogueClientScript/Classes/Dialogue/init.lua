@@ -7,10 +7,11 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 type Dialogue = IDialogue.Dialogue;
 type DialogueSettings = IDialogue.DialogueSettings;
 type Effect = IEffect.Effect;
+type Page = IEffect.Page;
 type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
 
 export type ConstructorProperties = {
-  getContent: (self: Dialogue) -> {string | Effect};
+  getContent: (self: Dialogue) -> {Page};
   runAction: (self: Dialogue, actionID: number) -> ();
   verifyCondition: (self: Dialogue) -> boolean;
   settings: OptionalDialogueSettings?;

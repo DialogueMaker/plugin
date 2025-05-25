@@ -9,10 +9,10 @@ type ExecutionProperties = IEffect.ExecutionProperties;
 export type ShakingEffectProperties = {
   intensity: number;
   frequency: number;
-  executionProperties: ExecutionProperties;
+  text: string;
 }
 
-local function ShakingContainer(properties: ShakingEffectProperties)
+local function ShakingContainer(properties: ShakingEffectProperties & {executionProperties: ExecutionProperties})
 
   local textContainerRef = React.useRef(nil);
   React.useEffect(function(): ()

@@ -6,14 +6,14 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 type Effect = IEffect.Effect;
 type Bounds = IEffect.Bounds;
 type RunEffectFunction = IEffect.RunEffectFunction;
-type GetBoundsFunction = IEffect.GetBoundsFunction;
+type FitFunction = IEffect.FitFunction;
 
 local Effect = {};
 
 export type ConstructorProperties = {
   name: string;
   run: RunEffectFunction;
-  getBounds: GetBoundsFunction;
+  fit: FitFunction;
 }
 
 function Effect.new(properties: ConstructorProperties): Effect
@@ -21,7 +21,7 @@ function Effect.new(properties: ConstructorProperties): Effect
   local effect: Effect = {
     type = "Effect";
     name = properties.name;
-    getBounds = properties.getBounds;
+    fit = properties.fit;
     run = properties.run;
   };
 

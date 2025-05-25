@@ -1,10 +1,9 @@
 --!strict
 
-local IDialogue = require(script.Parent.Dialogue);
 local IEffect = require(script.Parent.Effect);
 
-type DialogueContent = IDialogue.DialogueContent;
 type Effect = IEffect.Effect;
+type Page = IEffect.Page;
 
 export type DialogueContentFitter = DialogueContentFitterProperties & DialogueContentFitterMethods;
 
@@ -16,8 +15,6 @@ export type DialogueContentFitterProperties = {
   textLabel: TextLabel;
   contentContainer: GuiObject;
 }
-
-export type Page = {string | Effect}
 
 export type RichTextTag = {
   attributes: string?;

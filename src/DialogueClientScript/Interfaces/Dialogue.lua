@@ -3,6 +3,7 @@
 local IEffect = require(script.Parent.Effect);
 
 type Effect = IEffect.Effect;
+type Page = IEffect.Page;
 
 export type Dialogue = {
 
@@ -24,7 +25,7 @@ export type Dialogue = {
 
     This function does not run if the dialogue is a redirect.
   ]]
-  getContent: (self: Dialogue) -> {DialogueContent};
+  getContent: (self: Dialogue) -> Page;
 
   --[[
     In order for this dialogue to show, the condition must pass by returning true. 
@@ -48,8 +49,6 @@ export type Dialogue = {
   moduleScript: ModuleScript;
   
 };
-
-export type DialogueContent = string | Effect;
 
 export type DialogueSettings = {
   timeout: TimeoutDialogueSettings;

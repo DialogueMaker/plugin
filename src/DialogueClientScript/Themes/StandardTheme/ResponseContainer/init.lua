@@ -15,18 +15,32 @@ export type ResponseComponentListProperties = {
 local function ResponseComponentList(props: ResponseComponentListProperties)
   
   local responseComponents = {};
+
   for index, response in props.responses do
 
-    table.insert(responseComponents, React.createElement(ResponseButton, {
-      text = response:getContent()[1] :: string; -- The response's text is always at the first index.
-      layoutOrder = index;
-      key = index;
-      onClick = function()
+    local text = "";
+    for _, component in response:getContent() do
 
-        props.onComplete(response);
+      assert(typeof(component) == "string", "[Dialogue Maker] Effect components are currently not supported in response buttons. Please use strings instead.");
+      
+      text = text .. component;
 
-      end;
-    }))
+    end;
+
+    if text ~= "" then
+
+      table.insert(responseComponents, React.createElement(ResponseButton, {
+        text = text;
+        layoutOrder = index;
+        key = index;
+        onClick = function()
+
+          props.onComplete(response);
+
+        end;
+      }));
+
+    end;
 
   end;
 

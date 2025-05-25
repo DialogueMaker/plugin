@@ -13,14 +13,16 @@ type Bounds = IEffect.Bounds;
 type Effect = IEffect.Effect;
 type ContinuePageFunction = IEffect.ContinuePageFunction;
 type ExecutionProperties = IEffect.ExecutionProperties;
+type Page = IEffect.Page;
 
 local PauseEffect = {};
 
 function PauseEffect.new(timeSeconds: number): Effect
   
-  local function getBounds(self: Effect, initialWidth: number, maximumWidth: number): {Bounds}
+  local function fit(self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page})
     
-    return {};
+    -- This effect is just a pause, so we don't need to do anything special to fit it.
+    return contentContainer, pages;
     
   end;
 
@@ -65,7 +67,7 @@ function PauseEffect.new(timeSeconds: number): Effect
   
   local effect = Effect.new({
     name = "PauseEffect";
-    getBounds = getBounds;
+    fit = fit;
     run = run;
   });
 

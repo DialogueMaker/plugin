@@ -4,12 +4,12 @@ local ReactHooks = DialogueClientScript.ReactHooks;
 
 local React = require(DialogueClientScript.Packages.react);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
-local IDialogueContentFitter = require(DialogueClientScript.Interfaces.DialogueContentFitter);
+local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 local MessageTextSegment = require(script.MessageTextSegment);
 local usePages = require(ReactHooks.usePages);
 
-type Page = IDialogueContentFitter.Page;
+type Page = IEffect.Page;
 type Dialogue = IDialogue.Dialogue;
 
 export type MessageContainerProperties = {
