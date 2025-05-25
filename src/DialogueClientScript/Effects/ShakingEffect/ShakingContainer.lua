@@ -14,8 +14,8 @@ export type ShakingEffectProperties = {
 
 local function ShakingContainer(properties: ShakingEffectProperties & {children: React.ReactNode})
 
-  local textContainerRef = React.useRef(nil);
-  React.useEffect(function(): ()
+  local textContainerRef = properties.react.useRef(nil);
+  properties.react.useEffect(function(): ()
 
     local textContainer = textContainerRef.current;
     if textContainer then
@@ -42,18 +42,18 @@ local function ShakingContainer(properties: ShakingEffectProperties & {children:
 
   end, {properties.intensity :: unknown, properties.frequency});
 
-  return React.createElement("Frame", {
+  return properties.react.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
     BackgroundTransparency = 1;
     Size = UDim2.new();
   }, {
-    TextContainer = React.createElement("Frame", {
+    TextContainer = properties.react.createElement("Frame", {
       AutomaticSize = Enum.AutomaticSize.XY;
       BackgroundTransparency = 1;
       Size = UDim2.new();
       ref = textContainerRef; -- Used on a child because the position won't change if the parent is affected by UIListLayout.
     }, {
-      Message = React.createElement(React.Fragment, {}, {properties.children});
+      Message = properties.react.createElement(properties.react.Fragment, {}, {properties.children});
     });
   });
 

@@ -6,6 +6,7 @@
 -- © 2025 Dialogue Maker Group
 
 local DialogueClientScript = script.Parent.Parent;
+local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local Effect = require(DialogueClientScript.Classes.Effect);
 local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
@@ -22,7 +23,9 @@ function PauseEffect.new(timeSeconds: number): Effect
   local function fit(self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page})
     
     -- This effect is just a pause, so we don't need to do anything special to fit it.
-    return contentContainer, pages;
+    local newPages = DialogueContentFitter:clonePages(pages);
+    table.insert(newPages[#pages], self);
+    return contentContainer, newPages;
     
   end;
 

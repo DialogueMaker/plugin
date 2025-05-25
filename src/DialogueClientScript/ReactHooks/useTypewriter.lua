@@ -8,7 +8,7 @@ type Dialogue = IDialogue.Dialogue;
 export type TypewriterProperties = {
   text: string;
   letterDelay: number;
-  skipPageEvent: RBXScriptSignal?;
+  skipPageSignal: RBXScriptSignal?;
   shouldUseRichText: boolean?;
   onComplete: () -> ();
 };
@@ -47,9 +47,9 @@ local function useTypewriter(properties: TypewriterProperties): number
 
       end);
 
-      if properties.skipPageEvent then
+      if properties.skipPageSignal then
 
-        local skipConnection = properties.skipPageEvent:Once(function()
+        local skipConnection = properties.skipPageSignal:Once(function()
         
           task.cancel(typewriterTask);
           setMaxVisibleGraphemes(-1);

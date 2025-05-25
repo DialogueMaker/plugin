@@ -93,13 +93,12 @@ local function MessageContainer(props: MessageContainerProperties)
 
         end;
 
+        local dialogueSettings = props.dialogue:getSettings();
         if typeof(dialogueContentItem) == "string" then
           
-          local dialogueSettings = props.dialogue:getSettings();
           local textSegment = React.createElement(MessageTextSegment, {
             text = dialogueContentItem;
-            dialogue = props.dialogue;
-            skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
+            skipPageSignal = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
             textSize = 14;
             key = `{currentPageIndex}.{index}`;
@@ -113,9 +112,15 @@ local function MessageContainer(props: MessageContainerProperties)
 
           local possibleComponent = dialogueContentItem:run({
             shouldSkip = shouldSkip;
-            skipPageEvent = skipPageEvent;
+            skipPageSignal = if skipPageEvent then skipPageEvent.Event else nil;
             continuePage = onComplete;
             textComponent = MessageTextSegment;
+            textComponentProperties = {
+              layoutOrder = index;
+              letterDelay = if shouldSkip then 0 else dialogueSettings.typewriter.characterDelaySeconds;
+              textSize = 14;
+            };
+            react = React;
           });
 
           if possibleComponent then

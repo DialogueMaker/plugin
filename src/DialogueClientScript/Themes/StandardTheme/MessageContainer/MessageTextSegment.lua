@@ -14,7 +14,7 @@ local function TextSegment(props: TextComponentProperties)
     text = text;
     letterDelay = props.letterDelay;
     onComplete = props.onComplete;
-    skipPageEvent = props.skipPageEvent;
+    skipPageSignal = props.skipPageSignal;
   });
 
   return React.createElement("TextLabel", {

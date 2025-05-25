@@ -75,9 +75,37 @@ function DialogueContentFitter:cleanContentContainer(contentContainer: GuiObject
 
 end;
 
+function DialogueContentFitter:clonePages(pages: {Page}): {Page}
+
+  local clonedPages: {Page} = {};
+  for _, page in pages do
+
+    local clonedPage: Page = {};
+    for _, component in page do
+
+      if typeof(component) == "string" then
+
+        table.insert(clonedPage, component);
+
+      else
+
+        table.insert(clonedPage, table.clone(component));
+
+      end
+
+    end;
+
+    table.insert(clonedPages, clonedPage);
+
+  end;
+
+  return clonedPages;
+
+end;
+
 function DialogueContentFitter:fitText(text: string, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page})
 
-  pages = table.clone(pages);
+  pages = self:clonePages(pages);
   local uiListLayout = contentContainer:FindFirstChildOfClass("UIListLayout");
   assert(uiListLayout, "[Dialogue Maker] Content container must have a UIListLayout to fit text.");
 

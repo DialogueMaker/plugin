@@ -9,7 +9,6 @@ local DialogueClientScript = script.Parent.Parent;
 local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local Effect = require(DialogueClientScript.Classes.Effect);
 local IEffect = require(DialogueClientScript.Interfaces.Effect);
-local React = require(DialogueClientScript.Packages.react);
 local ShakingContainer = require(script.ShakingContainer);
 
 type Bounds = IEffect.Bounds;
@@ -31,12 +30,13 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
     -- In the future, this effect may support other content such as images or buttons.
     -- But for now, this is enough.
     local simulatedContentContainer, simulatedPages = DialogueContentFitter:fitText(properties.text, contentContainer, textLabel, pages);
-    
+
     -- Replace the inserted strings with effects.
     for currentPageIndex = #pages, #simulatedPages do
 
       local initialComponentIndex = if currentPageIndex == #pages then #pages[#pages] + 1 else 1;
       local currentPage = simulatedPages[currentPageIndex];
+      
       for currentComponentIndex = initialComponentIndex, #currentPage do
 
         local text = currentPage[currentComponentIndex];
@@ -60,17 +60,20 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
 
     return function()
       
-      return React.createElement(ShakingContainer, {
+      return executionProperties.react.createElement(ShakingContainer, {
         frequency = properties.frequency;
         intensity = properties.intensity;
         text = properties.text;
+        react = executionProperties.react;
       }, {
-        Message = React.createElement(executionProperties.textComponent, {
+        Message = executionProperties.react.createElement(executionProperties.textComponent, {
           skipPageEvent = executionProperties.skipPageEvent;
           onComplete = executionProperties.continuePage;
           text = properties.text;
+          layoutOrder = executionProperties.textComponentProperties.layoutOrder;
           letterDelay = executionProperties.textComponentProperties.letterDelay;
           textSize = executionProperties.textComponentProperties.textSize;
+          react = executionProperties.react;
         })
       });
 
