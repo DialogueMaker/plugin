@@ -12,15 +12,10 @@ export type ShakingEffectProperties = {
   text: string;
 }
 
-local function ShakingContainer(properties: ShakingEffectProperties & {executionProperties: ExecutionProperties})
+local function ShakingContainer(properties: ShakingEffectProperties & {children: React.ReactNode})
 
   local textContainerRef = React.useRef(nil);
   React.useEffect(function(): ()
-  
-    if properties.executionProperties.shouldSkip then
-      properties.executionProperties.continuePage();
-      return;
-    end;
 
     local textContainer = textContainerRef.current;
     if textContainer then
@@ -37,23 +32,7 @@ local function ShakingContainer(properties: ShakingEffectProperties & {execution
       
       end);
 
-      local skipPageSignal = if properties.executionProperties.skipPageEvent then
-
-        properties.executionProperties.skipPageEvent.Event:Once(function()
-          
-          properties.executionProperties.continuePage();
-          
-        end)
-
-      else nil;
-
       return function()
-        
-        if skipPageSignal then
-          
-          skipPageSignal:Disconnect();
-          
-        end;
         
         task.cancel(shakingTask);
         
@@ -61,7 +40,7 @@ local function ShakingContainer(properties: ShakingEffectProperties & {execution
     
     end
 
-  end, {properties.intensity :: unknown, properties.frequency, properties.executionProperties});
+  end, {properties.intensity :: unknown, properties.frequency});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -74,7 +53,7 @@ local function ShakingContainer(properties: ShakingEffectProperties & {execution
       Size = UDim2.new();
       ref = textContainerRef; -- Used on a child because the position won't change if the parent is affected by UIListLayout.
     }, {
-
+      Message = React.createElement(React.Fragment, {}, {properties.children});
     });
   });
 

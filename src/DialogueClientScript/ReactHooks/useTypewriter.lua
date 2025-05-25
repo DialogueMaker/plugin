@@ -7,7 +7,6 @@ type Dialogue = IDialogue.Dialogue;
 
 export type TypewriterProperties = {
   text: string;
-  dialogue: Dialogue;
   letterDelay: number;
   skipPageEvent: RBXScriptSignal?;
   shouldUseRichText: boolean?;
@@ -17,18 +16,6 @@ export type TypewriterProperties = {
 local function useTypewriter(properties: TypewriterProperties): number
   
   local maxVisibleGraphemes, setMaxVisibleGraphemes = React.useState(0);
-  local typewriterTask, setTypewriterTask = React.useState(nil :: thread?);
-
-  React.useEffect(function()
-  
-    setMaxVisibleGraphemes(0);
-    if typewriterTask then
-
-      task.cancel(typewriterTask);
-
-    end;
-
-  end, {properties.dialogue});
 
   React.useEffect(function(): ()
 
@@ -59,8 +46,6 @@ local function useTypewriter(properties: TypewriterProperties): number
         end;
 
       end);
-
-      setTypewriterTask(typewriterTask);
 
       if properties.skipPageEvent then
 

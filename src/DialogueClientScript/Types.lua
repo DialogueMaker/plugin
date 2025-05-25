@@ -17,7 +17,7 @@ export type ThemeProperties = {
   onTimeout: () -> ();
 }
 
-export type TextSegmentProperties = {
+export type TextComponentProperties = {
   text: string;
   skipPageEvent: RBXScriptSignal?;
   letterDelay: number;

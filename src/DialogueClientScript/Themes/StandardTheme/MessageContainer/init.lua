@@ -102,22 +102,27 @@ local function MessageContainer(props: MessageContainerProperties)
             skipPageEvent = if skipPageEvent then skipPageEvent.Event else nil;
             layoutOrder = index;
             textSize = 14;
-            key = index;
+            key = `{currentPageIndex}.{index}`;
             letterDelay = if shouldSkip then 0 else dialogueSettings.typewriter.characterDelaySeconds;
             onComplete = onComplete;
           });
 
           table.insert(messageComponentList, textSegment);
 
-        else
+        elseif componentIndex == index then
 
-          if componentIndex == index then
+          local possibleComponent = dialogueContentItem:run({
+            shouldSkip = shouldSkip;
+            skipPageEvent = skipPageEvent;
+            continuePage = onComplete;
+            textComponent = MessageTextSegment;
+          });
 
-            dialogueContentItem:run({
-              shouldSkip = shouldSkip;
-              skipPageEvent = skipPageEvent;
-              continuePage = onComplete;
-            });
+          if possibleComponent then
+
+            table.insert(messageComponentList, React.createElement(possibleComponent, {
+              key = `{currentPageIndex}.{index}`;
+            }));
 
           end;
 

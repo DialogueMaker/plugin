@@ -5,6 +5,8 @@ local IEffect = require(script.Parent.Effect);
 type Effect = IEffect.Effect;
 type Page = IEffect.Page;
 
+export type GetContentFunction = (self: Dialogue) -> Page;
+
 export type Dialogue = {
 
   type: "Message" | "Response" | "Redirect";
@@ -25,7 +27,7 @@ export type Dialogue = {
 
     This function does not run if the dialogue is a redirect.
   ]]
-  getContent: (self: Dialogue) -> Page;
+  getContent: GetContentFunction;
 
   --[[
     In order for this dialogue to show, the condition must pass by returning true. 

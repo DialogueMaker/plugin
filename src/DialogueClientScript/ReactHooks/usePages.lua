@@ -8,16 +8,16 @@ local Types = require(DialogueClientScript.Types);
 
 type Dialogue = IDialogue.Dialogue;
 type Page = IEffect.Page;
-type TextSegmentProperties = Types.TextSegmentProperties;
-type TextSegmentElement = React.ReactElement<any, TextLabel>;
+type TextComponentProperties = Types.TextComponentProperties;
+type TextComponentElement = React.ReactElement<any, TextLabel>;
 
-local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextSegmentProperties) -> TextSegmentElement, textSize: number): ({Page}, TextSegmentElement?)
+local function usePages(dialogue: Dialogue, textContainerRef: React.Ref<GuiObject>, TextSegment: (TextComponentProperties) -> TextComponentElement, textSize: number): ({Page}, TextComponentElement?)
 
   local pages, setPages = React.useState({} :: {Page});
   local shouldShowTestSegment, setShouldShowTestSegment = React.useState(true);
   local testTextSegment: TextLabel?, setTestTextSegment = React.useState(nil :: TextLabel?);
   local testTextSegmentRef: React.Ref<TextLabel> = React.useRef(nil :: TextLabel?);
-  local testTextSegmentComponent: TextSegmentElement = React.createElement(TextSegment, {
+  local testTextSegmentComponent: TextComponentElement = React.createElement(TextSegment, {
     text = "";
     skipPageEvent = nil;
     letterDelay = 0;

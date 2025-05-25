@@ -58,12 +58,23 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
 
   local function run(self: Effect, executionProperties: ExecutionProperties)
 
-    return React.createElement(ShakingContainer, {
-      frequency = properties.frequency;
-      intensity = properties.intensity;
-      text = properties.text;
-      executionProperties = executionProperties;
-    });
+    return function()
+      
+      return React.createElement(ShakingContainer, {
+        frequency = properties.frequency;
+        intensity = properties.intensity;
+        text = properties.text;
+      }, {
+        Message = React.createElement(executionProperties.textComponent, {
+          skipPageEvent = executionProperties.skipPageEvent;
+          onComplete = executionProperties.continuePage;
+          text = properties.text;
+          letterDelay = executionProperties.textComponentProperties.letterDelay;
+          textSize = executionProperties.textComponentProperties.textSize;
+        })
+      });
+
+    end;
 
   end;
   

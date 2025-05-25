@@ -12,13 +12,15 @@ export type ExecutionProperties = {
   skipPageEvent: BindableEvent?;
   shouldSkip: boolean;
   continuePage: ContinuePageFunction;
+  textComponent: (...any) -> React.ReactElement<any, any>;
+  textComponentProperties: any;
 }
 
 export type Page = {string | Effect};
 
 export type ContinuePageFunction = () -> ();
 
-export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> React.ReactElement<any, any>?;
+export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> ((...any) -> React.ReactElement<any, any>)?;
 
 export type FitFunction = (self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}) -> (GuiObject, {Page});
 

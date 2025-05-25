@@ -3,16 +3,15 @@ local DialogueClientScript = script.Parent.Parent.Parent.Parent;
 local React = require(DialogueClientScript.Packages.react);
 local useTypewriter = require(DialogueClientScript.ReactHooks.useTypewriter);
 local types = require(DialogueClientScript.Types);
-type TextSegmentProperties = types.TextSegmentProperties;
+type TextComponentProperties = types.TextComponentProperties;
 
-local function TextSegment(props: TextSegmentProperties)
+local function TextSegment(props: TextComponentProperties)
 
   local ref = React.useRef(nil :: TextLabel?);
 
   local text = props.text;
   local maxVisibleGraphemes = useTypewriter({
     text = text;
-    dialogue = props.dialogue;
     letterDelay = props.letterDelay;
     onComplete = props.onComplete;
     skipPageEvent = props.skipPageEvent;
