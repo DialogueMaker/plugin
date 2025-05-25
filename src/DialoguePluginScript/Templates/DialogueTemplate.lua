@@ -6,9 +6,10 @@ local StarterPlayer = game:GetService("StarterPlayer");
 local DialogueClientScript = StarterPlayer.StarterPlayerScripts.DialogueClientScript;
 local Dialogue = require(DialogueClientScript.Classes.Dialogue);
 local IDialogue = require(DialogueClientScript.Interfaces.Dialogue);
+local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type Dialogue = IDialogue.Dialogue;
-type Content = IDialogue.Content;
+type Page = IEffect.Page;
 type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
 
 local function verifyCondition(self: Dialogue): boolean
@@ -17,7 +18,7 @@ local function verifyCondition(self: Dialogue): boolean
 
 end;
 
-local function getContent(self: Dialogue): {Content}
+local function getContent(self: Dialogue): Page
 
   local player = Players.LocalPlayer;
   return {`Hi {player.Name}!`};
