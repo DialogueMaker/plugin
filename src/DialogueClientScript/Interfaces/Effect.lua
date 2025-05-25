@@ -18,7 +18,7 @@ export type ContinuePageFunction = () -> ();
 
 export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> React.ReactElement<any, any>?;
 
-export type GetBoundsFunction = (self: Effect, initialWidth: number, maximumWidth: number) -> {Bounds};
+export type GetPagesFunction = (self: Effect, initialWidth: number, maximumWidth: number) -> {string | Effect};
 
 export type Effect = {
   
@@ -26,7 +26,7 @@ export type Effect = {
   
   run: RunEffectFunction;
 
-  getBounds: GetBoundsFunction;
+  getPages: GetPagesFunction;
   
   name: string;
 
