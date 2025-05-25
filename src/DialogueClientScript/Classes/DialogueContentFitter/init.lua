@@ -17,6 +17,7 @@ function DialogueContentFitter.new(contentContainer: GuiObject, textLabel: TextL
   textLabel.Size = UDim2.fromScale(0, 0);
   textLabel.MaxVisibleGraphemes = -1;
 
+  local contentContainerParent = contentContainer.Parent;
   contentContainer = contentContainer:Clone();
   contentContainer.Visible = false;
 
@@ -24,10 +25,7 @@ function DialogueContentFitter.new(contentContainer: GuiObject, textLabel: TextL
 
     -- We clone the content container to avoid race conditions.
     local contentContainer = self.contentContainer:Clone();
-    local uiListLayout = contentContainer:FindFirstChildOfClass("UIListLayout");
-    assert(uiListLayout, "[Dialogue Maker] Content container must have a UIListLayout to fit text.");
-
-    contentContainer.Parent = self.contentContainer.Parent;
+    contentContainer.Parent = contentContainerParent;
 
     local pages: {Page} = {{}};
     
@@ -79,13 +77,12 @@ end;
 
 function DialogueContentFitter:fitText(text: string, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page})
 
-  contentContainer = contentContainer:Clone();
   pages = table.clone(pages);
   local uiListLayout = contentContainer:FindFirstChildOfClass("UIListLayout");
   assert(uiListLayout, "[Dialogue Maker] Content container must have a UIListLayout to fit text.");
 
   local lastSpaceIndex: number? = nil;
-      
+
   repeat
     
     textLabel = textLabel:Clone();
@@ -343,7 +340,7 @@ function DialogueContentFitter:fitText(text: string, contentContainer: GuiObject
           continue;
           
         end
-        
+
         assert(lastSpaceIndex, "[Dialogue Maker] Unable to fit text in text container even after removing the spaces. The text might be too big or the text container might be too small.");
         textLabel.Text = textLabel.Text:sub(1, lastSpaceIndex - 1);
         
