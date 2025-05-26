@@ -1,5 +1,9 @@
 --!strict
-local DialogueClientScript = script.Parent.Parent.Parent;
+
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local ReactHooks = DialogueClientScript.ReactHooks;
 
 local React = require(DialogueClientScript.Packages.react);
@@ -108,9 +112,9 @@ local function MessageContainer(props: MessageContainerProperties)
 
           table.insert(messageComponentList, textSegment);
 
-        elseif componentIndex == index then
+        else
 
-          local possibleComponent = dialogueContentItem:run({
+          local possibleComponent, possibleProps, possibleChildren = dialogueContentItem:run({
             shouldSkip = shouldSkip;
             skipPageSignal = if skipPageEvent then skipPageEvent.Event else nil;
             continuePage = onComplete;
@@ -125,9 +129,12 @@ local function MessageContainer(props: MessageContainerProperties)
 
           if possibleComponent then
 
-            table.insert(messageComponentList, React.createElement(possibleComponent, {
-              key = `{currentPageIndex}.{index}`;
-            }));
+            possibleProps.key = `{currentPageIndex}.{index}`
+            local element = React.createElement(possibleComponent, possibleProps, possibleChildren);
+
+            print(element);
+
+            table.insert(messageComponentList, element);
 
           end;
 

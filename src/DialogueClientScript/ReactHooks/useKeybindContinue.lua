@@ -2,8 +2,10 @@
 
 local ContextActionService = game:GetService("ContextActionService");
 local UserInputService = game:GetService("UserInputService");
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
 
-local DialogueClientScript = script.Parent.Parent;
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local React = require(DialogueClientScript.Packages.react);
 
 local IDialogueClient = require(DialogueClientScript.Interfaces.DialogueClient);

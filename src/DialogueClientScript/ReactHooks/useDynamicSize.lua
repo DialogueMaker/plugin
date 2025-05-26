@@ -1,5 +1,10 @@
 --!strict
-local React = require(script.Parent.Parent.Packages.react);
+
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
+local React = require(DialogueClientScript.Packages.react);
 
 export type DynamicSizeProperties = {
   minimumHeight: number?;

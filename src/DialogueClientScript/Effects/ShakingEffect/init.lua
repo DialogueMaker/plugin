@@ -5,10 +5,14 @@
 -- Programmer: Christian Toney
 -- © 2025 Dialogue Maker Group
 
-local DialogueClientScript = script.Parent.Parent;
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local Effect = require(DialogueClientScript.Classes.Effect);
 local IEffect = require(DialogueClientScript.Interfaces.Effect);
+local React = require(DialogueClientScript.Packages.react);
 local ShakingContainer = require(script.ShakingContainer);
 
 type Bounds = IEffect.Bounds;
@@ -21,6 +25,8 @@ type ShakingEffectProperties = ShakingContainer.ShakingEffectProperties;
 local ShakingEffect = {};
 
 function ShakingEffect.new(properties: ShakingEffectProperties): Effect
+  
+  assert(properties.intensity == math.floor(properties.intensity), "Expected intensity to be an integer");
   
   local function fit(self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page}) 
     
@@ -58,26 +64,21 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
 
   local function run(self: Effect, executionProperties: ExecutionProperties)
 
-    return function()
-      
-      return executionProperties.react.createElement(ShakingContainer, {
-        frequency = properties.frequency;
-        intensity = properties.intensity;
+    return ShakingContainer, {
+      frequency = properties.frequency;
+      intensity = properties.intensity;
+      text = properties.text;
+      layoutOrder = executionProperties.textComponentProperties.layoutOrder;
+    }, {
+      Message = React.createElement(executionProperties.textComponent, {
+        skipPageEvent = executionProperties.skipPageEvent;
         text = properties.text;
-        react = executionProperties.react;
-      }, {
-        Message = executionProperties.react.createElement(executionProperties.textComponent, {
-          skipPageEvent = executionProperties.skipPageEvent;
-          onComplete = executionProperties.continuePage;
-          text = properties.text;
-          layoutOrder = executionProperties.textComponentProperties.layoutOrder;
-          letterDelay = executionProperties.textComponentProperties.letterDelay;
-          textSize = executionProperties.textComponentProperties.textSize;
-          react = executionProperties.react;
-        })
-      });
-
-    end;
+        onComplete = executionProperties.continuePage;
+        layoutOrder = 1;
+        letterDelay = executionProperties.textComponentProperties.letterDelay;
+        textSize = executionProperties.textComponentProperties.textSize;
+      })
+    };
 
   end;
   

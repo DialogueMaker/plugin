@@ -5,7 +5,10 @@
 -- Programmer: Christian Toney
 -- © 2025 Dialogue Maker Group
 
-local DialogueClientScript = script.Parent.Parent;
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local DialogueContentFitter = require(DialogueClientScript.Classes.DialogueContentFitter);
 local Effect = require(DialogueClientScript.Classes.Effect);
 local IEffect = require(DialogueClientScript.Interfaces.Effect);

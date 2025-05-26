@@ -5,7 +5,10 @@
 --
 -- Programmer: Christian Toney (Christian_Toney)
 
-local DialogueClientScript = script.Parent.Parent;
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local ReactHooks = DialogueClientScript.ReactHooks;
 local React = require(DialogueClientScript.Packages.react);
 local Types = require(DialogueClientScript.Types);

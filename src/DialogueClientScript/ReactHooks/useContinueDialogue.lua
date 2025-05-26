@@ -1,5 +1,9 @@
 --!strict
-local DialogueClientScript = script.Parent.Parent;
+
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local IEffect = require(DialogueClientScript.Interfaces.Effect);
 type Page = IEffect.Page;
 

@@ -1,8 +1,10 @@
 --!strict
 
 local Players = game:GetService("Players");
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
 
-local DialogueClientScript = script.Parent.Parent;
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local React = require(DialogueClientScript.Packages.react);
 local ReactRoblox = require(DialogueClientScript.Packages["react-roblox"]);
 local IDialogueClient = require(DialogueClientScript.Interfaces.DialogueClient);

@@ -1,6 +1,9 @@
 --!strict
 
-local DialogueClientScript = script.Parent.Parent.Parent;
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local React = require(DialogueClientScript.Packages.react);
 local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
@@ -12,14 +15,33 @@ export type ShakingEffectProperties = {
   text: string;
 }
 
-local function ShakingContainer(properties: ShakingEffectProperties & {children: React.ReactNode})
+local function ShakingContainer(properties: ShakingEffectProperties & {layoutOrder: number; children: React.ReactNode})
 
-  local textContainerRef = properties.react.useRef(nil);
-  properties.react.useEffect(function(): ()
+  local textContainerRef = React.useRef(nil :: GuiObject?);
+  local contentSize: Vector2?, setContentSize = React.useState(nil :: Vector2?);
+  React.useEffect(function(): ()
+  
+    local textContainer = textContainerRef.current;
+    if textContainer then
+
+      local size = textContainer.AbsoluteSize;
+      setContentSize(size);
+
+      return function()
+
+        setContentSize(nil);
+
+      end;
+      
+    end;
+
+  end, {properties.children});
+
+  React.useEffect(function(): ()
 
     local textContainer = textContainerRef.current;
     if textContainer then
-      
+
       local shakingTask = task.spawn(function()
         
         while task.wait(properties.frequency) do
@@ -42,18 +64,19 @@ local function ShakingContainer(properties: ShakingEffectProperties & {children:
 
   end, {properties.intensity :: unknown, properties.frequency});
 
-  return properties.react.createElement("Frame", {
-    AutomaticSize = Enum.AutomaticSize.XY;
+  return React.createElement("Frame", {
+    AutomaticSize = if contentSize then Enum.AutomaticSize.None else Enum.AutomaticSize.XY;
     BackgroundTransparency = 1;
-    Size = UDim2.new();
+    Size = if contentSize then UDim2.fromOffset(contentSize.X, contentSize.Y) else UDim2.new();
+    LayoutOrder = properties.layoutOrder;
   }, {
-    TextContainer = properties.react.createElement("Frame", {
-      AutomaticSize = Enum.AutomaticSize.XY;
+    TextContainer = React.createElement("Frame", {
       BackgroundTransparency = 1;
-      Size = UDim2.new();
+      AutomaticSize = if contentSize then Enum.AutomaticSize.None else Enum.AutomaticSize.XY;
+      Size = UDim2.fromScale(1, 1);
       ref = textContainerRef; -- Used on a child because the position won't change if the parent is affected by UIListLayout.
     }, {
-      Message = properties.react.createElement(properties.react.Fragment, {}, {properties.children});
+      Message = React.createElement(React.Fragment, {}, {properties.children});
     });
   });
 

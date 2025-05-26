@@ -1,5 +1,9 @@
 --!strict
-local DialogueClientScript = script.Parent.Parent.Parent.Parent;
+
+local StarterPlayer = game:GetService("StarterPlayer");
+local StarterPlayerScripts = StarterPlayer.StarterPlayerScripts;
+
+local DialogueClientScript = StarterPlayerScripts.DialogueClientScript;
 local React = require(DialogueClientScript.Packages.react);
 local useTypewriter = require(DialogueClientScript.ReactHooks.useTypewriter);
 local types = require(DialogueClientScript.Types);
