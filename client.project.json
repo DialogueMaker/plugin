@@ -1,5 +1,5 @@
 {
-  "name": "Dialogue Maker",
+  "name": "DialogueClientScript",
   "tree": {
     "$className": "DataModel",
     "StarterPlayer": {
