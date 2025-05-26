@@ -9,9 +9,13 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type ExecutionProperties = IEffect.ExecutionProperties;
 
+export type ShakingEffectStyle = "One-shot" | "Continuous";
+
 export type ShakingEffectProperties = {
-  intensity: number;
-  frequency: number;
+  intensity: number?;
+  frequency: number?;
+  rotation: number?;
+  style: ShakingEffectStyle?;
   text: string;
 }
 
@@ -44,11 +48,15 @@ local function ShakingContainer(properties: ShakingEffectProperties & {layoutOrd
 
       local shakingTask = task.spawn(function()
         
-        while task.wait(properties.frequency) do
+        local intensity = properties.intensity or 2;
+        local frequency = properties.frequency or 0.05;
+        local rotation = properties.rotation or 0;
+        while task.wait(frequency) do
 
-          local xOffset = math.random(-properties.intensity, properties.intensity);
-          local yOffset = math.random(-properties.intensity, properties.intensity);
+          local xOffset = math.random(-intensity, intensity);
+          local yOffset = math.random(-intensity, intensity);
           textContainer.Position = UDim2.new(0, xOffset, 0, yOffset);
+          textContainer.Rotation = math.random(-rotation, rotation);
           
         end
       

@@ -21,12 +21,13 @@ type Effect = IEffect.Effect;
 type ExecutionProperties = IEffect.ExecutionProperties;
 type Page = IEffect.Page;
 type ShakingEffectProperties = ShakingContainer.ShakingEffectProperties;
+type RunEffectFunctionReturnValue = IEffect.RunEffectFunctionReturnValue;
 
 local ShakingEffect = {};
 
 function ShakingEffect.new(properties: ShakingEffectProperties): Effect
   
-  assert(properties.intensity == math.floor(properties.intensity), "Expected intensity to be an integer");
+  assert(not properties.intensity or properties.intensity == math.floor(properties.intensity), "Expected intensity to be an integer.");
   
   local function fit(self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}): (GuiObject, {Page}) 
     
@@ -62,13 +63,14 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
     
   end;
 
-  local function run(self: Effect, executionProperties: ExecutionProperties)
+  local function run(self: Effect, executionProperties: ExecutionProperties): RunEffectFunctionReturnValue
 
-    return ShakingContainer, {
+    return React.createElement(ShakingContainer, {
       frequency = properties.frequency;
       intensity = properties.intensity;
       text = properties.text;
       layoutOrder = executionProperties.textComponentProperties.layoutOrder;
+      key = executionProperties.key;
     }, {
       Message = React.createElement(executionProperties.textComponent, {
         skipPageEvent = executionProperties.skipPageEvent;
@@ -78,7 +80,7 @@ function ShakingEffect.new(properties: ShakingEffectProperties): Effect
         letterDelay = executionProperties.textComponentProperties.letterDelay;
         textSize = executionProperties.textComponentProperties.textSize;
       })
-    };
+    });
 
   end;
   

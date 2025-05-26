@@ -114,7 +114,7 @@ local function MessageContainer(props: MessageContainerProperties)
 
         else
 
-          local possibleComponent, possibleProps, possibleChildren = dialogueContentItem:run({
+          local possibleComponent = dialogueContentItem:run({
             shouldSkip = shouldSkip;
             skipPageSignal = if skipPageEvent then skipPageEvent.Event else nil;
             continuePage = onComplete;
@@ -124,17 +124,12 @@ local function MessageContainer(props: MessageContainerProperties)
               letterDelay = if shouldSkip then 0 else dialogueSettings.typewriter.characterDelaySeconds;
               textSize = 14;
             };
-            react = React;
+            key = `{currentPageIndex}.{index}`;
           });
 
           if possibleComponent then
 
-            possibleProps.key = `{currentPageIndex}.{index}`
-            local element = React.createElement(possibleComponent, possibleProps, possibleChildren);
-
-            print(element);
-
-            table.insert(messageComponentList, element);
+            table.insert(messageComponentList, possibleComponent);
 
           end;
 

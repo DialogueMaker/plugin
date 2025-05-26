@@ -17,13 +17,16 @@ export type ExecutionProperties = {
   continuePage: ContinuePageFunction;
   textComponent: (...any) -> React.ReactElement<any, any>;
   textComponentProperties: any;
+  key: string;
 }
 
 export type Page = {string | Effect};
 
 export type ContinuePageFunction = () -> ();
 
-export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> ((...any) -> React.ReactElement<any, any>)?;
+export type RunEffectFunctionReturnValue = React.ReactElement<any, any>?;
+
+export type RunEffectFunction = (self: Effect, executionProperties: ExecutionProperties) -> RunEffectFunctionReturnValue;
 
 export type FitFunction = (self: Effect, contentContainer: GuiObject, textLabel: TextLabel, pages: {Page}) -> (GuiObject, {Page});
 
