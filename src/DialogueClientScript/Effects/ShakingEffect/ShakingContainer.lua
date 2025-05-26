@@ -9,13 +9,10 @@ local IEffect = require(DialogueClientScript.Interfaces.Effect);
 
 type ExecutionProperties = IEffect.ExecutionProperties;
 
-export type ShakingEffectStyle = "One-shot" | "Continuous";
-
 export type ShakingEffectProperties = {
   intensity: number?;
   frequency: number?;
   rotation: number?;
-  style: ShakingEffectStyle?;
   text: string;
 }
 
