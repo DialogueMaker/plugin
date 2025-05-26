@@ -1,0 +1,14 @@
+{
+  "name": "DialoguePluginScript",
+  "tree": {
+    "$className": "DataModel",
+    "ServerStorage": {
+      "DialoguePluginScript": {
+        "$path": "src",
+        "Packages": {
+          "$path": "Packages"
+        }
+      }
+    }
+  }
+}

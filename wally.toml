@@ -1,5 +1,5 @@
 [package]
-name = "beastslash/roblox-dialogue-maker"
+name = "dialoguemaker/plugin"
 version = "0.1.0"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"

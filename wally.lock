@@ -3,11 +3,6 @@
 registry = "test"
 
 [[package]]
-name = "beastslash/roblox-dialogue-maker"
-version = "0.1.0"
-dependencies = [["react", "jsdotlua/react@17.2.1"], ["react-error-boundary", "chriscerie/react-error-boundary@0.2.0"], ["react-roblox", "jsdotlua/react-roblox@17.1.0"]]
-
-[[package]]
 name = "chriscerie/react-error-boundary"
 version = "0.2.0"
 dependencies = [["Collections", "jsdotlua/collections@1.2.7"], ["LuauPolyfill", "jsdotlua/luau-polyfill@1.2.7"], ["React", "jsdotlua/react@17.2.1"], ["ReactRoblox", "jsdotlua/react-roblox@17.1.0"], ["Sift", "csqrl/sift@0.0.11"], ["TestEZ", "roblox/testez@0.4.1"]]
@@ -16,6 +11,11 @@ dependencies = [["Collections", "jsdotlua/collections@1.2.7"], ["LuauPolyfill", 
 name = "csqrl/sift"
 version = "0.0.11"
 dependencies = []
+
+[[package]]
+name = "dialoguemaker/plugin"
+version = "0.1.0"
+dependencies = [["react", "jsdotlua/react@17.2.1"], ["react-error-boundary", "chriscerie/react-error-boundary@0.2.0"], ["react-roblox", "jsdotlua/react-roblox@17.1.0"]]
 
 [[package]]
 name = "jsdotlua/boolean"
