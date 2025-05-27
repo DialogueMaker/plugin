@@ -18,7 +18,7 @@
       }
     },
     {
-      "label": "Update Wally dependencies",
+      "label": "Update Wally plugin dependencies",
       "type": "shell",
       "command": "wally install",
       "windows": {
@@ -66,6 +66,25 @@
       },
       "dependsOn": [
         "Generate updated sourcemap"
+      ]
+    },
+    {
+      "label": "Update Wally client dependencies",
+      "type": "shell",
+      "command": "wally install --project-path .\\src\\DialogueClientScript",
+      "windows": {
+        "command": "wally install --project-path .\\src\\DialogueClientScript"
+      },
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "runOptions": {
+        "runOn": "folderOpen",
+      },
+      "dependsOn": [
+        "Update Aftman dependencies"
       ]
     }
   ]
