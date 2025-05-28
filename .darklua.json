@@ -1,0 +1,18 @@
+{
+  "rules": [
+    {
+      "rule": "convert_require",
+      "current": {
+        "name": "path",
+        "sources": {
+          "pkg": "roblox_packages"
+        }
+      },
+      "target": {
+        "name": "roblox",
+        "rojo_sourcemap": "./sourcemap.json",
+        "indexing_style": "property"
+      }
+    }
+  ]
+}

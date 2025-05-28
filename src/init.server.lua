@@ -5,7 +5,7 @@ local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts"
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local Icons = require(script.Icons);
-local React = require(script.Packages.react);
+local React = require("@pkg/react");
 local ReactRoblox = require(script.Packages["react-roblox"]);
 local Window = require(script.Window);
 
