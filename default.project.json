@@ -6,7 +6,7 @@
       "DialoguePluginScript": {
         "$path": "src",
         "Packages": {
-          "$path": "Packages"
+          "$path": "roblox_packages"
         }
       }
     }
