@@ -1,0 +1,14 @@
+{
+  "name": "DialoguePluginScript",
+  "tree": {
+    "$className": "DataModel",
+    "ServerStorage": {
+      "DialoguePluginScript": {
+        "$path": "dist",
+        "Packages": {
+          "$path": "roblox_packages"
+        }
+      }
+    }
+  }
+}

@@ -8,14 +8,15 @@ includes = [
   "pesde.toml",
   "README.md",
   "LICENSE",
-  "dist/**/*.lua",
+  "src/**/*.lua",
 ]
+workspace_members = ["src/DialogueClientScript", "src/DialogueClientScript/src/Themes/StandardTheme"]
 private = true
 
 [target]
 environment = "roblox"
-lib = "dist/init.lua"
-build_files = ["dist"]
+lib = "src/init.lua"
+build_files = ["src"]
 
 [engines]
 pesde = "^0.7.0-rc.3"

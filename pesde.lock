@@ -5,6 +5,12 @@ name = "dialoguemaker/plugin"
 version = "5.0.0"
 target = "roblox"
 
+[workspace."dialoguemaker/client"]
+roblox = "src/DialogueClientScript"
+
+[workspace."dialoguemaker/standard_theme"]
+roblox = "src/DialogueClientScript/src/Themes/StandardTheme"
+
 [graph."0x5eal/unzip@0.1.3 luau".pkg_ref]
 ref_ty = "pesde"
 index_url = "https://github.com/pesde-pkg/index"
