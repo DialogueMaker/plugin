@@ -4,6 +4,12 @@
     "$path": "src",
     "roblox_packages": {
       "$path": "roblox_packages"
+    },
+    "DialogueClientScript": {
+      "$path": "src/DialogueClientScript",
+      "$properties": {
+        "Enabled": false
+      }
     }
   }
 }
