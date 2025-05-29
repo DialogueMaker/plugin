@@ -2,11 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Update Aftman dependencies with Rokit",
+      "label": "Update dependencies",
       "type": "shell",
-      "command": "rokit install",
+      "command": "pesde install",
       "windows": {
-        "command": "rokit install"
+        "command": "pesde install"
       },
       "group": "none",
       "presentation": {
@@ -16,57 +16,6 @@
       "runOptions": {
         "runOn": "folderOpen",
       }
-    },
-    {
-      "label": "Update Wally dependencies",
-      "type": "shell",
-      "command": "wally install",
-      "windows": {
-        "command": "wally install"
-      },
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "runOptions": {
-        "runOn": "folderOpen",
-      },
-      "dependsOn": [
-        "Update Aftman dependencies"
-      ]
-    },
-    {
-      "label": "Generate updated sourcemap",
-      "type": "shell",
-      "command": "${command:luau-lsp.regenerateSourcemap}",
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "runOptions": {
-        "runOn": "folderOpen",
-      },
-      "dependsOn": [
-        "Update Wally dependencies"
-      ]
-    },
-    {
-      "label": "Update Wally package types",
-      "type": "shell",
-      "command": "wally-package-types --sourcemap sourcemap.json Packages/",
-      "group": "none",
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "runOptions": {
-        "runOn": "folderOpen",
-      },
-      "dependsOn": [
-        "Generate updated sourcemap"
-      ]
     }
   ]
 }
