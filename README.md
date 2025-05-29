@@ -31,8 +31,6 @@ To contribute, you'll need to install some third-party tools that make developme
 
 * [Rojo](https://rojo.space/) *(automatically installed)*: This package is responsible for connecting code editors like Visual Studio Code to Roblox Studio. The command-line version is automatically installed when you run `psede install` in the root of this project, but you should also install the Visual Studio Code [extension](https://marketplace.visualstudio.com/items?itemName=evaera.vscode-rojo) to make things easier for you. You can learn more about Rojo [on their website](https://rojo.space/).
 
-* [darklua](https://darklua.com/) *(automatically installed)*: This is used to resolve path require variables such as `@pkg`. This is automatically installed when you run `psede install` in the root of this project. You can learn more about darklua [on their website](https://darklua.com/).
-
 * [React](https://react.luau.page/) *(automatically installed)*: This is used to programmatically create the graphical windows you see while using the plugin. This is automatically installed when you run `psede install` in the root of this project.
 
 ## Acknowledgements
