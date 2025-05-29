@@ -73,23 +73,6 @@ index_url = "https://github.com/pesde-pkg/index"
 ref_ty = "pesde"
 index_url = "https://github.com/pesde-pkg/index"
 
-[graph."pesde/darklua@0.16.0 lune"]
-direct = ["darklua", { name = "pesde/darklua", version = "^0.16.0", index = "default", target = "lune" }, "dev"]
-
-[graph."pesde/darklua@0.16.0 lune".dependencies]
-core = ["pesde/toolchainlib@0.1.15 lune", "standard"]
-option = ["lukadev_0/option@1.2.0 lune", "standard"]
-result = ["lukadev_0/result@1.2.0 lune", "standard"]
-
-[graph."pesde/darklua@0.16.0 lune".pkg_ref]
-ref_ty = "pesde"
-index_url = "https://github.com/pesde-pkg/index"
-
-[graph."pesde/darklua@0.16.0 lune".pkg_ref.dependencies]
-core = [{ name = "pesde/toolchainlib", version = "^0.1.11", index = "https://github.com/pesde-pkg/index", target = "lune" }, "standard"]
-option = [{ name = "lukadev_0/option", version = "^1.2.0", index = "https://github.com/pesde-pkg/index" }, "standard"]
-result = [{ name = "lukadev_0/result", version = "^1.2.0", index = "https://github.com/pesde-pkg/index" }, "standard"]
-
 [graph."pesde/luau_lsp@1.47.0 lune"]
 direct = ["luau_lsp", { name = "pesde/luau_lsp", version = "^1.47.0", index = "default", target = "lune" }, "dev"]
 
