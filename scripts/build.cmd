@@ -20,6 +20,3 @@ rd /S /Q dist\DialogueClientScript\scripts
 rd /S /Q dist\DialogueClientScript\src
 echo d | xcopy /S dist\DialogueClientScript\dist dist\DialogueClientScript\src
 rd /S /Q dist\DialogueClientScript\dist
-
-rojo sourcemap -o sourcemap.json
-darklua process dist dist
