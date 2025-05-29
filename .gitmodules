@@ -1,0 +1,3 @@
+[submodule "src/DialogueClientScript"]
+	path = src/DialogueClientScript
+	url = https://github.com/dialoguemaker/client

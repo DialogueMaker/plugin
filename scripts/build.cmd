@@ -3,7 +3,7 @@ pesde install
 
 :: Build DialogueClientScript.
 cd src\DialogueClientScript
-scripts\build.cmd
+call scripts\build.cmd
 
 :: Build DialoguePluginScript.
 cd ..\..
