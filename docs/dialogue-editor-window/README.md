@@ -8,6 +8,13 @@ The dialogue editor window automatically closes if the Explorer selection change
 ## Why can't I edit text or settings in the Dialogue Editor?
 See [issue #98](https://github.com/DialogueMaker/plugin/issues/98).
 
-## Components
-* [DialogueTable](./DialogueTable/README.md)
-* [Toolbar]()
+## Toolbar
+### View parent
+
+### Add message
+
+### Adjust settings
+
+---
+
+Documentation writers: Christian Toney
