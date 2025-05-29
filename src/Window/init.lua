@@ -1,7 +1,7 @@
 --!strict
 local Selection = game:GetService("Selection");
 
-local React = require(script.Parent.Packages.react);
+local React = require(script.Parent.roblox_packages.react);
 local Toolbar = require(script.Toolbar);
 local DialogueTable = require(script.DialogueTable);
 

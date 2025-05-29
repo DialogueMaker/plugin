@@ -3,7 +3,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent.Parent;
-local React = require(root.Packages.react);
+local React = require(root.roblox_packages.react);
 local Dropdown = require(script.Dropdown);
 local DropdownOption = require(script.DropdownOption);
 local useStudioColors = require(root.useStudioColors);

@@ -3,7 +3,7 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
 local DialoguePluginScript = script.Parent.Parent;
-local React = require(DialoguePluginScript.Packages.react);
+local React = require(DialoguePluginScript.roblox_packages.react);
 local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(DialoguePluginScript.useStudioColors);
 

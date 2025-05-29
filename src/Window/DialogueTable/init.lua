@@ -1,6 +1,6 @@
 --!strict
 local root = script.Parent.Parent;
-local React = require(root.Packages.react);
+local React = require(root.roblox_packages.react);
 local DialogueTableHeader = require(script.DialogueTableHeader);
 local DialogueTableBody = require(script.DialogueTableBody);
 local useStudioColors = require(root.useStudioColors);

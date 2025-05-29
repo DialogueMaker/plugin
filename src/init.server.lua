@@ -5,8 +5,8 @@ local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts"
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local Icons = require(script.Icons);
-local React = require(script.Packages.react);
-local ReactRoblox = require(script.Packages["react-roblox"]);
+local React = require(script.roblox_packages.react);
+local ReactRoblox = require(script.roblox_packages["react-roblox"]);
 local Window = require(script.Window);
 
 local EditDialogueButton: PluginToolbarButton;

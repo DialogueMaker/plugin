@@ -1,3 +1,5 @@
+--!strict
+
 export type IconDictionary = {
   editDialogueButton: string;
   resetScriptsButton: string;

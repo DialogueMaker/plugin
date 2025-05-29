@@ -2,7 +2,7 @@
   "name": "DialoguePluginScript",
   "tree": {
     "$path": "src",
-    "Packages": {
+    "roblox_packages": {
       "$path": "roblox_packages"
     }
   }

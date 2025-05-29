@@ -1,6 +1,6 @@
 --!strict
 local root = script.Parent.Parent.Parent;
-local React = require(root.Packages.react);
+local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.useStudioColors);
 local TweenService = game:GetService("TweenService");
 

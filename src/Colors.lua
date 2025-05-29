@@ -1,3 +1,5 @@
+--!strict
+
 export type ColorDictionary = {
   backgroundResponse: Color3;
   backgroundRedirect: Color3;
