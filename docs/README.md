@@ -4,6 +4,7 @@ Welcome to the Dialogue Maker Plugin documentation. The purpose of these docs ar
 * [Developing and building the plugin](/docs/development/README.md)
 * [Dialogue editor window](/docs/dialogue-editor-window/README.md)
 * [Getting support](/docs/support/README.md)
+* [Toolbar](/docs/toolbar/README.md)
 
 ---
 
