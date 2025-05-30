@@ -55,7 +55,7 @@ local function repairDialogueServerParent(dialogueServerParent: Model | BasePart
 
     print(`[Dialogue Maker] Adding settings script to {dialogueServerParent.Name}...`);
 
-    local SettingsScript = script.DialogueClientScript.Templates.DialogueServerTemplate:Clone();
+    local SettingsScript = script.Templates.DialogueServerTemplate:Clone();
     SettingsScript.Name = "DialogueServer";
     SettingsScript.Parent = dialogueServerParent;
 

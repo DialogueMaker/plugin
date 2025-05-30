@@ -1,14 +1,15 @@
-# Roblox Dialogue Maker plugin
+# Dialogue Maker Plugin
+![](https://github.com/user-attachments/assets/8759b695-e748-44df-93d8-1c935387af4e)
+
 ## About
-The Dialogue Maker is an open-source plugin for creating RPG-like dialogue boxes for NPCs in your Roblox game! It comes with a GUI that allows you to add messages and player responses to your NPCs.
+Run the show with the Dialogue Maker Plugin: an open-source plugin for creating RPG-like dialogue boxes for NPCs in your Roblox game! It comes with a GUI that helps you add messages and player responses to your NPCs. 
 
 ## Features
-* Responsive dialogue editor
-* Trigger dialogue with proximity regions and ClickDetectors
-* Prioritize your dialogue with conditions and message stacking
-* Run functions before and after a message
-* Impose dialogue timeouts
-* Embed variables that are customizable throughout the conversation
+### Responsive dialogue editor
+The Dialogue Editor uses the power of Roblox Studio's Explorer to help you navigate dialogue trees. We let you create labels per dialogue item, which can help if you need to know which message is which before you open the script.
+
+![alt text](image.png)
+
 * Add responses for the player to add interactivity to the conversation
 * Add dialogue redirects
 * Customize themes per NPC and per screen size
@@ -24,14 +25,7 @@ Check out the [documentation](/docs/README.md).
 ### Can I contribute?
 Sure! If you feel like that the Dialogue Maker can be improved for everyone, just send a feature request in the issues. You could also submit a pull request if you already added it yourself. Beastslash will sync changes made between the plugin and repository.
 
-### Third-party tools
-To contribute, you'll need to install some third-party tools that make development more efficient.
-
-* [pesde](https://github.com/pesde-pkg/pesde/releases/tag/v0.7.0-rc.3%2Bregistry.0.2.3-rc.2): This is used for installing packages that the plugin uses, such as [React Lua](https://github.com/jsdotlua/react-lua). It's also used to install packages that the [client](https://github.com/DialogueMaker/client) uses. Be sure to use v0.7.0-rc3 or above because earlier versions of pesde require admin access. You can learn more about pesde here [on their website](https://docs.pesde.dev/).
-
-* [Rojo](https://rojo.space/) *(automatically installed)*: This package is responsible for connecting code editors like Visual Studio Code to Roblox Studio. The command-line version is automatically installed when you run `psede install` in the root of this project, but you should also install the Visual Studio Code [extension](https://marketplace.visualstudio.com/items?itemName=evaera.vscode-rojo) to make things easier for you. You can learn more about Rojo [on their website](https://rojo.space/).
-
-* [React](https://react.luau.page/) *(automatically installed)*: This is used to programmatically create the graphical windows you see while using the plugin. This is automatically installed when you run `psede install` in the root of this project.
+Just be aware that your contribution available to anyone under the GPL-3.0 license. Read [LICENSE](./LICENSE) for more information.
 
 ## Acknowledgements
 * [**Christian "Sudobeast" Toney**](https://christiantoney.com) - Producer and Lead Programmer
