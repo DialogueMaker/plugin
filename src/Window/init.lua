@@ -13,7 +13,7 @@ export type WindowProperties = {
 
 local function Window(props: WindowProperties)
 
-  local dialogueServerScript: ModuleScript?, setDialogueServerScript = React.useState(nil :: ModuleScript?);
+  local conversationScript: ModuleScript?, setConversationScript = React.useState(nil :: ModuleScript?);
   local selectedScript: ModuleScript?, setSelectedScript = React.useState(nil :: ModuleScript?);
 
   React.useEffect(function()
@@ -25,8 +25,8 @@ local function Window(props: WindowProperties)
 
         local selectedInstance = selection[1];
         local isSelectionAModuleScript = selectedInstance:IsA("ModuleScript");
-        local dialogueServerScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_DialogueServer") then selectedInstance else nil;
-        if not dialogueServerScript then
+        local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Conversation") then selectedInstance else nil;
+        if not conversationScript then
 
           local parent = selectedInstance.Parent;
           while parent do
@@ -37,9 +37,9 @@ local function Window(props: WindowProperties)
 
             end;
             
-            if parent:HasTag("DialogueMaker_DialogueServer") then
+            if parent:HasTag("DialogueMaker_Conversation") then
               
-              dialogueServerScript = parent;
+              conversationScript = parent;
               break;
 
             end;
@@ -48,7 +48,7 @@ local function Window(props: WindowProperties)
           
           end;
 
-          if not dialogueServerScript then
+          if not conversationScript then
 
             props.closeDialogueEditor();
             return;
@@ -57,7 +57,7 @@ local function Window(props: WindowProperties)
 
         end;
 
-        local selectedScript = if dialogueServerScript == selectedInstance or (isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Dialogue")) then selectedInstance else nil;
+        local selectedScript = if conversationScript == selectedInstance or (isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Dialogue")) then selectedInstance else nil;
         if not selectedScript then
 
           props.closeDialogueEditor();
@@ -65,7 +65,7 @@ local function Window(props: WindowProperties)
 
         end;
 
-        setDialogueServerScript(dialogueServerScript);
+        setConversationScript(conversationScript);
         setSelectedScript(selectedScript);
 
       elseif #selection == 0 then
@@ -89,15 +89,15 @@ local function Window(props: WindowProperties)
 
   React.useEffect(function(): ()
   
-    if dialogueServerScript then
+    if conversationScript then
 
       local function updateTitle()
 
-        props.pluginGUI.Title = `Dialogue Maker • {dialogueServerScript.Name}`;
+        props.pluginGUI.Title = `Dialogue Maker • {conversationScript.Name}`;
 
       end;
 
-      local updateTitleConnection = dialogueServerScript:GetPropertyChangedSignal("Name"):Connect(updateTitle);
+      local updateTitleConnection = conversationScript:GetPropertyChangedSignal("Name"):Connect(updateTitle);
       updateTitle();
 
       return function()
@@ -108,9 +108,9 @@ local function Window(props: WindowProperties)
 
     end;
 
-  end, {dialogueServerScript});
+  end, {conversationScript});
 
-  return if dialogueServerScript and selectedScript then
+  return if conversationScript and selectedScript then
     React.createElement("Frame", {
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 1;
@@ -123,7 +123,7 @@ local function Window(props: WindowProperties)
         Toolbar = React.createElement(Toolbar, {
           plugin = props.plugin;
           selectedScript = selectedScript;
-          dialogueServerScript = dialogueServerScript;
+          conversationScript = conversationScript;
         });
         DialogueTable = React.createElement(DialogueTable, {
           selectedScript = selectedScript;

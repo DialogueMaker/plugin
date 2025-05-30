@@ -8,7 +8,7 @@ local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(DialoguePluginScript.useStudioColors);
 
 type ToolbarProps = {
-  dialogueServerScript: ModuleScript;
+  conversationScript: ModuleScript;
   selectedScript: ModuleScript;
   plugin: Plugin;
 }
@@ -17,7 +17,7 @@ local function Toolbar(props: ToolbarProps)
 
   local colors = useStudioColors();
   local selectedScript = props.selectedScript;
-  local dialogueServerScript = props.dialogueServerScript;
+  local conversationScript = props.conversationScript;
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
@@ -33,7 +33,7 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = selectedScript:HasTag("DialogueMaker_DialogueServer");
+      isDisabled = selectedScript:HasTag("DialogueMaker_Conversation");
       onClick = function()
 
         Selection:Set({selectedScript.Parent});
@@ -84,7 +84,7 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.plugin:OpenScript(dialogueServerScript);
+        props.plugin:OpenScript(conversationScript);
 
       end;
     });

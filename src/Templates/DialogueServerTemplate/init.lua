@@ -2,10 +2,22 @@
 
 local Players = game:GetService("Players");
 
-local packages = Players.LocalPlayer.PlayerScripts.DialogueClientScript.roblox_packages;
-local DialogueServer = require(packages.dialogue_server);
+local loaderScript;
+for _, possibleScript in Players.LocalPlayer.PlayerScripts:GetDescendants() do
 
--- See documentation: https://github.com/DialogueMaker/dialogue_server
-local dialogueServer = DialogueServer.new({}, script);
+  if possibleScript:HasTag("DialogueMaker_Loader") then
+    
+    loaderScript = possibleScript;
+    break;
 
-return dialogueServer; 
+  end;
+
+end;
+
+local packages = loaderScript.roblox_packages;
+local Conversation = require(packages.conversation) :: any;
+
+-- See documentation: https://github.com/DialogueMaker/conversation
+local conversation = Conversation.new({}, script);
+
+return conversation; 

@@ -20,7 +20,7 @@ end;
 
 local toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
 local themeName = settings().Studio.Theme.Name;
-local createDialogueButton = toolbar:CreateButton("Create Conversation", "Creates a ModuleScript that contains a DialogueServer, selects that ModuleScript, then runs the Edit Server script.", Icons[themeName].createDialogueButton);
+local createDialogueButton = toolbar:CreateButton("Create Conversation", "Creates a ModuleScript that contains a Conversation, selects that ModuleScript, then runs the Edit Server script.", Icons[themeName].createDialogueButton);
 local editDialogueButton = toolbar:CreateButton("Edit Conversation", "", Icons[themeName].editDialogueButton);
 local initializeClientButton = toolbar:CreateButton("Initialize Client", "", Icons[themeName].initializeClientButton);
 local adjustClientSettingsButton = toolbar:CreateButton("Adjust Client Settings", "", Icons[themeName].adjustClientSettingsButton);
@@ -40,7 +40,7 @@ end;
 
 local function getDialogueClientScript(): LocalScript?
 
-  local dialogueClientScripts = CollectionService:GetTagged("DialogueMaker_Client");
+  local dialogueClientScripts = CollectionService:GetTagged("DialogueMaker_Loader");
   local dialogueClientScript;
   for _, possibleDialogueClientScript in dialogueClientScripts do
 
@@ -74,10 +74,10 @@ local function refreshButtons()
   adjustClientSettingsButton.Icon = Icons[themeName].adjustClientSettingsButton;
 
   local selectedInstance = getSelectedInstance();
-  local isSelectingDialogueServer = if selectedInstance then selectedInstance:HasTag("DialogueMaker_DialogueServer") else false;
+  local isSelectingConversation = if selectedInstance then selectedInstance:HasTag("DialogueMaker_Conversation") else false;
   local isSelectingDialogue = if selectedInstance then selectedInstance:HasTag("DialogueMaker_Dialogue") else false;
-  editDialogueButton.Enabled = pluginGUI ~= nil or isSelectingDialogue or isSelectingDialogueServer;
-  createDialogueButton.Enabled = if selectedInstance then not isSelectingDialogue and not isSelectingDialogueServer else false;
+  editDialogueButton.Enabled = pluginGUI ~= nil or isSelectingDialogue or isSelectingConversation;
+  createDialogueButton.Enabled = if selectedInstance then not isSelectingDialogue and not isSelectingConversation else false;
 
   local dialogueClientScript = getDialogueClientScript();
   adjustClientSettingsButton.Enabled = dialogueClientScript ~= nil;
@@ -142,7 +142,7 @@ local function initializeDialogueClientScript()
     -- Put the new instance in place of the old script.
     local currentDialogueClientScript = getDialogueClientScript();
     local newDialogueClientScript = script.DialogueClientScript:Clone();
-    newDialogueClientScript:AddTag("DialogueMaker_Client");
+    newDialogueClientScript:AddTag("DialogueMaker_Loader");
     newDialogueClientScript.Parent = if currentDialogueClientScript then currentDialogueClientScript.Parent else StarterPlayerScripts;
     newDialogueClientScript.Enabled = true;
 
@@ -174,7 +174,7 @@ end;
 local function editSelectedDialogue()
 
   local selectedInstance = getSelectedInstance();
-  if not selectedInstance or (not selectedInstance:HasTag("DialogueMaker_DialogueServer") and not selectedInstance:HasTag("DialogueMaker_Dialogue")) then
+  if not selectedInstance or (not selectedInstance:HasTag("DialogueMaker_Conversation") and not selectedInstance:HasTag("DialogueMaker_Dialogue")) then
 
     editDialogueButton:SetActive(false);
     return;
@@ -195,29 +195,29 @@ local function editSelectedDialogue()
 
 end;
 
-local function initializeDialogueServerScript()
+local function initializeConversationScript()
 
   local selectedInstance = getSelectedInstance();
   
-  if not selectedInstance or selectedInstance:HasTag("DialogueMaker_DialogueServer") then
+  if not selectedInstance or selectedInstance:HasTag("DialogueMaker_Conversation") then
 
     createDialogueButton:SetActive(false);
     return;
     
   end;
 
-  print(`[Dialogue Maker] Adding DialogueServer script to {selectedInstance.Name}...`);
+  print(`[Dialogue Maker] Adding Conversation script to {selectedInstance.Name}...`);
 
-  local dialogueServerScript = script.Templates.DialogueServerTemplate:Clone();
-  dialogueServerScript.Name = "DialogueServer";
-  dialogueServerScript.Parent = selectedInstance;
+  local conversationScript = script.Templates.ConversationTemplate:Clone();
+  conversationScript.Name = "Conversation";
+  conversationScript.Parent = selectedInstance;
 
-  print(`[Dialogue Maker] Added DialogueServer script to {dialogueServerScript:GetFullName()}.`);
+  print(`[Dialogue Maker] Added Conversation script to {conversationScript:GetFullName()}.`);
 
-  dialogueServerScript = dialogueServerScript;
+  conversationScript = conversationScript;
 
   -- Select the new dialogue module script
-  Selection:Set({dialogueServerScript});
+  Selection:Set({conversationScript});
 
   -- Open the dialogue editor
   editSelectedDialogue();
@@ -292,7 +292,7 @@ local function resetClientPackages()
   
 end;
 
-createDialogueButton.Click:Connect(initializeDialogueServerScript);
+createDialogueButton.Click:Connect(initializeConversationScript);
 editDialogueButton.Click:Connect(function()
 
   if pluginGUI then
