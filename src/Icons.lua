@@ -1,21 +1,27 @@
 --!strict
 
 export type IconDictionary = {
+  createDialogueButton: string;
   editDialogueButton: string;
-  resetScriptsButton: string;
-  removeUnusedInstancesButton: string;
+  initializeClientButton: string;
+  resetClientPackagesButton: string;
+  adjustClientSettingsButton: string;
 };
 
 local icons: {[string]: IconDictionary} = {
   Dark = {
-    editDialogueButton = "rbxassetid://14109181603";
-    resetScriptsButton = "rbxassetid://79508672220984";
-    removeUnusedInstancesButton = "rbxassetid://84394323866794";
+    createDialogueButton = "rbxassetid://96115609800319";
+    editDialogueButton = "rbxassetid://127299128199963";
+    initializeClientButton = "rbxassetid://132607891158489";
+    resetClientPackagesButton = "rbxassetid://79508672220984";
+    adjustClientSettingsButton = "rbxassetid://97729919485963";
   };
   Light = {
-    editDialogueButton = "rbxassetid://71795784446490";
-    resetScriptsButton = "rbxassetid://124128740725936";
-    removeUnusedInstancesButton = "rbxassetid://123847425613619";
+    createDialogueButton = "rbxassetid://105482129208897";
+    editDialogueButton = "rbxassetid://90245206529823";
+    initializeClientButton = "rbxassetid://1309120878585096";
+    resetClientPackagesButton = "rbxassetid://124128740725936";
+    adjustClientSettingsButton = "rbxassetid://132037029914710";
   };
 };
 

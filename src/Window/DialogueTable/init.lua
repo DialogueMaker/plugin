@@ -6,7 +6,7 @@ local DialogueTableBody = require(script.DialogueTableBody);
 local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableProperties = {
-  dialogueParent: ModuleScript;
+  selectedScript: ModuleScript;
   plugin: Plugin;
 }
 
@@ -34,7 +34,7 @@ local function DialogueTable(props: DialogueTableProperties)
     });
     DialogueTableHeader = React.createElement(DialogueTableHeader);
     DialogueTableBody = React.createElement(DialogueTableBody, {
-      dialogueParent = props.dialogueParent;
+      selectedScript = props.selectedScript;
       plugin = props.plugin;
     });
   })

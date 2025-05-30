@@ -10,10 +10,11 @@ The Dialogue Editor uses the power of Roblox Studio's Explorer to help you navig
 
 ![alt text](image.png)
 
-* Add responses for the player to add interactivity to the conversation
-* Add dialogue redirects
-* Customize themes per NPC and per screen size
-* Add message pauses
+### Full support for Dialogue Maker Client
+This plugin makes configuring Dialogue Maker Client easy. It creates scripts from pre-defined templates when you want to make a new conversation or configure a conversation tree.
+
+### Update and recover Dialogue Maker Client
+If we release a new update to Dialogue Maker Client, you can use this plugin to update the packages, easing the transition from an older version to a new one. You can also use the plugin to restore your packages if they become corrupted.
 
 ## Where can I get it?
 You can either get [the version Beastslash updates at the Roblox Library](https://www.roblox.com/library/4930928141/Dialogue-Maker-Beta) or you can build your own version by using the scripts in this repository.

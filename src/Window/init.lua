@@ -6,7 +6,6 @@ local Toolbar = require(script.Toolbar);
 local DialogueTable = require(script.DialogueTable);
 
 export type WindowProperties = {
-  repairDialogueServerParent: (dialogueServerParent: Model | BasePart) -> ();
   plugin: Plugin;
   pluginGUI: DockWidgetPluginGui;
   closeDialogueEditor: () -> ();
@@ -14,8 +13,8 @@ export type WindowProperties = {
 
 local function Window(props: WindowProperties)
 
-  local dialogueServerParent: (Model | BasePart)?, setDialogueServerParent = React.useState(nil :: (Model | BasePart)?);
-  local dialogueParent: ModuleScript?, setDialogueParent = React.useState(nil :: ModuleScript?);
+  local dialogueServerScript: ModuleScript?, setDialogueServerScript = React.useState(nil :: ModuleScript?);
+  local selectedScript: ModuleScript?, setSelectedScript = React.useState(nil :: ModuleScript?);
 
   React.useEffect(function()
   
@@ -25,19 +24,49 @@ local function Window(props: WindowProperties)
       if #selection == 1 then
 
         local selectedInstance = selection[1];
-        local dialogueServerParent = if selectedInstance.ClassName == "Model" or selectedInstance:IsA("BasePart") then selectedInstance else selectedInstance:FindFirstAncestorOfClass("Model") or selectedInstance:FindFirstAncestorWhichIsA("BasePart");
-        setDialogueServerParent(dialogueServerParent);
-        setDialogueParent(if selectedInstance == dialogueServerParent then dialogueServerParent:FindFirstChild("DialogueServer") else selectedInstance);
+        local isSelectionAModuleScript = selectedInstance:IsA("ModuleScript");
+        local dialogueServerScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_DialogueServer") then selectedInstance else nil;
+        if not dialogueServerScript then
 
-        if dialogueServerParent and dialogueServerParent:FindFirstChild("DialogueServer") then
+          local parent = selectedInstance.Parent;
+          while parent do
 
-          props.pluginGUI.Title = `Dialogue Maker • {dialogueServerParent.Name}`;
+            if not parent:IsA("ModuleScript") then
+              
+              break;
 
-        else
+            end;
+            
+            if parent:HasTag("DialogueMaker_DialogueServer") then
+              
+              dialogueServerScript = parent;
+              break;
 
-          props.closeDialogueEditor();
+            end;
+            
+            parent = parent.Parent;
+          
+          end;
+
+          if not dialogueServerScript then
+
+            props.closeDialogueEditor();
+            return;
+
+          end;
 
         end;
+
+        local selectedScript = if dialogueServerScript == selectedInstance or (isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Dialogue")) then selectedInstance else nil;
+        if not selectedScript then
+
+          props.closeDialogueEditor();
+          return;
+
+        end;
+
+        setDialogueServerScript(dialogueServerScript);
+        setSelectedScript(selectedScript);
 
       elseif #selection == 0 then
 
@@ -56,9 +85,32 @@ local function Window(props: WindowProperties)
 
     end;
 
-  end, {dialogueServerParent});
+  end, {});
 
-  return if dialogueServerParent and dialogueParent then
+  React.useEffect(function(): ()
+  
+    if dialogueServerScript then
+
+      local function updateTitle()
+
+        props.pluginGUI.Title = `Dialogue Maker • {dialogueServerScript.Name}`;
+
+      end;
+
+      local updateTitleConnection = dialogueServerScript:GetPropertyChangedSignal("Name"):Connect(updateTitle);
+      updateTitle();
+
+      return function()
+
+        updateTitleConnection:Disconnect();
+
+      end;
+
+    end;
+
+  end, {dialogueServerScript});
+
+  return if dialogueServerScript and selectedScript then
     React.createElement("Frame", {
       Size = UDim2.new(1, 0, 1, 0);
       BackgroundTransparency = 1;
@@ -69,13 +121,12 @@ local function Window(props: WindowProperties)
       });
       Editor = React.createElement(React.Fragment, {}, {
         Toolbar = React.createElement(Toolbar, {
-          dialogueParent = dialogueParent;
           plugin = props.plugin;
-          repairDialogueServerParent = props.repairDialogueServerParent;
-          dialogueServerParent = dialogueServerParent;
+          selectedScript = selectedScript;
+          dialogueServerScript = dialogueServerScript;
         });
         DialogueTable = React.createElement(DialogueTable, {
-          dialogueParent = dialogueParent;
+          selectedScript = selectedScript;
           plugin = props.plugin;
         });
       })

@@ -1,41 +1,83 @@
 --!strict
+
+local ChangeHistoryService = game:GetService("ChangeHistoryService");
+local CollectionService = game:GetService("CollectionService");
 local Selection = game:GetService("Selection");
 local StarterPlayer = game:GetService("StarterPlayer");
 local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
-local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local Icons = require(script.Icons);
 local React = require(script.roblox_packages.react);
 local ReactRoblox = require(script.roblox_packages["react-roblox"]);
 local Window = require(script.Window);
 
-local EditDialogueButton: PluginToolbarButton;
+local toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
+local themeName = settings().Studio.Theme.Name;
+local createDialogueButton = toolbar:CreateButton("Create Conversation", "Creates a ModuleScript that contains a DialogueServer, selects that ModuleScript, then runs the Edit Server script.", Icons[themeName].createDialogueButton);
+local editDialogueButton = toolbar:CreateButton("Edit Conversation", "", Icons[themeName].editDialogueButton);
+local initializeClientButton = toolbar:CreateButton("Initialize Client", "", Icons[themeName].initializeClientButton);
+local adjustClientSettingsButton = toolbar:CreateButton("Adjust Client Settings", "", Icons[themeName].adjustClientSettingsButton);
+local resetClientPackagesButton = toolbar:CreateButton("Reset Client Packages", "", Icons[themeName].resetClientPackagesButton);
 local pluginGUI: DockWidgetPluginGui?;
 
-local function getSelectedInstance(): BasePart | Model?
+local function getSelectedInstance(): Instance?
 
   local selectedObjects = Selection:Get();
   if #selectedObjects ~= 1 then return nil; end;
   
   local instance = selectedObjects[1];
-  if not instance:IsA("Model") and not instance:IsA("BasePart") then 
-  
-    local possibleDialogueServerParent = instance:FindFirstAncestorWhichIsA("Model") or instance:FindFirstAncestorWhichIsA("BasePart");
-    local possibleDialogueServer = possibleDialogueServerParent and possibleDialogueServerParent:FindFirstChild("DialogueServer");
-    if possibleDialogueServer and possibleDialogueServer:HasTag("DialogueMaker_DialogueServer") then
-
-      instance = possibleDialogueServerParent;
-
-    end;
-
-  end;
   
   return instance;
 
 end;
 
--- Closes the editor when called
--- @since v1.0.0
+local function getDialogueClientScript(): LocalScript?
+
+  local dialogueClientScripts = CollectionService:GetTagged("DialogueMaker_Client");
+  local dialogueClientScript;
+  for _, possibleDialogueClientScript in dialogueClientScripts do
+
+    if possibleDialogueClientScript:IsA("LocalScript") then
+
+      if dialogueClientScript then
+
+        warn(`[Dialogue Maker] Extra Dialogue Maker Client script found at {possibleDialogueClientScript:GetFullName()}. This is not supported, please remove the extra ones. We'll use {possibleDialogueClientScript:GetFullName()} instead.`);
+
+      end;
+
+      dialogueClientScript = possibleDialogueClientScript;
+
+    end;
+
+  end;
+
+  return dialogueClientScript;
+
+end;
+
+local function refreshButtons()
+
+  editDialogueButton:SetActive(pluginGUI ~= nil);
+  
+  local themeName = settings().Studio.Theme.Name;
+  createDialogueButton.Icon = Icons[themeName].createDialogueButton;
+  editDialogueButton.Icon = Icons[themeName].editDialogueButton;
+  resetClientPackagesButton.Icon = Icons[themeName].resetClientPackagesButton;
+  initializeClientButton.Icon = Icons[themeName].initializeClientButton;
+  adjustClientSettingsButton.Icon = Icons[themeName].adjustClientSettingsButton;
+
+  local selectedInstance = getSelectedInstance();
+  local isSelectingDialogueServer = if selectedInstance then selectedInstance:HasTag("DialogueMaker_DialogueServer") else false;
+  local isSelectingDialogue = if selectedInstance then selectedInstance:HasTag("DialogueMaker_Dialogue") else false;
+  editDialogueButton.Enabled = pluginGUI ~= nil or isSelectingDialogue or isSelectingDialogueServer;
+  createDialogueButton.Enabled = if selectedInstance then not isSelectingDialogue and not isSelectingDialogueServer else false;
+
+  local dialogueClientScript = getDialogueClientScript();
+  adjustClientSettingsButton.Enabled = dialogueClientScript ~= nil;
+  resetClientPackagesButton.Enabled = dialogueClientScript ~= nil;
+
+end;
+
 local function closeDialogueEditor(): ()
 
   if pluginGUI then 
@@ -44,60 +86,207 @@ local function closeDialogueEditor(): ()
     pluginGUI = nil;
 
   end;
-  EditDialogueButton:SetActive(false);
-  EditDialogueButton.Enabled = getSelectedInstance() ~= nil;
-
-end;
-
-local function repairDialogueServerParent(dialogueServerParent: Model | BasePart): ()
   
-  if not dialogueServerParent:FindFirstChild("DialogueServer") then
-
-    print(`[Dialogue Maker] Adding settings script to {dialogueServerParent.Name}...`);
-
-    local SettingsScript = script.Templates.DialogueServerTemplate:Clone();
-    SettingsScript.Name = "DialogueServer";
-    SettingsScript.Parent = dialogueServerParent;
-
-  end;
+  refreshButtons();
 
 end;
 
--- Open the editor when called.
--- @since v1.0.0
 local function openDialogueEditor(): ()
 
-  pluginGUI = plugin:CreateDockWidgetPluginGui(
-    `Dialogue Maker`, 
-    DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150));
-  if pluginGUI then
+  local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150);
+  local newPluginGui = plugin:CreateDockWidgetPluginGui(`Dialogue Maker`, widgetInfo);
+  pluginGUI = newPluginGui;
 
-    pluginGUI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-    pluginGUI.Title = `Dialogue Maker`;
-    pluginGUI:BindToClose(closeDialogueEditor);
-    
-    local pluginGUIRoot = ReactRoblox.createRoot(pluginGUI);
-    pluginGUIRoot:render(React.createElement(Window, {
-      plugin = plugin;
-      pluginGUI = pluginGUI;
-      repairDialogueServerParent = repairDialogueServerParent;
-      closeDialogueEditor = function()
+  newPluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+  newPluginGui.Title = `Dialogue Maker`;
+  newPluginGui:BindToClose(closeDialogueEditor);
+  
+  local pluginGUIRoot = ReactRoblox.createRoot(newPluginGui);
+  pluginGUIRoot:render(React.createElement(Window, {
+    plugin = plugin;
+    pluginGUI = newPluginGui;
+    closeDialogueEditor = function()
 
-        pluginGUIRoot:unmount();
-        closeDialogueEditor();
+      pluginGUIRoot:unmount();
+      closeDialogueEditor();
 
-      end;
-    }));
-    
-  end;
+    end;
+  }));
+
+  refreshButtons();
 
 end;
 
-local Toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
+local function initializeDialogueClientScript()
 
-local themeName = settings().Studio.Theme.Name;
-EditDialogueButton = Toolbar:CreateButton("Edit Dialogue", "Edit dialogue of a selected NPC. The selected object must be a singular model.", Icons[themeName].editDialogueButton);
-EditDialogueButton.Click:Connect(function()
+  local didSucceed, errorMessage = pcall(function()
+
+    -- Set an undo point just in case the user wants to revert this.
+    if ChangeHistoryService:IsRecordingInProgress() then
+
+      ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+
+    end;
+
+    print("[Dialogue Maker] Adding DialogueClientScript...");
+
+    local historyServiceIdentifier = ChangeHistoryService:TryBeginRecording("Initialize Dialogue Maker Client script");
+    
+    -- Put the new instance in place of the old script.
+    local currentDialogueClientScript = getDialogueClientScript();
+    local newDialogueClientScript = script.DialogueClientScript:Clone();
+    newDialogueClientScript:AddTag("DialogueMaker_Client");
+    newDialogueClientScript.Parent = if currentDialogueClientScript then currentDialogueClientScript.Parent else StarterPlayerScripts;
+    newDialogueClientScript.Enabled = true;
+
+    if currentDialogueClientScript then
+
+      -- Using .Parent = nil because :Destroy() prevents undoing.
+      currentDialogueClientScript.Parent = nil;
+
+    end;
+
+    print(`[Dialogue Maker] Added DialogueClientScript to {newDialogueClientScript.Parent:GetFullName()}.`);
+
+    -- Finalize the undo point
+    ChangeHistoryService:FinishRecording(historyServiceIdentifier, Enum.FinishRecordingOperation.Commit);
+
+  end);
+
+  if not didSucceed then
+
+    warn(`[Dialogue Maker] Failed to initialize Dialogue Maker Client script: {errorMessage}`);
+    return;
+
+  end;
+
+  refreshButtons();
+
+end;
+
+local function editSelectedDialogue()
+
+  local selectedInstance = getSelectedInstance();
+  if not selectedInstance or (not selectedInstance:HasTag("DialogueMaker_DialogueServer") and not selectedInstance:HasTag("DialogueMaker_Dialogue")) then
+
+    editDialogueButton:SetActive(false);
+    return;
+    
+  end;
+
+  -- Just for convenience.
+  local dialogueClientScript = getDialogueClientScript();
+  if not dialogueClientScript then
+
+    initializeDialogueClientScript();
+
+  end;
+
+  -- Now we can open the dialogue editor.
+  editDialogueButton:SetActive(true);
+  openDialogueEditor();
+
+end;
+
+local function initializeDialogueServerScript()
+
+  local selectedInstance = getSelectedInstance();
+  
+  if not selectedInstance or selectedInstance:HasTag("DialogueMaker_DialogueServer") then
+
+    createDialogueButton:SetActive(false);
+    return;
+    
+  end;
+
+  print(`[Dialogue Maker] Adding DialogueServer script to {selectedInstance.Name}...`);
+
+  local dialogueServerScript = script.Templates.DialogueServerTemplate:Clone();
+  dialogueServerScript.Name = "DialogueServer";
+  dialogueServerScript.Parent = selectedInstance;
+
+  print(`[Dialogue Maker] Added DialogueServer script to {dialogueServerScript:GetFullName()}.`);
+
+  dialogueServerScript = dialogueServerScript;
+
+  -- Select the new dialogue module script
+  Selection:Set({dialogueServerScript});
+
+  -- Open the dialogue editor
+  editSelectedDialogue();
+
+end;
+
+local function openDialogueClientScript()
+
+  local dialogueClientScript = getDialogueClientScript();
+  if not dialogueClientScript then
+
+    warn("[Dialogue Maker] No DialogueClientScript found. Please initialize it first.");
+    return;
+
+  end;
+
+  plugin:OpenScript(dialogueClientScript);
+
+end;
+
+local function resetClientPackages()
+
+  -- Debounce
+  resetClientPackagesButton.Enabled = false;
+  
+  local dialogueClientScript = getDialogueClientScript();
+  if not dialogueClientScript then
+
+    warn("[Dialogue Maker] No DialogueClientScript found. Please initialize it first.");
+    return;
+
+  end;
+
+  local didSucceed, errorMessage = pcall(function()
+
+    -- Set an undo point just in case the user wants to revert this.
+    if ChangeHistoryService:IsRecordingInProgress() then
+
+      ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+
+    end;
+
+    local historyServiceIdentifier = ChangeHistoryService:TryBeginRecording("Reset Dialogue Maker Client packages");
+
+    -- Delete the old script packages.
+    local robloxPackages = dialogueClientScript:FindFirstChild("roblox_packages");
+    if robloxPackages then
+
+      -- Using .Parent = nil because :Destroy() prevents undoing.
+      robloxPackages.Parent = nil;
+
+    end;
+
+    -- Put the new instances in their places
+    local newPackages = script.DialogueClientScript.roblox_packages:Clone();
+    newPackages.Parent = dialogueClientScript;
+
+    -- Finalize the undo point
+    ChangeHistoryService:FinishRecording(historyServiceIdentifier, Enum.FinishRecordingOperation.Commit);
+    
+    print("[Dialogue Maker] Reset Dialogue Maker Client packages successfully.");
+
+  end);
+
+  if not didSucceed then
+
+    warn(`[Dialogue Maker] Failed to reset Dialogue Maker Client packages: {errorMessage}`);
+
+  end;
+
+  resetClientPackagesButton.Enabled = true;
+  
+end;
+
+createDialogueButton.Click:Connect(initializeDialogueServerScript);
+editDialogueButton.Click:Connect(function()
 
   if pluginGUI then
     
@@ -106,83 +295,14 @@ EditDialogueButton.Click:Connect(function()
     
   end;
 
-  local selectedInstance = getSelectedInstance();
-  
-  if not selectedInstance then
-
-    EditDialogueButton:SetActive(false);
-    return;
-    
-  end
-
-  -- Verify NPC dialogue folder
-  repairDialogueServerParent(selectedInstance);
-
-  -- Add the chat receiver script in the StarterPlayerScripts.
-  if not StarterPlayerScripts:FindFirstChild("DialogueClientScript") then
-
-    print("[Dialogue Maker] Adding DialogueClientScript to the StarterPlayerScripts...");
-    local DialogueClientScript = script.DialogueClientScript:Clone()
-    DialogueClientScript.Parent = StarterPlayerScripts;
-    DialogueClientScript.Disabled = false;
-    print("[Dialogue Maker] Added DialogueClientScript to the StarterPlayerScripts.");
-
-  end;
-
-  -- Now we can open the dialogue editor.
-  EditDialogueButton:SetActive(true);
-  openDialogueEditor();
+  editSelectedDialogue()
 
 end);
-EditDialogueButton:SetActive(pluginGUI ~= nil);
+initializeClientButton.Click:Connect(initializeDialogueClientScript);
+adjustClientSettingsButton.Click:Connect(openDialogueClientScript);
+resetClientPackagesButton.Click:Connect(resetClientPackages);
 
-Selection.SelectionChanged:Connect(function()
-
-  EditDialogueButton.Enabled = pluginGUI ~= nil or getSelectedInstance() ~= nil;
-
-end);
-
-local ResetScriptsButton = Toolbar:CreateButton("Fix Scripts", "Reset DialogueMakerSharedDependencies and DialogueClientScript back to the a stable version.", Icons[themeName].resetScriptsButton);
-ResetScriptsButton.Click:Connect(function()
-
-  -- Debounce
-  ResetScriptsButton.Enabled = false;
-
-  local Success, Msg = pcall(function()
-
-    -- Set an undo point just in case the user wants to revert this.
-    ChangeHistoryService:SetWaypoint("Resetting Dialogue Maker scripts");
-
-    -- Delete the old script
-    local oldDialogueClientScript = StarterPlayerScripts:FindFirstChild("DialogueClientScript");
-    if oldDialogueClientScript then
-
-      oldDialogueClientScript:Destroy();
-
-    end;
-
-    -- Put the new instances in their places
-    local newDialogueClientScript = script.DialogueClientScript:Clone();
-    newDialogueClientScript.Enabled = true;
-    newDialogueClientScript.Parent = StarterPlayerScripts;
-
-    -- Finalize the undo point
-    ChangeHistoryService:SetWaypoint("Reset Dialogue Maker scripts");
-    
-  end)
-
-  -- Done!
-  ResetScriptsButton.Enabled = true;
-  print("[Dialogue Maker] " .. if Success then "Fixed Dialogue Maker scripts!" else ("Couldn't fix scripts: " .. Msg));
-
-end);
-
-local function refreshButtons()
-
-  local themeName = settings().Studio.Theme.Name;
-  EditDialogueButton.Icon = Icons[themeName].editDialogueButton;
-  ResetScriptsButton.Icon = Icons[themeName].resetScriptsButton;
-
-end;
-
+Selection.SelectionChanged:Connect(refreshButtons);
 settings().Studio.ThemeChanged:Connect(refreshButtons);
+
+refreshButtons();

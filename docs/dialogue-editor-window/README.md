@@ -1,7 +1,7 @@
 # Dialogue Editor
 You can use the **Dialogue Editor** to easily change dialogue priorities, initialize and label [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) objects, and change dialogue types.
 
-You can open it by pressing the [Create Dialogue](/docs/toolbar/README.md#create-dialogue) or [Edit Dialogue](/docs/toolbar/README.md#edit-dialogue) buttons on the plugin toolbar.
+You can open it by pressing the [Create Conversation](/docs/toolbar/README.md#create-conversation) or [Edit Conversation](/docs/toolbar/README.md#edit-conversation) buttons on the plugin toolbar.
 
 The dialogue editor window automatically closes if the Explorer selection changes to an instance that isn't a ModuleScript and a descendant of a [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) ModuleScript. 
 

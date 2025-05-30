@@ -5,7 +5,7 @@ local DialogueItem = require(script.DialogueItem);
 local useStudioColors = require(root.useStudioColors);
 
 export type DialogueTableBodyProperties = {
-  dialogueParent: ModuleScript;
+  selectedScript: ModuleScript;
   plugin: Plugin;
 }
 
@@ -13,7 +13,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   local colors = useStudioColors();
 
-  local dialogueParent = props.dialogueParent;
+  local dialogueParent = props.selectedScript;
   local redirects, setRedirects = React.useState({} :: {ModuleScript});
   local responses, setResponses = React.useState({} :: {ModuleScript});
   local messages, setMessages = React.useState({} :: {ModuleScript});

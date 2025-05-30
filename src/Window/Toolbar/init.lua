@@ -8,16 +8,16 @@ local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(DialoguePluginScript.useStudioColors);
 
 type ToolbarProps = {
-  dialogueParent: ModuleScript;
-  dialogueServerParent: Model | BasePart;
-  repairDialogueServerParent: (dialogueServerParent: Model | BasePart) -> ();
+  dialogueServerScript: ModuleScript;
+  selectedScript: ModuleScript;
   plugin: Plugin;
 }
 
 local function Toolbar(props: ToolbarProps)
 
   local colors = useStudioColors();
-  local dialogueParent = props.dialogueParent;
+  local selectedScript = props.selectedScript;
+  local dialogueServerScript = props.dialogueServerScript;
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
@@ -33,10 +33,10 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = dialogueParent:HasTag("DialogueMaker_DialogueServer");
+      isDisabled = selectedScript:HasTag("DialogueMaker_DialogueServer");
       onClick = function()
 
-        Selection:Set({props.dialogueParent.Parent});
+        Selection:Set({selectedScript.Parent});
 
       end;
     });
@@ -54,12 +54,9 @@ local function Toolbar(props: ToolbarProps)
 
         local identifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
 
-        -- Ensure the NPC is properly configured.
-        props.repairDialogueServerParent(props.dialogueServerParent);
-
         -- Find a name for the content script.
         local targetPriority = 1;
-        for _, instance in dialogueParent:GetChildren() do
+        for _, instance in selectedScript:GetChildren() do
           
           local comparedName = tonumber(instance.Name);
           if comparedName and comparedName >= targetPriority then
@@ -74,7 +71,8 @@ local function Toolbar(props: ToolbarProps)
         local newContentScript = DialoguePluginScript.Templates.DialogueTemplate:Clone();
         newContentScript.Name = targetPriority;
         newContentScript:SetAttribute("DialogueType", "Message");
-        newContentScript.Parent = dialogueParent;
+        newContentScript:AddTag("DialogueMaker_Dialogue");
+        newContentScript.Parent = selectedScript;
 
         ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
 
@@ -86,10 +84,7 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.repairDialogueServerParent(props.dialogueServerParent);
-
-        local npcDialogueSettingsScript = props.dialogueServerParent:FindFirstChild("DialogueServer") :: ModuleScript;
-        props.plugin:OpenScript(npcDialogueSettingsScript);
+        props.plugin:OpenScript(dialogueServerScript);
 
       end;
     });
