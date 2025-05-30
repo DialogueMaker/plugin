@@ -6,7 +6,7 @@ By default, this plugin is made for Studio developers. Rojo's two-way sync is cu
 Dialogue Maker is open-source, so you can easily make your own loader in your favorite code editor by using git submodules.
 
 > [!NOTE]
-> This method may defeat the purpose of the ["Reset Packages"](/docs/toolbar/README.md#reset-packages) button, but who cares? You'll have a loader that you can break all you want and easily revert by using Rojo and git. So much better.
+> This method may defeat the purpose of the ["Initialize Loader Script"](/docs/toolbar/README.md#initialize-client), ["Adjust Client Settings"](/docs/toolbar/README.md#adjust-settings), and ["Reset Packages"](/docs/toolbar/README.md#reset-packages) buttons, but who cares? You'll have a loader that you can break all you want and easily revert by using Rojo and git. So much better.
 
 #### Clone, fork, or create a template from Dialogue Maker Group's loader
 Consider cloning the DialogueMaker/loader repository if you have edit access to the loader, you're doing some quick testing, or you just want to use the default loader as-is. 
