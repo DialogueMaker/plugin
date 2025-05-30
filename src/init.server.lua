@@ -5,11 +5,18 @@ local CollectionService = game:GetService("CollectionService");
 local Selection = game:GetService("Selection");
 local StarterPlayer = game:GetService("StarterPlayer");
 local StarterPlayerScripts = StarterPlayer:FindFirstChild("StarterPlayerScripts");
+local RunService = game:GetService("RunService");
 
 local Icons = require(script.Icons);
 local React = require(script.roblox_packages.react);
 local ReactRoblox = require(script.roblox_packages["react-roblox"]);
 local Window = require(script.Window);
+
+if RunService:IsRunning() then
+
+  return;
+
+end;
 
 local toolbar = plugin:CreateToolbar("Dialogue Maker by Beastslash");
 local themeName = settings().Studio.Theme.Name;
@@ -41,7 +48,7 @@ local function getDialogueClientScript(): LocalScript?
 
       if dialogueClientScript then
 
-        warn(`[Dialogue Maker] Extra Dialogue Maker Client script found at {possibleDialogueClientScript:GetFullName()}. This is not supported, please remove the extra ones. We'll use {possibleDialogueClientScript:GetFullName()} instead.`);
+        warn(`[Dialogue Maker] Extra Dialogue Maker Client script found at {dialogueClientScript:GetFullName()}. This is not supported, please remove the extra ones. We'll use {possibleDialogueClientScript:GetFullName()} instead.`);
 
       end;
 
