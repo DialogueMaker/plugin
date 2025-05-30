@@ -1,4 +1,6 @@
 # Toolbar
+As the plugin loads, it will create a Toolbar so you can access the tools of the Dialogue Maker.
+
 ## Buttons
 ### Create Dialogue
 This button creates a ModuleScript that contains a [`DialogueServer`]() object, selects that ModuleScript, then runs the [Edit Dialogue](#edit-dialogue) script.
