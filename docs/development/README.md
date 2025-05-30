@@ -1,4 +1,4 @@
-# Development
+# Developing and building the plugin
 ## Fork the repository if you need to
 If you have write access to DialogueMaker/plugin, skip to the [next step](#recursively-clone-the-repository). If you don't, you're going to have to [fork the repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo). This essentially creates a sandbox environment for you to make your changes without affecting others.
 
@@ -40,8 +40,8 @@ After you select the repository, your file explorer should open for you to choos
 > 
 > You may need to run this again later. Submodules are kinda quirky.
 
-## Install pesde
-To develop with the plugin, you'll have to install some third-party tools. First up, [pesde](https://github.com/pesde-pkg/pesde/releases/tag/v0.7.0-rc.3%2Bregistry.0.2.3-rc.2): This is used for installing packzages that the plugin uses, such as [Rojo](https://rojo.space) and [React Lua](https://github.com/jsdotlua/react-lua). It's also used to install packages that the [client](https://github.com/DialogueMaker/client) uses. Be sure to use v0.7.0-rc3 or above because earlier versions of pesde require admin access. You can learn more about pesde here [on their website](https://docs.pesde.dev/).
+## Install pesde and packaged tools
+To develop with the plugin, you'll have to install some third-party tools. First up, [pesde](https://docs.pesde.dev/installation/): This is used for installing packzages that the plugin uses, such as [Rojo](https://rojo.space) and [React Lua](https://github.com/jsdotlua/react-lua). It's also used to install packages that the [client](https://github.com/DialogueMaker/client) uses. Be sure to use [v0.7.0-rc3](https://github.com/pesde-pkg/pesde/releases/tag/v0.7.0-rc.3%2Bregistry.0.2.3-rc.2) or above because earlier versions of pesde require admin access. You can learn more about pesde here [on their website](https://docs.pesde.dev/).
 
 After installing pesde, you can run the following command to install the remaining tools:
 
@@ -49,22 +49,45 @@ After installing pesde, you can run the following command to install the remaini
 pesde install
 ```
 
-## Install Rojo Roblox Studio plugin
+## Install the Rojo Roblox Studio plugin
 The Rojo Roblox Studio plugin is used to sync your changes between your code editor and Roblox Studio.
+
+### Using the terminal
+```bash
+rojo plugin install
+```
+
+### Using Visual Studio Code
+If you have the [Rojo extension](https://marketplace.visualstudio.com/items?itemName=evaera.vscode-rojo), you can add the Roblox Studio plugin using the GUI.
 
 ![alt text](image-1.png)
 
 ![alt text](image.png)
 
-## Make and test your feature
+## Open up the local Rojo server
 After installing the tools, you should be able to use Rojo. Serve [development.project.json](/development.project.json) to develop with the plugin.
 
-Save DialoguePluginScript as a local plugin on Roblox Studio to test your changes.
+### Using the terminal
+```bash
+rojo serve development.project.json
+```
 
+### Using Visual Studio Code
+> [!WARNING]
+> You may have an issue with closing and re-opening the server normally with Rojo's extension. Consider [using the terminal](#using-the-terminal-2) for the time being.
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
+## Make and test your feature
+Save DialoguePluginScript as a local plugin on Roblox Studio to test your changes. You need to do this every time you save changes to the code.
+
+## Commit your changes
 Remember to regularly commit your changes with meaningful messages. This will help you remember what you did, and help others do the same.
 
 ## Submit a pull request when you're ready
-TBA
+Whenever you're ready, [make a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request?tool=webui) from your local repository to the DialogueMaker/plugin repository. [Mark it as a draft](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request) if you aren't finished with it. 
 
 ---
 
