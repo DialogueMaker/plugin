@@ -8,7 +8,7 @@ This button is enabled if you are selecting an instance *and* not selecting a Mo
 ### Edit Dialogue
 If the [Dialogue Editor](/docs/dialogue-editor-window/README.md) is closed, this button opens it. For convenience, this checks for a ModuleScript with a "DialogueMaker_DialogueClient" tag in your game. If there isn't one, this button runs the [Initialize Client](#initialize-client) script. 
 
-If the Dialogue Editor is closed, this button closes the window.
+If the Dialogue Editor is open, this button closes the window.
 
 This button is enabled if you are currently a ModuleScript with a "DialogueMaker_DialogueServer" tag or a "DialogueMaker_Dialogue" tag.
 
