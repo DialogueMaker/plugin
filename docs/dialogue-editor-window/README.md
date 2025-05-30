@@ -1,7 +1,9 @@
-# Dialogue editor window
-You can use the **dialogue editor window** to easily change dialogue priorities, initialize and label [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) objects, and change dialogue types.
+# Dialogue Editor
+You can use the **Dialogue Editor** to easily change dialogue priorities, initialize and label [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) objects, and change dialogue types.
 
-The dialogue editor window automatically closes if the Explorer selection changes to an instance that isn't a ModuleScript and a descendant of a [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) ModuleScript. The window remains open if a `DialogueServer` ModuleScript or its parent are selected, as long as the parent is a BasePart or a Model. Although Workspace is a Model, the window will close if that is selected.
+You can open it by pressing the [Create Dialogue](/docs/toolbar/README.md#create-dialogue) or [Edit Dialogue](/docs/toolbar/README.md#edit-dialogue) buttons on the plugin toolbar.
+
+The dialogue editor window automatically closes if the Explorer selection changes to an instance that isn't a ModuleScript and a descendant of a [`DialogueServer`](/src/DialogueClientScript/Classes/DialogueServer/README.md) ModuleScript. 
 
 ![An example of the Dialogue Editor interface. The buttons shown are "View parent", "Add message", and "Adjust settings".](dialogue-editor-example.png)
 

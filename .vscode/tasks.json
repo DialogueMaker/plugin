@@ -2,13 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Update dependencies",
+      "label": "Install dependencies",
       "type": "shell",
       "command": "pesde install",
       "windows": {
         "command": "pesde install"
       },
-      "group": "none",
+      "group": {
+        "kind": "build"
+      },
       "presentation": {
         "reveal": "always",
         "panel": "new"
