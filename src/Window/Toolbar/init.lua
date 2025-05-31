@@ -71,7 +71,6 @@ local function Toolbar(props: ToolbarProps)
         local newContentScript = DialoguePluginScript.Templates.DialogueTemplate:Clone();
         newContentScript.Name = targetPriority;
         newContentScript:SetAttribute("DialogueType", "Message");
-        newContentScript:AddTag("DialogueMaker_Dialogue");
         newContentScript.Parent = selectedScript;
 
         ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);

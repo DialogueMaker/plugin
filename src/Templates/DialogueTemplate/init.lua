@@ -1,20 +1,9 @@
 --!strict
 
+local StarterPlayer = game:GetService("StarterPlayer");
 local Players = game:GetService("Players");
 
-local loaderScript;
-for _, possibleScript in Players.LocalPlayer.PlayerScripts:GetDescendants() do
-
-  if possibleScript:HasTag("DialogueMaker_Loader") then
-    
-    loaderScript = possibleScript;
-    break;
-
-  end;
-
-end;
-
-local packages = loaderScript.roblox_packages;
+local packages = StarterPlayer.StarterPlayerScripts.DialogueClientScript.roblox_packages;
 local Dialogue = require(packages.dialogue);
 local IDialogue = require(packages.dialogue_types);
 local IEffect = require(packages.effect_types);

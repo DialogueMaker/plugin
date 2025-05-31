@@ -277,7 +277,7 @@ local function resetClientPackages()
 
     -- Finalize the undo point
     ChangeHistoryService:FinishRecording(historyServiceIdentifier, Enum.FinishRecordingOperation.Commit);
-    
+
     print("[Dialogue Maker] Reset Dialogue Maker Client packages successfully.");
 
   end);
