@@ -5,18 +5,12 @@ local Players = game:GetService("Players");
 
 local packages = StarterPlayer.StarterPlayerScripts.DialogueClientScript.roblox_packages;
 local Dialogue = require(packages.dialogue);
-local IDialogue = require(packages.dialogue_types);
-local IEffect = require(packages.effect_types);
+local DialogueMakerTypes = require(packages.dialogue_maker_types);
 
-type Dialogue = IDialogue.Dialogue;
-type Page = IEffect.Page;
-type OptionalDialogueSettings = IDialogue.OptionalDialogueSettings;
-
-local function verifyCondition(self: Dialogue): boolean
-
-  return true;
-
-end;
+type Client = DialogueMakerTypes.Client;
+type Dialogue = DialogueMakerTypes.Dialogue;
+type Page = DialogueMakerTypes.Page;
+type OptionalDialogueSettings = DialogueMakerTypes.OptionalDialogueSettings;
 
 local function getContent(self: Dialogue): Page
 
@@ -25,17 +19,23 @@ local function getContent(self: Dialogue): Page
 
 end;
 
-local function runAction(self: Dialogue, actionID: number): ()
+local function verifyCondition(self: Dialogue): boolean
 
-  if actionID == 1 then
+  return true;
 
-    -- This runs before the current message is displayed.
+end;
 
-  elseif actionID == 2 then
+local function runInitializationAction()
 
-    -- This runs before the next message is displayed.
+  -- This runs before the current message is displayed.
 
-  end;
+end;
+
+local function runCompletionAction(self: Dialogue, client: Client, requestedDialogue: Dialogue?): ()
+
+  -- This runs before the next message is displayed.
+  local nextDialogue = requestedDialogue or self:findNextVerifiedDialogue();
+  client:setDialogue(nextDialogue);
 
 end;
 
@@ -43,7 +43,8 @@ local dialogueSettings: OptionalDialogueSettings = {};
 local dialogue = Dialogue.new({
   getContent = getContent;
   verifyCondition = verifyCondition;
-  runAction = runAction;
+  runInitializationAction = runInitializationAction;
+  runCompletionAction = runCompletionAction;
   settings = dialogueSettings;
 }, script);
 
