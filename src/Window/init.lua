@@ -25,7 +25,7 @@ local function Window(props: WindowProperties)
 
         local selectedInstance = selection[1];
         local isSelectionAModuleScript = selectedInstance:IsA("ModuleScript");
-        local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Conversation") then selectedInstance else nil;
+        local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMakerConversation") then selectedInstance else nil;
         if not conversationScript then
 
           local parent = selectedInstance.Parent;
@@ -37,7 +37,7 @@ local function Window(props: WindowProperties)
 
             end;
             
-            if parent:HasTag("DialogueMaker_Conversation") then
+            if parent:HasTag("DialogueMakerConversation") then
               
               conversationScript = parent;
               break;

@@ -74,7 +74,7 @@ local function refreshButtons()
   adjustClientSettingsButton.Icon = Icons[themeName].adjustClientSettingsButton;
 
   local selectedInstance = getSelectedInstance();
-  local isSelectingConversation = if selectedInstance then selectedInstance:HasTag("DialogueMaker_Conversation") else false;
+  local isSelectingConversation = if selectedInstance then selectedInstance:HasTag("DialogueMakerConversation") else false;
   local isSelectingDialogue = if selectedInstance then selectedInstance:HasTag("DialogueMaker_Dialogue") else false;
   editDialogueButton.Enabled = pluginGUI ~= nil or isSelectingDialogue or isSelectingConversation;
   createDialogueButton.Enabled = if selectedInstance then not isSelectingDialogue and not isSelectingConversation else false;
@@ -174,7 +174,7 @@ end;
 local function editSelectedDialogue()
 
   local selectedInstance = getSelectedInstance();
-  if not selectedInstance or (not selectedInstance:HasTag("DialogueMaker_Conversation") and not selectedInstance:HasTag("DialogueMaker_Dialogue")) then
+  if not selectedInstance or (not selectedInstance:HasTag("DialogueMakerConversation") and not selectedInstance:HasTag("DialogueMaker_Dialogue")) then
 
     editDialogueButton:SetActive(false);
     return;
@@ -199,7 +199,7 @@ local function initializeConversationScript()
 
   local selectedInstance = getSelectedInstance();
   
-  if not selectedInstance or selectedInstance:HasTag("DialogueMaker_Conversation") then
+  if not selectedInstance or selectedInstance:HasTag("DialogueMakerConversation") then
 
     createDialogueButton:SetActive(false);
     return;

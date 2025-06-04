@@ -33,7 +33,7 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = selectedScript:HasTag("DialogueMaker_Conversation");
+      isDisabled = selectedScript:HasTag("DialogueMakerConversation");
       onClick = function()
 
         Selection:Set({selectedScript.Parent});
