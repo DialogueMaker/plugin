@@ -53,7 +53,7 @@ These scripts are a bit more difficult to automatically sync from Roblox Studio.
 Save your Conversation ModuleScripts as a file and add them to your Rojo project. Whenever you make a change in Roblox Studio, just save the file again. You'll have to edit the conversations using Roblox Studio's script editor, but it's easier than the next method.
 
 ### The do-it-yourself method
-You could manually add the ModuleScripts that host the `Conversation` or `Dialogue` into your Rojo project. Just be sure to also add an [init.meta.json file](https://rojo.space/docs/v7/sync-details/#meta-files) that has the "DialogueMakerConversation" or "DialogueMaker_Dialogue" tags in the ModuleScript's properties. Also, ensure the priorities are numbered correctly.
+You could manually add the ModuleScripts that host the `Conversation` or `Dialogue` into your Rojo project. Just be sure to also add an [init.meta.json file](https://rojo.space/docs/v7/sync-details/#meta-files) that has the "DialogueMakerConversationScript" or "DialogueMaker_Dialogue" tags in the ModuleScript's properties. Also, ensure the priorities are numbered correctly.
 
 This can be *very* painful, so consider using the previous method unless you're aiming for precision in your repository.
 

@@ -1,51 +1,22 @@
 --!strict
+-- This script is automatically generated and edited by the Dialogue Maker plugin.
+-- If you want to edit this script, please do so using the plugin's interface, or mark this script as manually modified first.
+-- Otherwise, your changes shall be sent to the grinder, and ruthlessly overwritten.
+--
+-- Sidenote: If you're a programmer, consider using the Dialogue Maker Kit directly instead of using the plugin.
+-- It might be more suitable for your needs as it provides more flexibility, especially if you're using
+-- external tools like Rojo to manage your code.
+-- 
+-- See documentation: https://github.com/DialogueMaker/dialogue
 
-local StarterPlayer = game:GetService("StarterPlayer");
-local Players = game:GetService("Players");
+local packages = script.Parent.Parent.DialogueMakerKit.Packages; -- Automatically replaced by the plugin.
+local Dialogue = require(packages.Dialogue);
 
-local packages = StarterPlayer.StarterPlayerScripts.DialogueClientScript.roblox_packages;
-local Dialogue = require(packages.dialogue);
-local DialogueMakerTypes = require(packages.dialogue_maker_types);
+local properties = {
+  type = script:GetAttribute("DialogueType");
+  -- START REPLACEMENT
+};
 
-type Client = DialogueMakerTypes.Client;
-type Dialogue = DialogueMakerTypes.Dialogue;
-type Page = DialogueMakerTypes.Page;
-type OptionalDialogueSettings = DialogueMakerTypes.OptionalDialogueSettings;
-
-local function getContent(self: Dialogue): Page
-
-  local player = Players.LocalPlayer;
-  return {`Hi {player.Name}!`};
-
-end;
-
-local function verifyCondition(self: Dialogue): boolean
-
-  return true;
-
-end;
-
-local function runInitializationAction()
-
-  -- This runs before the current message is displayed.
-
-end;
-
-local function runCompletionAction(self: Dialogue, client: Client, requestedDialogue: Dialogue?): ()
-
-  -- This runs before the next message is displayed.
-  local nextDialogue = requestedDialogue or self:findNextVerifiedDialogue();
-  client:setDialogue(nextDialogue);
-
-end;
-
-local dialogueSettings: OptionalDialogueSettings = {};
-local dialogue = Dialogue.new({
-  getContent = getContent;
-  verifyCondition = verifyCondition;
-  runInitializationAction = runInitializationAction;
-  runCompletionAction = runCompletionAction;
-  settings = dialogueSettings;
-}, script);
+local dialogue = Dialogue.new(script:GetAttribute("DialogueContent"), properties, Dialogue.listFromInstance(script));
 
 return dialogue;

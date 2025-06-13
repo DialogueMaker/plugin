@@ -8,8 +8,8 @@ local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(DialoguePluginScript.useStudioColors);
 
 type ToolbarProps = {
-  conversationScript: ModuleScript;
-  selectedScript: ModuleScript;
+  conversationScript: ModuleScript?;
+  selectedScript: ModuleScript?;
   plugin: Plugin;
 }
 
@@ -33,10 +33,14 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = selectedScript:HasTag("DialogueMakerConversation");
+      isDisabled = not selectedScript;
       onClick = function()
 
-        Selection:Set({selectedScript.Parent});
+        if selectedScript then
+
+          Selection:Set({selectedScript.Parent});
+
+        end;
 
       end;
     });
@@ -44,7 +48,14 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14099284898";
       text = "Add message";
       layoutOrder = 2;
+      isDisabled = not selectedScript;
       onClick = function()
+
+        if not selectedScript then
+
+          return;
+
+        end;
 
         if ChangeHistoryService:IsRecordingInProgress() then
 
@@ -77,9 +88,9 @@ local function Toolbar(props: ToolbarProps)
 
       end;
     });
-    AdjustSettingsButton = React.createElement(ToolbarButton, {
+    SettingsButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14099277263";
-      text = "Adjust settings";
+      text = "Settings";
       layoutOrder = 3;
       onClick = function()
 

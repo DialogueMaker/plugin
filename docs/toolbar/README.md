@@ -5,14 +5,14 @@ As the plugin loads, it will create a Toolbar so you can access the tools of the
 ### Create Conversation
 This button creates a ModuleScript that contains a [`Conversation`]() object, selects that ModuleScript, then runs the [Edit Conversation](#edit-server) script.
 
-This button is enabled if you are selecting an instance *and* not selecting a ModuleScript with a "DialogueMakerConversation" tag or a "DialogueMaker_Dialogue" tag.
+This button is enabled if you are selecting an instance *and* not selecting a ModuleScript with a "DialogueMakerConversationScript" tag or a "DialogueMaker_Dialogue" tag.
 
 ### Edit Conversation
 If the [Dialogue Editor](/docs/dialogue-editor-window/README.md) is closed, this button opens it. For convenience, this checks for a ModuleScript with a "DialogueMaker_Loader" tag in your game. If there isn't one, this button runs the [Initialize Client](#initialize-client) script. 
 
 If the Dialogue Editor is open, this button closes the window.
 
-This button is enabled if you are currently a ModuleScript with a "DialogueMakerConversation" tag or a "DialogueMaker_Dialogue" tag.
+This button is enabled if you are currently a ModuleScript with a "DialogueMakerConversationScript" tag or a "DialogueMaker_Dialogue" tag.
 
 ### Initialize Client
 This creates a ModuleScript that contains a [`DialogueClient`]() object. To reduce friction, the location depends on if you already have a ModuleScript with a "DialogueMaker_Loader" tag. If you do, this button simply replaces that script with a new one. If you don't, this button creates one in your StarterPlayerScripts.

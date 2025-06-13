@@ -10,7 +10,7 @@ includes = [
   "LICENSE",
   "src/**/*.lua",
 ]
-workspace_members = ["src/DialogueClientScript"]
+workspace_members = ["src/DialogueMakerKit"]
 private = true
 
 [target]

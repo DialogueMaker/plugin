@@ -25,7 +25,7 @@ local function Window(props: WindowProperties)
 
         local selectedInstance = selection[1];
         local isSelectionAModuleScript = selectedInstance:IsA("ModuleScript");
-        local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMakerConversation") then selectedInstance else nil;
+        local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMakerConversationScript") then selectedInstance else nil;
         if not conversationScript then
 
           local parent = selectedInstance.Parent;
@@ -37,7 +37,7 @@ local function Window(props: WindowProperties)
 
             end;
             
-            if parent:HasTag("DialogueMakerConversation") then
+            if parent:HasTag("DialogueMakerConversationScript") then
               
               conversationScript = parent;
               break;
@@ -57,7 +57,7 @@ local function Window(props: WindowProperties)
 
         end;
 
-        local selectedScript = if conversationScript == selectedInstance or (isSelectionAModuleScript and selectedInstance:HasTag("DialogueMaker_Dialogue")) then selectedInstance else nil;
+        local selectedScript = if conversationScript == selectedInstance or (isSelectionAModuleScript and selectedInstance:HasTag("DialogueMakerDialogueScript")) then selectedInstance else nil;
         if not selectedScript then
 
           props.closeDialogueEditor();
@@ -110,28 +110,26 @@ local function Window(props: WindowProperties)
 
   end, {conversationScript});
 
-  return if conversationScript and selectedScript then
-    React.createElement("Frame", {
-      Size = UDim2.new(1, 0, 1, 0);
-      BackgroundTransparency = 1;
-    }, {
-      UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
-        Padding = UDim.new(0, 0);
-      });
-      Editor = React.createElement(React.Fragment, {}, {
-        Toolbar = React.createElement(Toolbar, {
-          plugin = props.plugin;
-          selectedScript = selectedScript;
-          conversationScript = conversationScript;
-        });
-        DialogueTable = React.createElement(DialogueTable, {
-          selectedScript = selectedScript;
-          plugin = props.plugin;
-        });
+  return React.createElement("Frame", {
+    Size = UDim2.new(1, 0, 1, 0);
+    BackgroundTransparency = 1;
+  }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 0);
+    });
+    Toolbar = React.createElement(Toolbar, {
+      plugin = props.plugin;
+      selectedScript = selectedScript;
+      conversationScript = conversationScript;
+    });
+    DialogueTable = if selectedScript then
+      React.createElement(DialogueTable, {
+        selectedScript = selectedScript;
+        plugin = props.plugin;
       })
-    })
-  else nil;
+    else nil;
+  });
 
 end;
 
