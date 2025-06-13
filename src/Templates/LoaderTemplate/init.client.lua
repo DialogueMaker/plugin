@@ -52,6 +52,7 @@ for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerC
             component = ThemeComponent;
           };
         };
+        -- END REPLACEMENT
       });
 
       client.dialogueGUI.Destroying:Wait();

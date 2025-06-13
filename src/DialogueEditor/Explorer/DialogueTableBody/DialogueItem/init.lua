@@ -1,4 +1,5 @@
 --!strict
+
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
@@ -6,7 +7,8 @@ local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Dropdown = require(script.Dropdown);
 local DropdownOption = require(script.DropdownOption);
-local useStudioColors = require(root.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 
 export type DialogueItemProperties = {
   type: "Response" | "Message" | "Redirect";
@@ -20,17 +22,19 @@ export type DialogueItemProperties = {
 local function DialogueItem(props: DialogueItemProperties)
 
   local colors = useStudioColors();
+  local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
 
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
   local isConnectionsDropdownOpen, setIsConnectionsDropdownOpen = React.useState(false);
   local contentScript = props.contentScript;
 
-  local labelName, setLabelName = React.useState(contentScript:GetAttribute("Label") or "");
+  local dialogueContent, setDialogueContent = React.useState(contentScript:GetAttribute("DialogueContent") or "");
   React.useEffect(function()
 
-    local changedSignal = contentScript:GetAttributeChangedSignal("Label"):Connect(function()
+    local changedSignal = contentScript:GetAttributeChangedSignal("DialogueContent"):Connect(function()
 
-      setLabelName(contentScript:GetAttribute("Label") or "");
+      refreshDialogueMakerScripts();
+      setDialogueContent(contentScript:GetAttribute("DialogueContent") or "");
 
     end);
 
@@ -50,9 +54,9 @@ local function DialogueItem(props: DialogueItemProperties)
     Size = UDim2.new(1, 0, 0, 25);
   }, {
     UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
-        FillDirection = Enum.FillDirection.Horizontal;
-        Padding = UDim.new(0, 3);
+      SortOrder = Enum.SortOrder.LayoutOrder;
+      FillDirection = Enum.FillDirection.Horizontal;
+      Padding = UDim.new(0, 3);
     });
     PriorityTextBox = React.createElement("TextBox", {
       Text = props.contentScript.Name;
@@ -74,7 +78,7 @@ local function DialogueItem(props: DialogueItemProperties)
       end;
     });
     LabelTextBox = React.createElement("TextBox", {
-      Text = labelName;
+      Text = dialogueContent;
       PlaceholderText = "Unlabeled";
       TextColor3 = colors.text;
       PlaceholderColor3 = colors.textPlaceholder;
@@ -87,7 +91,7 @@ local function DialogueItem(props: DialogueItemProperties)
       ClearTextOnFocus = false;
       [React.Change.Text] = function(self)
         
-        contentScript:SetAttribute("Label", if self.Text == "" then nil else self.Text);
+        contentScript:SetAttribute("DialogueContent", self.Text);
 
       end;
     });
@@ -95,12 +99,7 @@ local function DialogueItem(props: DialogueItemProperties)
       layoutOrder = 3;
       size = UDim2.new(0, 0, 1, 0);
       text = props.type :: string;
-      iconImage = if props.type == "Message" then 
-        "rbxassetid://14099768265" 
-      elseif props.type == "Response" then 
-        "rbxassetid://14099769224" 
-      else 
-        "rbxassetid://14099768484";
+      iconImage = `rbxassetid://{if props.type == "Message" then "14099768265" elseif props.type == "Response" then "14099769224" else "14099768484"}`;
       toggleButtonChildren = {
         UIFlexItem = React.createElement("UIFlexItem", {
           FlexMode = Enum.UIFlexMode.Fill;
@@ -204,19 +203,9 @@ local function DialogueItem(props: DialogueItemProperties)
       isOpen = isConnectionsDropdownOpen;
       setIsOpen = setIsConnectionsDropdownOpen;
     }, {
-      ConfigureButton = React.createElement(DropdownOption, {
-        layoutOrder = 1;
-        text = "Configure";
-        onClick = function()
-
-          props.plugin:OpenScript(props.contentScript);
-          setIsConnectionsDropdownOpen(false);
-
-        end;
-      });
       ViewChildrenButton = if props.type == "Redirect" then nil else React.createElement(DropdownOption, {
-        layoutOrder = 2;
-        text = "View children";
+        layoutOrder = 1;
+        text = "Open";
         onClick = function()
 
           Selection:Set({props.contentScript});
@@ -224,8 +213,34 @@ local function DialogueItem(props: DialogueItemProperties)
 
         end;
       });
-      DeleteButton = React.createElement(DropdownOption, {
+      ConfigureButton = React.createElement(DropdownOption, {
+        layoutOrder = 2;
+        text = "Settings";
+        onClick = function()
+
+          
+
+        end;
+      });
+      EditScriptButton = React.createElement(DropdownOption, {
         layoutOrder = 3;
+        text = `{if props.contentScript:HasTag("ManuallyManaged") then "Enable" else "Disable"} automatic management`;
+        onClick = function()
+
+          if props.contentScript:HasTag("ManuallyManaged") then
+
+            props.contentScript:RemoveTag("ManuallyManaged");
+
+          else
+
+            props.contentScript:AddTag("ManuallyManaged");
+
+          end;
+
+        end;
+      });
+      DeleteButton = React.createElement(DropdownOption, {
+        layoutOrder = 4;
         text = "Delete";
         onClick = function()
 
@@ -249,4 +264,4 @@ local function DialogueItem(props: DialogueItemProperties)
 
 end;
 
-return DialogueItem;
+return React.memo(DialogueItem);

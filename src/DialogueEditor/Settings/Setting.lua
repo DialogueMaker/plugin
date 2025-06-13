@@ -9,7 +9,7 @@ export type SettingProperties = {
   name: string;
   description: string;
   defaultValue: any;
-  type: "boolean" | "string" | "number" | "table" | "Instance";
+  type: "boolean" | "string" | "number" | nil;
   value: any?;
   className: string?;
   onChanged: (value: any) -> ();

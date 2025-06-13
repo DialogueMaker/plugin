@@ -1,8 +1,9 @@
 --!strict
+
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.DialogueItem);
-local useStudioColors = require(root.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type DialogueTableBodyProperties = {
   selectedScript: ModuleScript;
@@ -162,4 +163,4 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
 end;
 
-return DialogueTableBody;
+return React.memo(DialogueTableBody);

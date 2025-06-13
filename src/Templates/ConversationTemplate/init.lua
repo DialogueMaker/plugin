@@ -15,6 +15,7 @@ local Conversation = require(packages.Conversation);
 
 local properties = {
   -- START REPLACEMENT
+  -- END REPLACEMENT
 }
 
 local conversation = Conversation.new(properties, Dialogue.listFromInstance(script));

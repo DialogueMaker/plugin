@@ -1,7 +1,8 @@
 --!strict
+
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local useStudioColors = require(root.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type DropdownOptionProperties = {
   layoutOrder: number;
@@ -57,4 +58,4 @@ local function DropdownOption(props: DropdownOptionProperties)
 
 end;
 
-return DropdownOption;
+return React.memo(DropdownOption);

@@ -15,6 +15,7 @@ local Dialogue = require(packages.Dialogue);
 local properties = {
   type = script:GetAttribute("DialogueType");
   -- START REPLACEMENT
+  -- END REPLACEMENT
 };
 
 local dialogue = Dialogue.new(script:GetAttribute("DialogueContent"), properties, Dialogue.listFromInstance(script));

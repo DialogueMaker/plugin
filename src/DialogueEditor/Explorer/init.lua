@@ -1,16 +1,17 @@
 --!strict
+
 local root = script.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueTableHeader = require(script.DialogueTableHeader);
 local DialogueTableBody = require(script.DialogueTableBody);
-local useStudioColors = require(root.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type DialogueTableProperties = {
   selectedScript: ModuleScript;
   plugin: Plugin;
 }
 
-local function DialogueTable(props: DialogueTableProperties)
+local function Explorer(props: DialogueTableProperties)
 
   local colors = useStudioColors();
 
@@ -41,4 +42,4 @@ local function DialogueTable(props: DialogueTableProperties)
 
 end;
 
-return DialogueTable;
+return React.memo(Explorer);

@@ -1,20 +1,23 @@
 --!strict
+
 local Selection = game:GetService("Selection");
 
 local React = require(script.Parent.roblox_packages.react);
 local Toolbar = require(script.Toolbar);
-local DialogueTable = require(script.DialogueTable);
+local Explorer = require(script.Explorer);
+local Settings = require(script.Settings);
 
-export type WindowProperties = {
+export type DialogueEditorProperties = {
   plugin: Plugin;
   pluginGUI: DockWidgetPluginGui;
   closeDialogueEditor: () -> ();
 }
 
-local function Window(props: WindowProperties)
+local function DialogueEditor(props: DialogueEditorProperties)
 
   local conversationScript: ModuleScript?, setConversationScript = React.useState(nil :: ModuleScript?);
   local selectedScript: ModuleScript?, setSelectedScript = React.useState(nil :: ModuleScript?);
+  local settingsType, setSettingsType = React.useState(nil);
 
   React.useEffect(function()
   
@@ -123,14 +126,19 @@ local function Window(props: WindowProperties)
       selectedScript = selectedScript;
       conversationScript = conversationScript;
     });
-    DialogueTable = if selectedScript then
-      React.createElement(DialogueTable, {
+    Explorer = if not settingsType and selectedScript then
+      React.createElement(Explorer, {
         selectedScript = selectedScript;
         plugin = props.plugin;
+      })
+    else nil;
+    Settings = if settingsType then
+      React.createElement(Settings, {
+        type = settingsType;
       })
     else nil;
   });
 
 end;
 
-return Window;
+return DialogueEditor;

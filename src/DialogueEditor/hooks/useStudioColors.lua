@@ -1,7 +1,7 @@
 --!strict
 
-local React = require(script.Parent.roblox_packages.react);
-local Colors = require(script.Parent.Colors);
+local React = require(script.Parent.Parent.Parent.roblox_packages.react);
+local Colors = require(script.Parent.Parent.Parent.Colors);
 type ColorDictionary = Colors.ColorDictionary;
 
 local function useStudioColors(): ColorDictionary

@@ -1,7 +1,8 @@
 --!strict
+
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local useStudioColors = require(root.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 local function DialogueTableHeader()
 
@@ -64,4 +65,4 @@ local function DialogueTableHeader()
 
 end;
 
-return DialogueTableHeader;
+return React.memo(DialogueTableHeader);

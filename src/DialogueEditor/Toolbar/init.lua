@@ -2,10 +2,10 @@
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
-local DialoguePluginScript = script.Parent.Parent;
-local React = require(DialoguePluginScript.roblox_packages.react);
+local root = script.Parent.Parent;
+local React = require(root.roblox_packages.react);
 local ToolbarButton = require(script.ToolbarButton);
-local useStudioColors = require(DialoguePluginScript.useStudioColors);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 type ToolbarProps = {
   conversationScript: ModuleScript?;
@@ -79,7 +79,7 @@ local function Toolbar(props: ToolbarProps)
         end;
 
         -- Create the content script.
-        local newContentScript = DialoguePluginScript.Templates.DialogueTemplate:Clone();
+        local newContentScript = root.Templates.DialogueTemplate:Clone();
         newContentScript.Name = targetPriority;
         newContentScript:SetAttribute("DialogueType", "Message");
         newContentScript.Parent = selectedScript;
@@ -94,7 +94,6 @@ local function Toolbar(props: ToolbarProps)
       layoutOrder = 3;
       onClick = function()
 
-        props.plugin:OpenScript(conversationScript);
 
       end;
     });
@@ -102,4 +101,4 @@ local function Toolbar(props: ToolbarProps)
 
 end;
 
-return Toolbar;
+return React.memo(Toolbar);
