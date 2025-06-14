@@ -2,46 +2,129 @@
 
 local root = script.Parent.Parent;
 local React = require(root.roblox_packages.react);
+local Setting = require(script.Setting);
 local settingsMetadata = require(script.settingsMetadata);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
-local useSettings = require(root.DialogueEditor.hooks.useSettings);
-
-local Setting = require(script.Setting);
-
-export type Settings = {
-  [string]: {
-    [string]: {
-      name: string;
-      description: string;
-      type: ("boolean" | "number" | "string")?;
-      defaultValue: any;
-      className: string?; -- Optional, used for ObjectValue settings
-    };
-  }
-}
 
 export type SettingsProperties = {
-  type: "Loader" | "Conversation" | "Dialogue" | "Game";
-  conversationScript: ModuleScript?;
-  selectedScript: ModuleScript?;
+  settingsTarget: ModuleScript;
 }
 
 function Settings(properties: SettingsProperties)
 
-  local metadataCollection = settingsMetadata[properties.type:lower()];
-  if not metadataCollection then
+  local settingsTarget = properties.settingsTarget;
 
-    error(`Invalid type provided to Settings component: ${properties.type}. Expected one of: "Client", "Conversation", "Dialogue", or "Game".`);
+  local targetType = React.useMemo(function()
+  
+    if settingsTarget:HasTag("DialogueMakerLoader") then
 
-  end;
+      return "loader";
 
-  local currentSettings, findSettingsFolder = useSettings();
+    elseif settingsTarget:HasTag("DialogueMakerConversationScript") then
+
+      return "conversation";
+
+    elseif settingsTarget:HasTag("DialogueMakerDialogueScript") then
+
+      return "dialogue";
+
+    else
+
+      error(`Invalid settings target provided: {settingsTarget.Name}. Expected a DialogueMaker script.`);
+
+    end;
+
+  end, { settingsTarget });
+
+  local metadataCollection = settingsMetadata[targetType];
+  
+  local settingsContainer = React.useMemo(function()
+
+    return settingsTarget:FindFirstChild("Settings");
+
+  end, { settingsTarget });
+
+  local getCurrentSettings = React.useCallback(function(): { [string]: {[string]: any} }
+
+    if not settingsContainer then
+
+      return {};
+
+    end;
+
+    local currentSettings = {};
+
+    for _, categoryFolder in settingsContainer:GetChildren() do
+
+      if categoryFolder:IsA("Folder") then
+
+        currentSettings[categoryFolder.Name] = currentSettings[categoryFolder.Name] or {};
+
+        for _, settingInstance in categoryFolder:GetChildren() do
+
+          if settingInstance:IsA("BoolValue") or settingInstance:IsA("ObjectValue") or settingInstance:IsA("NumberValue") then
+
+            currentSettings[categoryFolder.Name][settingInstance.Name] = settingInstance.Value;
+
+          end;
+
+        end;
+
+      end;
+
+    end;
+
+    return currentSettings;
+
+  end, { settingsContainer });
+
+  local currentSettings, setCurrentSettings = React.useState(getCurrentSettings());
+
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
-  React.useEffect(function()
+  React.useEffect(function(): ()
   
     refreshDialogueMakerScripts();
 
-  end, {currentSettings});
+    if settingsContainer then
+
+      local connections = {};
+      for _, child in settingsContainer:GetChildren() do
+
+        if child:IsA("Folder") then
+
+          for _, settingInstance in child:GetChildren() do
+
+            if settingInstance:IsA("ValueBase") then
+
+              local connection = settingInstance:GetPropertyChangedSignal("Value"):Connect(function()
+
+                setCurrentSettings(getCurrentSettings());
+              
+              end);
+              
+              table.insert(connections, connection);
+
+            end;
+
+          end;
+
+        end;
+
+      end;
+
+      return function()
+
+        for _, connection in connections do
+
+          connection:Disconnect();
+
+        end;
+
+      end;
+
+    end;
+
+  end, {settingsContainer :: unknown, currentSettings});
   
   local settingComponents = React.useMemo(function()
 
@@ -64,25 +147,24 @@ function Settings(properties: SettingsProperties)
           onChanged = function(newValue)
 
             -- Create the settings folder if it doesn't exist.
-            local settingsFolder = findSettingsFolder();
-            if not settingsFolder then
+            if not settingsContainer then
                 
-              local newSettingsFolder = Instance.new("Folder");
-              newSettingsFolder.Name = "Settings";
-              newSettingsFolder.Parent = if properties.type == "Conversation" then properties.conversationScript else properties.selectedScript;
-              settingsFolder = newSettingsFolder;
+              local newSettingsContainer = Instance.new("Folder");
+              newSettingsContainer.Name = "Settings";
+              newSettingsContainer.Parent = settingsTarget;
+              settingsContainer = newSettingsContainer;
 
             end;
 
-            assert(settingsFolder, "Settings folder not found even after creating it.");
+            assert(settingsContainer, "Settings folder not found even after creating it.");
 
             -- Create the category folder if it doesn't exist.
-            local categoryFolder = settingsFolder:FindFirstChild(categoryName);
+            local categoryFolder = settingsContainer:FindFirstChild(categoryName);
             if not categoryFolder then
 
               local newCategoryFolder = Instance.new("Folder");
               newCategoryFolder.Name = categoryName;
-              newCategoryFolder.Parent = settingsFolder;
+              newCategoryFolder.Parent = settingsContainer;
 
             end;
 
@@ -165,7 +247,7 @@ function Settings(properties: SettingsProperties)
 
     return settingComponents;
 
-  end, { metadataCollection, currentSettings, findSettingsFolder });
+  end, { metadataCollection, currentSettings, settingsTarget });
 
   return React.createElement("ScrollingFrame", {
 

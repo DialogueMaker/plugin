@@ -140,4 +140,4 @@ local function Setting(properties: SettingProperties)
 
 end;
 
-return Setting;
+return React.memo(Setting);

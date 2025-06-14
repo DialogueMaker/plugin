@@ -1,8 +1,10 @@
 --!strict
+
+local TweenService = game:GetService("TweenService");
+
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local useStudioColors = require(root.useStudioColors);
-local TweenService = game:GetService("TweenService");
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type ToolbarButtonProps = {
   iconImage: string;
@@ -93,4 +95,4 @@ local function ToolbarButton(props: ToolbarButtonProps)
 
 end;
 
-return ToolbarButton;
+return React.memo(ToolbarButton);

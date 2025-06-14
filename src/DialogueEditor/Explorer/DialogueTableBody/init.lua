@@ -4,20 +4,28 @@ local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.DialogueItem);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 
 export type DialogueTableBodyProperties = {
   selectedScript: ModuleScript;
   plugin: Plugin;
+  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueTableBody(props: DialogueTableBodyProperties)
 
-  local colors = useStudioColors();
-
   local dialogueParent = props.selectedScript;
+  local setSettingsTarget = props.setSettingsTarget;
+
+  local colors = useStudioColors();
+  local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
+
+  local conversations, setConversations = React.useState({} :: {ModuleScript});
   local redirects, setRedirects = React.useState({} :: {ModuleScript});
   local responses, setResponses = React.useState({} :: {ModuleScript});
   local messages, setMessages = React.useState({} :: {ModuleScript});
+  
+
   React.useEffect(function()
   
     local contentScriptConnections: {RBXScriptConnection} = {};
@@ -37,25 +45,57 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
     local function refreshTable()
 
       cleanupConnections();
+      refreshDialogueMakerScripts();
 
       -- Separate the dialogue item types.
+      local conversations: {ModuleScript} = {};
       local responses: {ModuleScript} = {};
       local messages: {ModuleScript} = {};
       local redirects: {ModuleScript} = {};
       for _, possibleDialogueItem in dialogueParent:GetChildren() do
         
-        if possibleDialogueItem:IsA("ModuleScript") and tonumber(possibleDialogueItem.Name) then
+        if possibleDialogueItem:IsA("ModuleScript") then
+
+          if possibleDialogueItem:HasTag("DialogueMakerDialogueScript") then
           
-          local dialogueType = possibleDialogueItem:GetAttribute("DialogueType");
-          local targetTable = if dialogueType == "Response" then responses elseif dialogueType == "Message" then messages else redirects;
-          table.insert(targetTable, possibleDialogueItem);
+            local dialogueType = possibleDialogueItem:GetAttribute("DialogueType");
+            local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
+            table.insert(targetTable, possibleDialogueItem);
+            table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
+            table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
+          
+          elseif possibleDialogueItem:HasTag("DialogueMakerConversationScript") then
+
+            table.insert(conversations, possibleDialogueItem);
+          
+          else
+          
+            warn(`Dialogue item {possibleDialogueItem.Name} is not a valid DialogueMaker script.`);
+            continue;
+
+          end;
+
           table.insert(contentScriptConnections, possibleDialogueItem:GetPropertyChangedSignal("Name"):Connect(refreshTable));
-          table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
-          
+
         end
         
-      end
+      end;
+
+      local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
+        
+        local messageAPriority = tonumber(dialogueA.Name) or math.huge;
+        local messageBPriority = tonumber(dialogueB.Name) or math.huge;
+        
+        return messageAPriority < messageBPriority;
+        
+      end;
       
+      table.sort(conversations, sortByMessagePriority);
+      table.sort(redirects, sortByMessagePriority);
+      table.sort(responses, sortByMessagePriority);
+      table.sort(messages, sortByMessagePriority);
+      
+      setConversations(conversations);
       setRedirects(redirects);
       setResponses(responses);
       setMessages(messages);
@@ -76,37 +116,24 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {dialogueParent :: any});
 
-  -- Sort the directory based on priority
-  local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
-    
-    local messageAPriority = tonumber(dialogueA.Name) or math.huge;
-    local messageBPriority = tonumber(dialogueB.Name) or math.huge;
-    
-    return messageAPriority < messageBPriority;
-    
-  end;
-  
-  table.sort(redirects, sortByMessagePriority);
-  table.sort(responses, sortByMessagePriority);
-  table.sort(messages, sortByMessagePriority);
-
   -- Create new status
   local currentZIndex = #redirects + #responses + #messages;
   local dialogueItems = {};
   local currentLayoutOrder = 1;
-  for categoryIndex, category in {redirects, responses, messages} do
+  for categoryIndex, category in {conversations, redirects, responses, messages} do
 
     for _, childContentScript in category do
 
       -- Make sure the message container is completely visible, even when dropdowns are open.
       local dialogueItem = React.createElement(DialogueItem, {
-        type = ({"Redirect", "Response", "Message"})[categoryIndex] :: ("Message" | "Response" | "Redirect");
+        type = ({"Conversation", "Redirect", "Response", "Message"})[categoryIndex] :: DialogueItem.DialogueItemType;
         layoutOrder = currentLayoutOrder;
         zIndex = currentZIndex;
         contentScript = childContentScript;
         dialogueParent = dialogueParent;
         plugin = props.plugin;
         key = childContentScript:GetDebugId();
+        setSettingsTarget = setSettingsTarget;
       });
 
       table.insert(dialogueItems, dialogueItem);

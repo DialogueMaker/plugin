@@ -1,23 +1,28 @@
 --!strict
+
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent;
 local React = require(root.roblox_packages.react);
+local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
-type ToolbarProps = {
-  conversationScript: ModuleScript?;
+export type ToolbarProps = {
   selectedScript: ModuleScript?;
   plugin: Plugin;
+  settingsTarget: ModuleScript?;
+  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function Toolbar(props: ToolbarProps)
 
   local colors = useStudioColors();
+  local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   local selectedScript = props.selectedScript;
-  local conversationScript = props.conversationScript;
+  local settingsTarget = props.settingsTarget;
+  local setSettingsTarget = props.setSettingsTarget;
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
@@ -33,7 +38,7 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14098871159";
       text = "View parent";
       layoutOrder = 1;
-      isDisabled = not selectedScript;
+      isDisabled = settingsTarget ~= nil or not selectedScript;
       onClick = function()
 
         if selectedScript then
@@ -46,16 +51,10 @@ local function Toolbar(props: ToolbarProps)
     });
     AddMessageButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14099284898";
-      text = "Add message";
+      text = if selectedScript then "Add message" else "Add conversation";
       layoutOrder = 2;
-      isDisabled = not selectedScript;
+      isDisabled = settingsTarget ~= nil;
       onClick = function()
-
-        if not selectedScript then
-
-          return;
-
-        end;
 
         if ChangeHistoryService:IsRecordingInProgress() then
 
@@ -63,37 +62,59 @@ local function Toolbar(props: ToolbarProps)
 
         end;
 
-        local identifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
+        local historyIdentifier;
+        if selectedScript then
 
-        -- Find a name for the content script.
-        local targetPriority = 1;
-        for _, instance in selectedScript:GetChildren() do
-          
-          local comparedName = tonumber(instance.Name);
-          if comparedName and comparedName >= targetPriority then
+          historyIdentifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
+
+          -- Find a name for the content script.
+          local targetPriority = 1;
+          for _, instance in selectedScript:GetChildren() do
             
-            targetPriority = comparedName + 1;
+            local comparedName = tonumber(instance.Name);
+            if comparedName and comparedName >= targetPriority then
+              
+              targetPriority = comparedName + 1;
+              
+            end
             
-          end
-          
+          end;
+
+          -- Create the content script.
+          local newContentScript = root.Templates.DialogueTemplate:Clone();
+          newContentScript.Name = targetPriority;
+          newContentScript:SetAttribute("DialogueType", "Message");
+          newContentScript.Parent = selectedScript;
+
+        else
+
+          historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
+
+          local newContentScript = root.Templates.ConversationTemplate:Clone();
+          newContentScript.Parent = selectedScript;
+
         end;
 
-        -- Create the content script.
-        local newContentScript = root.Templates.DialogueTemplate:Clone();
-        newContentScript.Name = targetPriority;
-        newContentScript:SetAttribute("DialogueType", "Message");
-        newContentScript.Parent = selectedScript;
-
-        ChangeHistoryService:FinishRecording(identifier, Enum.FinishRecordingOperation.Commit);
+        ChangeHistoryService:FinishRecording(historyIdentifier, Enum.FinishRecordingOperation.Commit);
+        refreshDialogueMakerScripts();
 
       end;
     });
     SettingsButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14099277263";
-      text = "Settings";
+      text = if settingsTarget == nil then "Settings" else "Close settings";
       layoutOrder = 3;
       onClick = function()
 
+        if settingsTarget then
+
+          setSettingsTarget(nil);
+
+        elseif selectedScript then
+
+          setSettingsTarget(selectedScript);
+
+        end;
 
       end;
     });

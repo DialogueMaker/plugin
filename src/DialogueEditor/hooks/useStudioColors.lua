@@ -16,8 +16,11 @@ local function useStudioColors(): ColorDictionary
     local themeChangedConnection = settings().Studio.ThemeChanged:Connect(onThemeChanged)
 
     return function()
+
       themeChangedConnection:Disconnect()
+
     end
+    
   end, {})
 
   return Colors[themeName] or Colors.Dark;

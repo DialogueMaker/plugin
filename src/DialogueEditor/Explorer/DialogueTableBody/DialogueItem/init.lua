@@ -8,43 +8,28 @@ local React = require(root.roblox_packages.react);
 local Dropdown = require(script.Dropdown);
 local DropdownOption = require(script.DropdownOption);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
-local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
+
+export type DialogueItemType = "Conversation" | "Response" | "Message" | "Redirect";
 
 export type DialogueItemProperties = {
-  type: "Response" | "Message" | "Redirect";
+  type: DialogueItemType;
   contentScript: ModuleScript;
   layoutOrder: number;
   zIndex: number;
   dialogueParent: ModuleScript;
   plugin: Plugin;
+  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueItem(props: DialogueItemProperties)
 
+  local contentScript = props.contentScript;
+  local setSettingsTarget = props.setSettingsTarget;
+
   local colors = useStudioColors();
-  local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
 
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
   local isConnectionsDropdownOpen, setIsConnectionsDropdownOpen = React.useState(false);
-  local contentScript = props.contentScript;
-
-  local dialogueContent, setDialogueContent = React.useState(contentScript:GetAttribute("DialogueContent") or "");
-  React.useEffect(function()
-
-    local changedSignal = contentScript:GetAttributeChangedSignal("DialogueContent"):Connect(function()
-
-      refreshDialogueMakerScripts();
-      setDialogueContent(contentScript:GetAttribute("DialogueContent") or "");
-
-    end);
-
-    return function()
-
-      changedSignal:Disconnect();
-
-    end;
-
-  end, {contentScript});
 
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
@@ -59,8 +44,8 @@ local function DialogueItem(props: DialogueItemProperties)
       Padding = UDim.new(0, 3);
     });
     PriorityTextBox = React.createElement("TextBox", {
-      Text = props.contentScript.Name;
-      PlaceholderText = props.contentScript.Name;
+      Text = if props.type == "Conversation" then "" else props.contentScript.Name;
+      PlaceholderText = if props.type == "Conversation" then "--" else props.contentScript.Name;
       TextColor3 = colors.text;
       PlaceholderColor3 = colors.textPlaceholder;
       LayoutOrder = 1;
@@ -68,6 +53,7 @@ local function DialogueItem(props: DialogueItemProperties)
       FontFace = Font.fromId(11702779517);
       BackgroundTransparency = 1;
       TextSize = 14;
+      Interactable = props.type ~= "Conversation";
       [React.Event.FocusLost] = function(self)
 
         local newPriority = tonumber(self.Text);
@@ -78,7 +64,7 @@ local function DialogueItem(props: DialogueItemProperties)
       end;
     });
     LabelTextBox = React.createElement("TextBox", {
-      Text = dialogueContent;
+      Text = contentScript:GetAttribute("DialogueContent") or "";
       PlaceholderText = "Unlabeled";
       TextColor3 = colors.text;
       PlaceholderColor3 = colors.textPlaceholder;
@@ -99,7 +85,7 @@ local function DialogueItem(props: DialogueItemProperties)
       layoutOrder = 3;
       size = UDim2.new(0, 0, 1, 0);
       text = props.type :: string;
-      iconImage = `rbxassetid://{if props.type == "Message" then "14099768265" elseif props.type == "Response" then "14099769224" else "14099768484"}`;
+      iconImage = `rbxassetid://{if props.type == "Message" or props.type == "Conversation" then "14099768265" elseif props.type == "Response" then "14099769224" else "14099768484"}`;
       toggleButtonChildren = {
         UIFlexItem = React.createElement("UIFlexItem", {
           FlexMode = Enum.UIFlexMode.Fill;
@@ -107,6 +93,7 @@ local function DialogueItem(props: DialogueItemProperties)
       };
       isOpen = isDialogueTypeDropdownOpen;
       setIsOpen = setIsDialogueTypeDropdownOpen;
+      isDisabled = props.type == "Conversation";
     }, {
       RedirectButton = React.createElement(DropdownOption, {
         onClick = function()
@@ -205,7 +192,7 @@ local function DialogueItem(props: DialogueItemProperties)
     }, {
       ViewChildrenButton = if props.type == "Redirect" then nil else React.createElement(DropdownOption, {
         layoutOrder = 1;
-        text = "Open";
+        text = "View children";
         onClick = function()
 
           Selection:Set({props.contentScript});
@@ -213,12 +200,12 @@ local function DialogueItem(props: DialogueItemProperties)
 
         end;
       });
-      ConfigureButton = React.createElement(DropdownOption, {
+      SettingsButton = React.createElement(DropdownOption, {
         layoutOrder = 2;
         text = "Settings";
         onClick = function()
 
-          
+          setSettingsTarget(contentScript);
 
         end;
       });

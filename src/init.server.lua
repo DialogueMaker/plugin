@@ -6,7 +6,7 @@ local RunService = game:GetService("RunService");
 local Icons = require(script.Icons);
 local React = require(script.roblox_packages.react);
 local ReactRoblox = require(script.roblox_packages["react-roblox"]);
-local Window = require(script.Window);
+local DialogueEditor = require(script.DialogueEditor);
 
 if RunService:IsRunning() then
 
@@ -40,7 +40,15 @@ local function refreshToolbar()
 
 end;
 
+local pluginGUIRoot: ReactRoblox.RootType? = nil;
 local function closeDialogueEditor(): ()
+
+  if pluginGUIRoot then
+
+    pluginGUIRoot:unmount();
+    pluginGUIRoot = nil;
+
+  end;
 
   if pluginGUI then 
 
@@ -63,17 +71,12 @@ local function openDialogueEditor(): ()
   newPluginGui.Title = "Dialogue Editor";
   newPluginGui:BindToClose(closeDialogueEditor);
   
-  local pluginGUIRoot = ReactRoblox.createRoot(newPluginGui);
-  pluginGUIRoot:render(React.createElement(Window, {
+  local newPluginGUIRoot = ReactRoblox.createRoot(newPluginGui);
+  newPluginGUIRoot:render(React.createElement(DialogueEditor, {
     plugin = plugin;
     pluginGUI = newPluginGui;
-    closeDialogueEditor = function()
-
-      pluginGUIRoot:unmount();
-      closeDialogueEditor();
-
-    end;
   }));
+  pluginGUIRoot = newPluginGUIRoot;
 
   refreshToolbar();
 

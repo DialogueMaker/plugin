@@ -9,9 +9,12 @@ local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 export type DialogueTableProperties = {
   selectedScript: ModuleScript;
   plugin: Plugin;
+  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function Explorer(props: DialogueTableProperties)
+
+  local setSettingsTarget = props.setSettingsTarget;
 
   local colors = useStudioColors();
 
@@ -37,6 +40,7 @@ local function Explorer(props: DialogueTableProperties)
     DialogueTableBody = React.createElement(DialogueTableBody, {
       selectedScript = props.selectedScript;
       plugin = props.plugin;
+      setSettingsTarget = setSettingsTarget;
     });
   })
 
