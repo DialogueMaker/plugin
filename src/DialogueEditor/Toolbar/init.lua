@@ -53,7 +53,7 @@ local function Toolbar(props: ToolbarProps)
       iconImage = "rbxassetid://14099284898";
       text = if selectedScript then "Add message" else "Add conversation";
       layoutOrder = 2;
-      isDisabled = settingsTarget ~= nil;
+      isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
       onClick = function()
 
         if ChangeHistoryService:IsRecordingInProgress() then
@@ -91,7 +91,7 @@ local function Toolbar(props: ToolbarProps)
           historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
 
           local newContentScript = root.Templates.ConversationTemplate:Clone();
-          newContentScript.Parent = selectedScript;
+          newContentScript.Parent = Selection:Get()[1];
 
         end;
 

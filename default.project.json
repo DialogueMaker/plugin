@@ -1,7 +1,14 @@
 {
   "name": "DialoguePluginScript",
+  "globIgnorePaths": ["src/DialogueMakerKit"],
   "tree": {
     "$path": "src",
+    "DialogueMakerKit": {
+      "$path": "src/DialogueMakerKit",
+      "$properties": {
+        "Tags": ["DialogueMakerKit"]
+      }
+    },
     "roblox_packages": {
       "$path": "roblox_packages"
     }
