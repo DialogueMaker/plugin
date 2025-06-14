@@ -127,3 +127,9 @@ addDialogueMakerKitButton.Click:Connect(addDialogueMakerKit);
 settings().Studio.ThemeChanged:Connect(refreshToolbar);
 Selection.SelectionChanged:Connect(refreshToolbar);
 refreshToolbar();
+
+plugin.Unloading:Connect(function()
+
+  closeDialogueEditor();
+
+end)

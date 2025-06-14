@@ -34,7 +34,7 @@ local function DialogueEditor(props: DialogueEditorProperties)
       settingsTarget = settingsTarget;
       setSettingsTarget = setSettingsTarget;
     });
-    Explorer = if not settingsTarget and selectedScript then
+    Explorer = if not settingsTarget then
       React.createElement(Explorer, {
         selectedScript = selectedScript;
         plugin = props.plugin;

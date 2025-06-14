@@ -7,7 +7,7 @@ local DialogueTableBody = require(script.DialogueTableBody);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type DialogueTableProperties = {
-  selectedScript: ModuleScript;
+  selectedScript: ModuleScript?;
   plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
 }

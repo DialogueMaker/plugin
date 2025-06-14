@@ -1,5 +1,7 @@
 --!strict
 
+local Selection = game:GetService("Selection");
+
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.DialogueItem);
@@ -7,14 +9,14 @@ local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 
 export type DialogueTableBodyProperties = {
-  selectedScript: ModuleScript;
+  selectedScript: ModuleScript?;
   plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueTableBody(props: DialogueTableBodyProperties)
 
-  local dialogueParent = props.selectedScript;
+  local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
 
   local colors = useStudioColors();
@@ -26,7 +28,7 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
   local messages, setMessages = React.useState({} :: {ModuleScript});
   
 
-  React.useEffect(function()
+  React.useEffect(function(): ()
   
     local contentScriptConnections: {RBXScriptConnection} = {};
 
@@ -52,33 +54,51 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
       local responses: {ModuleScript} = {};
       local messages: {ModuleScript} = {};
       local redirects: {ModuleScript} = {};
-      for _, possibleDialogueItem in dialogueParent:GetChildren() do
+
+      if selectedScript then
+
+        for _, possibleDialogueScript in selectedScript:GetChildren() do
+          
+          if possibleDialogueScript:IsA("ModuleScript") then
+
+            if possibleDialogueScript:HasTag("DialogueMakerDialogueScript") then
+            
+              local dialogueType = possibleDialogueScript:GetAttribute("DialogueType");
+              local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
+              table.insert(targetTable, possibleDialogueScript);
+              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
+              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
+            
+            else
+            
+              warn(`{possibleDialogueScript:GetFullName()} is not a valid DialogueMaker script.`);
+              continue;
+
+            end;
+
+            table.insert(contentScriptConnections, possibleDialogueScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
+
+          end
+          
+        end;
+
+      else
         
-        if possibleDialogueItem:IsA("ModuleScript") then
+        local selection = Selection:Get();
+        if #selection == 1 then
 
-          if possibleDialogueItem:HasTag("DialogueMakerDialogueScript") then
-          
-            local dialogueType = possibleDialogueItem:GetAttribute("DialogueType");
-            local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
-            table.insert(targetTable, possibleDialogueItem);
-            table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
-            table.insert(contentScriptConnections, possibleDialogueItem:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
-          
-          elseif possibleDialogueItem:HasTag("DialogueMakerConversationScript") then
+          for _, possibleConversationScript in selection[1]:GetChildren() do
 
-            table.insert(conversations, possibleDialogueItem);
-          
-          else
-          
-            warn(`Dialogue item {possibleDialogueItem.Name} is not a valid DialogueMaker script.`);
-            continue;
+            if possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:HasTag("DialogueMakerConversationScript") then
+              
+              table.insert(conversations, possibleConversationScript);
+            
+            end;
 
           end;
 
-          table.insert(contentScriptConnections, possibleDialogueItem:GetPropertyChangedSignal("Name"):Connect(refreshTable));
+        end;
 
-        end
-        
       end;
 
       local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
@@ -102,19 +122,24 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
     end;
     
-    local childAddedEvent = dialogueParent.ChildAdded:Connect(refreshTable);
-    local childRemovedEvent = dialogueParent.ChildRemoved:Connect(refreshTable);
-    refreshTable();
+    local selection = Selection:Get();
+    if selection[1] then
 
-    return function()
+      local childAddedEvent = selection[1].ChildAdded:Connect(refreshTable);
+      local childRemovedEvent = selection[1].ChildRemoved:Connect(refreshTable);
+      refreshTable();
 
-      cleanupConnections();
-      childAddedEvent:Disconnect();
-      childRemovedEvent:Disconnect();
+      return function()
+
+        cleanupConnections();
+        childAddedEvent:Disconnect();
+        childRemovedEvent:Disconnect();
+
+      end;
 
     end;
 
-  end, {dialogueParent :: any});
+  end, {selectedScript});
 
   -- Create new status
   local currentZIndex = #redirects + #responses + #messages;
@@ -130,7 +155,6 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
         layoutOrder = currentLayoutOrder;
         zIndex = currentZIndex;
         contentScript = childContentScript;
-        dialogueParent = dialogueParent;
         plugin = props.plugin;
         key = childContentScript:GetDebugId();
         setSettingsTarget = setSettingsTarget;
