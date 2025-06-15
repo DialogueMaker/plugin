@@ -2,9 +2,9 @@
 
 local Selection = game:GetService("Selection");
 
-local root = script.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local DialogueGroup = require(script.DialogueGroup);
+local DialogueGroup = require(script.components.DialogueGroup);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local TabSelector = require(root.DialogueEditor.components.TabSelector);
 local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.TabSelectorButton);

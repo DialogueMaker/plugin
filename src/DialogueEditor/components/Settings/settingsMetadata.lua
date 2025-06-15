@@ -1,8 +1,7 @@
 --!strict
 
-local root = script.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent;
 local Conversation = require(root.DialogueMakerKit.Packages.Conversation);
-local Dialogue = require(root.DialogueMakerKit.Packages.Dialogue);
 
 local metadata = {
   conversation = {

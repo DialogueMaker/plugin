@@ -1,8 +1,8 @@
 --!strict
 
-local root = script.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local Setting = require(script.Setting);
+local Setting = require(script.components.Setting);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type SettingsContainerProperties = {

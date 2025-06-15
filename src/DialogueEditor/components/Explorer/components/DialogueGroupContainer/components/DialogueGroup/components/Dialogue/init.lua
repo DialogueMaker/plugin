@@ -2,7 +2,7 @@
 
 local Selection = game:GetService("Selection");
 
-local root = script.Parent.Parent.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);

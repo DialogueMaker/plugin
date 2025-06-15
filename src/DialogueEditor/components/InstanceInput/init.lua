@@ -2,7 +2,7 @@
 
 local Selection = game:GetService("Selection");
 
-local root = script.Parent.Parent.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent;
 local Button = require(root.DialogueEditor.components.Button);
 local React = require(root.roblox_packages.react);
 

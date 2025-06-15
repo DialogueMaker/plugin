@@ -2,7 +2,7 @@
 
 local CollectionService = game:GetService("CollectionService");
 
-local root = script.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local TabSelector = require(root.DialogueEditor.components.TabSelector);
 local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.TabSelectorButton);

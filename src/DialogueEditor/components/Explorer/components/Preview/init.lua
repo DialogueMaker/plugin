@@ -2,12 +2,12 @@
 
 local Selection = game:GetService("Selection");
 
-local root = script.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Button = require(root.DialogueEditor.components.Button);
 local Checkbox = require(root.DialogueEditor.components.Checkbox);
 local Dropdown = require(root.DialogueEditor.components.Dropdown);
-local DropdownOption = require(root.DialogueEditor.components.Dropdown.DropdownOption);
+local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 

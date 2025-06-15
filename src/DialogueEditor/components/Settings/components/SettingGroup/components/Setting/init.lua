@@ -1,10 +1,10 @@
 --!strict
 
-local root = script.Parent.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local packages = root.roblox_packages;
 local React = require(packages.react);
-local InstanceInput = require(script.InstanceInput);
-local ToggleInput = require(script.ToggleInput);
+local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
+local ToggleInput = require(root.DialogueEditor.components.ToggleInput);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type SettingProperties = {

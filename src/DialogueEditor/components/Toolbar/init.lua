@@ -3,12 +3,13 @@
 local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
-local root = script.Parent.Parent;
+local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
+local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 
 export type ToolbarProps = {
   selectedScript: ModuleScript?;
@@ -27,6 +28,7 @@ local function Toolbar(props: ToolbarProps)
   local settingsTarget = props.settingsTarget;
   local layoutOrder = props.layoutOrder;
   local setSettingsTarget = props.setSettingsTarget;
+  local dialogueScriptType = useDialogueScriptType(selectedScript);
 
   local addDialogueScript = React.useCallback(function(type: "Message" | "Response" | "Redirect" | "Conversation")
   
@@ -82,8 +84,6 @@ local function Toolbar(props: ToolbarProps)
     refreshDialogueMakerScripts();
 
   end, {selectedScript :: unknown, refreshDialogueMakerScripts});
-
-  local isRedirect = if selectedScript then selectedScript:GetAttribute("DialogueType") == "Redirect" else false;
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
@@ -141,7 +141,7 @@ local function Toolbar(props: ToolbarProps)
         end;
       })
     else nil;
-    AddMessageButton = if selectedScript and not isRedirect then
+    AddMessageButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
         iconImage = "rbxassetid://14099284898";
         text = "Add message";
@@ -154,7 +154,7 @@ local function Toolbar(props: ToolbarProps)
         end;
       })
     else nil;
-    AddResponseButton = if selectedScript and not isRedirect then
+    AddResponseButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
         iconImage = "rbxassetid://14099284898";
         text = "Add response";
@@ -167,7 +167,7 @@ local function Toolbar(props: ToolbarProps)
         end;
       })
     else nil;
-    AddRedirectButton = if selectedScript and not isRedirect then
+    AddRedirectButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
         iconImage = "rbxassetid://14099284898";
         text = "Add redirect";
@@ -180,7 +180,7 @@ local function Toolbar(props: ToolbarProps)
         end;
       })
     else nil;
-    LinkDialogueButton = if isRedirect then
+    LinkDialogueButton = if dialogueScriptType == "Redirect" then
       React.createElement(ToolbarButton, {
         iconImage = icons.link;
         text = "Link dialogue";

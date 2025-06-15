@@ -1,9 +1,9 @@
 --!strict
 
-local root = script.Parent.Parent;
+local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local DialogueGroupContainer = require(script.DialogueGroupContainer);
-local Preview = require(script.Preview);
+local DialogueGroupContainer = require(script.components.DialogueGroupContainer);
+local Preview = require(script.components.Preview);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type DialogueTableProperties = {

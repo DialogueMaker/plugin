@@ -1,10 +1,10 @@
 --!strict
 
-local root = script.Parent.Parent;
+local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local SettingGroup = require(script.SettingGroup);
+local SettingGroup = require(script.components.SettingGroup);
 local settingsMetadata = require(script.settingsMetadata);
-local SettingsTabSelector = require(script.SettingsTabSelector);
+local SettingsTabSelector = require(script.components.SettingsTabSelector);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 

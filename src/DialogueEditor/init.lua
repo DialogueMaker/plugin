@@ -2,9 +2,9 @@
 
 local root = script.Parent;
 local React = require(root.roblox_packages.react);
-local Toolbar = require(script.Toolbar);
-local Explorer = require(script.Explorer);
-local Settings = require(script.Settings);
+local Toolbar = require(script.components.Toolbar);
+local Explorer = require(script.components.Explorer);
+local Settings = require(script.components.Settings);
 local useDialogueMakerScriptSelection = require(script.hooks.useDialogueMakerScriptSelection);
 local useAutomaticWidgetTitle = require(script.hooks.useAutomaticWidgetTitle);
 
