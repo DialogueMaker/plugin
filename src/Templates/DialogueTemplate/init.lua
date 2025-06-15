@@ -11,13 +11,29 @@
 
 local packages = script.Parent.Parent.DialogueMakerKit.Packages; -- Automatically replaced by the plugin.
 local Dialogue = require(packages.Dialogue);
+local DialogueMakerTypes = require(packages.DialogueMakerTypes);
 
 local properties = {
   type = script:GetAttribute("DialogueType");
-  -- START REPLACEMENT
-  -- END REPLACEMENT
+  -- START PROPERTIES REPLACEMENT
+  -- END PROPERTIES REPLACEMENT
 };
 
-local dialogue = Dialogue.new(script:GetAttribute("DialogueContent"), properties, Dialogue.listFromInstance(script));
+local content;
+
+if script:GetAttribute("ShouldUseContentScript") then 
+  
+  local contentScript = script:FindFirstChild("content");
+  assert(contentScript and contentScript:IsA("ModuleScript"), "Content script not found or is not a ModuleScript.");
+
+  content = require(contentScript) :: DialogueMakerTypes.GetContentFunction;
+
+else
+
+  content = script:GetAttribute("DialogueContent");
+
+end;
+
+local dialogue = Dialogue.new(content, properties, Dialogue.listFromInstance(script));
 
 return dialogue;

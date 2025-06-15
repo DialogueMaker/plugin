@@ -46,8 +46,8 @@ local function Dropdown(props: DropdownProps)
     ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
       Size = UDim2.new(1, 0, 1, 0);
-      BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else Color3.new(1, 1, 1);
-      BackgroundTransparency = 0.75;
+      BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else colors.input;
+      BackgroundTransparency = if props.isDisabled then 0.75 else 0;
       [React.Event.Activated] = if props.isDisabled then nil else function()
 
         setIsOpen(not isOpen);
@@ -120,6 +120,7 @@ local function Dropdown(props: DropdownProps)
       });
     });
     OptionsFrame = if isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
+      BackgroundColor3 = colors.input;
       LayoutOrder = 2;
       Size = UDim2.new(1, 0, 0, 0);
       AutomaticCanvasSize = Enum.AutomaticSize.Y;

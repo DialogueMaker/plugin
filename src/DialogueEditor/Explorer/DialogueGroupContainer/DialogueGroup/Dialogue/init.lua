@@ -12,6 +12,7 @@ export type DialogueItemType = "Conversation" | "Response" | "Message" | "Redire
 export type DialogueItemProperties = {
   type: DialogueItemType;
   dialogueScript: ModuleScript;
+  dialogueScriptCount: number;
   layoutOrder: number;
   plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
@@ -21,6 +22,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local dialogueType = props.type;
   local dialogueScript = props.dialogueScript;
+  local dialogueScriptCount = props.dialogueScriptCount;
   local layoutOrder = props.layoutOrder;
 
   local icons = useStudioIcons();
@@ -49,7 +51,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
     local index = table.find(children, dialogueScript);
 
-    if not index or index + increment < 1 or index + increment > #children then
+    if not index or index + increment < 1 or index + increment > dialogueScriptCount then
       
       return;
 
@@ -70,7 +72,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
     end;
 
-  end, {dialogueType :: unknown, dialogueScript});
+  end, {dialogueType :: unknown, dialogueScript, dialogueScriptCount});
 
   local isDeprioritized = (dialogueType == "Message" or dialogueType == "Redirect") and layoutOrder > 1;
 
@@ -90,9 +92,16 @@ local function DialogueItem(props: DialogueItemProperties)
       BackgroundTransparency = 1;
       Size = UDim2.fromOffset(20, 20);
       Image = icons.increasePriority;
+      ImageTransparency = if layoutOrder <= 1 then 0.5 else 0;
       LayoutOrder = 1;
       [React.Event.Activated] = function()
         
+        if layoutOrder <= 1 then
+          
+          return;
+
+        end;
+
         incrementPriority(-1);
 
       end;
@@ -101,9 +110,16 @@ local function DialogueItem(props: DialogueItemProperties)
       BackgroundTransparency = 1;
       Size = UDim2.fromOffset(20, 20);
       Image = icons.decreasePriority;
+      ImageTransparency = if layoutOrder >= dialogueScriptCount then 0.5 else 0;
       LayoutOrder = 2;
       [React.Event.Activated] = function()
         
+        if layoutOrder >= dialogueScriptCount then
+          
+          return;
+
+        end;
+
         incrementPriority(1);
 
       end;

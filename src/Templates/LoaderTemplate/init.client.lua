@@ -46,13 +46,13 @@ for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerC
       local conversation = require(possibleConversationScript) :: Conversation;
       local client = Client.new({
         dialogue = conversation:getNextVerifiedDialogue();
-        -- START REPLACEMENT
+        -- START PROPERTIES REPLACEMENT
         settings = {
           theme = {
             component = ThemeComponent;
           };
         };
-        -- END REPLACEMENT
+        -- END PROPERTIES REPLACEMENT
       });
 
       client.dialogueGUI.Destroying:Wait();

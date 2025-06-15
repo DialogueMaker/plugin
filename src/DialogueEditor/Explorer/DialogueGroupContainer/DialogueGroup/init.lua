@@ -28,6 +28,7 @@ local function SettingGroup(properties: DialogueGroupProperties)
       key = dialogueScript:GetFullName();
       plugin = properties.plugin;
       dialogueScript = dialogueScript;
+      dialogueScriptCount = #scriptList;
       layoutOrder = index;
       type = groupName :: DialogueItemType;
       setSettingsTarget = setSettingsTarget;

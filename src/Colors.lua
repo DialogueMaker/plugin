@@ -14,6 +14,7 @@ export type ColorDictionary = {
   toolbarButton: Color3;
   primaryButton: Color3;
   border: Color3;
+  input: Color3;
 };
 
 local colors: {[string]: ColorDictionary} = {
@@ -32,6 +33,7 @@ local colors: {[string]: ColorDictionary} = {
     toolbarButton = Color3.fromRGB(74, 74, 74);
     border = Color3.fromRGB(34, 34, 34);
     dropdownButton = Color3.fromRGB(201, 201, 201);
+    input = Color3.fromRGB(50, 50, 50);
   };
   Light = {
     backgroundResponse = Color3.fromRGB(30, 103, 19);
@@ -48,6 +50,7 @@ local colors: {[string]: ColorDictionary} = {
     border = Color3.fromRGB(227, 227, 227);
     dropdownButton = Color3.fromRGB(201, 201, 201);
     primaryButton = Color3.fromRGB(79, 161, 255);
+    input = Color3.fromRGB(255, 255, 255);
   };
 };
 

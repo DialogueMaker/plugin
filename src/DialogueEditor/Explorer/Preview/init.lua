@@ -100,18 +100,20 @@ local function Preview(properties: PreviewProperties)
     DialogueContentBox = if selectedDialogueType == "Message" or selectedDialogueType == "Response" then
       React.createElement("TextBox", {
         Text = selectedScript:GetAttribute("DialogueContent") or "";
+        PlaceholderText = "Enter dialogue content here. For variables and effects, use a content script instead.";
         TextColor3 = colors.text;
+        ClearTextOnFocus = false;
         AutomaticSize = Enum.AutomaticSize.Y;
         TextSize = 14;
         LayoutOrder = 2;
         Size = UDim2.fromScale(1, 0);
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+        BackgroundColor3 = colors.input;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
         TextXAlignment = Enum.TextXAlignment.Left;
         TextYAlignment = Enum.TextYAlignment.Top;
-        [React.Change.Text] = function(rbx: TextBox)
+        [React.Change.Text] = function(self: TextBox)
 
-          selectedScript:SetAttribute("DialogueContent", rbx.Text);
+          selectedScript:SetAttribute("DialogueContent", self.Text);
 
         end;
       }, {
