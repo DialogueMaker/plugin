@@ -14,6 +14,7 @@ export type ToolbarProps = {
   plugin: Plugin;
   settingsTarget: ModuleScript?;
   setSettingsTarget: (target: ModuleScript?) -> ();
+  layoutOrder: number;
 }
 
 local function Toolbar(props: ToolbarProps)
@@ -22,11 +23,65 @@ local function Toolbar(props: ToolbarProps)
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   local selectedScript = props.selectedScript;
   local settingsTarget = props.settingsTarget;
+  local layoutOrder = props.layoutOrder;
   local setSettingsTarget = props.setSettingsTarget;
+
+  local addDialogueScript = React.useCallback(function(type: "Message" | "Response" | "Redirect" | "Conversation")
+  
+    if ChangeHistoryService:IsRecordingInProgress() then
+
+      ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
+
+    end;
+
+    local historyIdentifier;
+    if type == "Conversation" then
+
+      historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
+
+      local newContentScript = root.Templates.ConversationTemplate:Clone();
+      newContentScript.Parent = Selection:Get()[1];
+      
+    elseif selectedScript then
+
+      historyIdentifier = ChangeHistoryService:TryBeginRecording(`Add {type:lower()} to NPC`);
+
+      -- Find a name for the content script.
+      local targetPriority = 1;
+      for _, instance in selectedScript:GetChildren() do
+        
+        local comparedName = tonumber(instance.Name);
+        if comparedName and comparedName >= targetPriority then
+          
+          targetPriority = comparedName + 1;
+          
+        end
+        
+      end;
+
+      -- Create the content script.
+      local newContentScript = root.Templates.DialogueTemplate:Clone();
+      newContentScript.Name = targetPriority;
+      newContentScript:SetAttribute("DialogueType", type);
+      
+      if type ~= "Redirect" then
+
+        newContentScript:SetAttribute("DialogueContent", "Hello world!");
+
+      end;
+
+      newContentScript.Parent = selectedScript;
+
+    end;
+
+    ChangeHistoryService:FinishRecording(historyIdentifier, Enum.FinishRecordingOperation.Commit);
+    refreshDialogueMakerScripts();
+
+  end, {selectedScript :: unknown, refreshDialogueMakerScripts});
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
-    LayoutOrder = 1;
+    LayoutOrder = layoutOrder;
     BackgroundColor3 = colors.toolbar;
     BorderSizePixel = 0;
   }, {
@@ -49,61 +104,10 @@ local function Toolbar(props: ToolbarProps)
 
       end;
     });
-    AddMessageButton = React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14099284898";
-      text = if selectedScript then "Add message" else "Add conversation";
-      layoutOrder = 2;
-      isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
-      onClick = function()
-
-        if ChangeHistoryService:IsRecordingInProgress() then
-
-          ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
-
-        end;
-
-        local historyIdentifier;
-        if selectedScript then
-
-          historyIdentifier = ChangeHistoryService:TryBeginRecording("Add message to NPC");
-
-          -- Find a name for the content script.
-          local targetPriority = 1;
-          for _, instance in selectedScript:GetChildren() do
-            
-            local comparedName = tonumber(instance.Name);
-            if comparedName and comparedName >= targetPriority then
-              
-              targetPriority = comparedName + 1;
-              
-            end
-            
-          end;
-
-          -- Create the content script.
-          local newContentScript = root.Templates.DialogueTemplate:Clone();
-          newContentScript.Name = targetPriority;
-          newContentScript:SetAttribute("DialogueType", "Message");
-          newContentScript.Parent = selectedScript;
-
-        else
-
-          historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
-
-          local newContentScript = root.Templates.ConversationTemplate:Clone();
-          newContentScript.Parent = Selection:Get()[1];
-
-        end;
-
-        ChangeHistoryService:FinishRecording(historyIdentifier, Enum.FinishRecordingOperation.Commit);
-        refreshDialogueMakerScripts();
-
-      end;
-    });
     SettingsButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14099277263";
       text = if settingsTarget == nil then "Settings" else "Close settings";
-      layoutOrder = 3;
+      layoutOrder = 2;
       onClick = function()
 
         if settingsTarget then
@@ -118,6 +122,58 @@ local function Toolbar(props: ToolbarProps)
 
       end;
     });
+    AddConversationButton = if not selectedScript then
+      React.createElement(ToolbarButton, {
+        iconImage = "rbxassetid://14099284898";
+        text = "Add conversation";
+        layoutOrder = 3;
+        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
+        onClick = function()
+
+          addDialogueScript("Conversation");
+
+        end;
+      })
+    else nil;
+    AddMessageButton = if selectedScript then
+      React.createElement(ToolbarButton, {
+        iconImage = "rbxassetid://14099284898";
+        text = "Add message";
+        layoutOrder = 4;
+        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
+        onClick = function()
+
+          addDialogueScript("Message");
+
+        end;
+      })
+    else nil;
+    AddResponseButton = if selectedScript then
+      React.createElement(ToolbarButton, {
+        iconImage = "rbxassetid://14099284898";
+        text = "Add response";
+        layoutOrder = 5;
+        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
+        onClick = function()
+
+          addDialogueScript("Response");
+
+        end;
+      })
+    else nil;
+    AddRedirectButton = if selectedScript then
+      React.createElement(ToolbarButton, {
+        iconImage = "rbxassetid://14099284898";
+        text = "Add redirect";
+        layoutOrder = 6;
+        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
+        onClick = function()
+
+          addDialogueScript("Redirect");
+
+        end;
+      })
+    else nil;
   });
 
 end;

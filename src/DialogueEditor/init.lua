@@ -33,17 +33,20 @@ local function DialogueEditor(props: DialogueEditorProperties)
       selectedScript = selectedScript;
       settingsTarget = settingsTarget;
       setSettingsTarget = setSettingsTarget;
+      layoutOrder = 1;
     });
     Explorer = if not settingsTarget then
       React.createElement(Explorer, {
         selectedScript = selectedScript;
         plugin = props.plugin;
         setSettingsTarget = setSettingsTarget;
+        layoutOrder = 2;
       })
     else nil;
     Settings = if settingsTarget then
       React.createElement(Settings, {
         settingsTarget = settingsTarget;
+        layoutOrder = 2;
       })
     else nil;
   });

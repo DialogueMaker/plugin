@@ -4,16 +4,18 @@ local root = script.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local SettingGroup = require(script.SettingGroup);
 local settingsMetadata = require(script.settingsMetadata);
-local SettingTypeSelector = require(script.SettingTypeSelector);
+local SettingsTabSelector = require(script.SettingsTabSelector);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 
 export type SettingsProperties = {
   settingsTarget: ModuleScript;
+  layoutOrder: number;
 }
 
 function Settings(properties: SettingsProperties)
 
   local settingsTarget = properties.settingsTarget;
+  local layoutOrder = properties.layoutOrder;
 
   local targetType = React.useMemo(function()
   
@@ -148,7 +150,7 @@ function Settings(properties: SettingsProperties)
   return React.createElement("ScrollingFrame", {
     Size = UDim2.fromScale(1, 1);
     BackgroundTransparency = 1;
-    LayoutOrder = 2;
+    LayoutOrder = layoutOrder;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
     CanvasSize = UDim2.fromScale(1, 1);
   }, {
@@ -162,7 +164,7 @@ function Settings(properties: SettingsProperties)
       SortOrder = Enum.SortOrder.LayoutOrder;
       Padding = UDim.new(0, 10);
     });
-    SettingTypeSelector = React.createElement(SettingTypeSelector, {
+    SettingsTabSelector = React.createElement(SettingsTabSelector, {
       settingsTarget = settingsTarget;
     });
     Settings = React.createElement(React.Fragment, {}, settingGroups);

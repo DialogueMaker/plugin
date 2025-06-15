@@ -4,9 +4,12 @@ local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local DialogueItem = require(script.DialogueItem);
-local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local DialogueGroup = require(script.DialogueGroup);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
+local TabSelector = require(root.DialogueEditor.components.TabSelector);
+local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.TabSelectorButton);
+
+type DialogueItemType = DialogueGroup.DialogueItemType;
 
 export type DialogueTableBodyProperties = {
   selectedScript: ModuleScript?;
@@ -14,22 +17,22 @@ export type DialogueTableBodyProperties = {
   setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
-local function DialogueTableBody(props: DialogueTableBodyProperties)
+local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
   local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
 
-  local colors = useStudioColors();
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
 
   local conversations, setConversations = React.useState({} :: {ModuleScript});
   local redirects, setRedirects = React.useState({} :: {ModuleScript});
   local responses, setResponses = React.useState({} :: {ModuleScript});
   local messages, setMessages = React.useState({} :: {ModuleScript});
-  
+  local selectedTab: DialogueItemType?, setSelectedTab = React.useState(nil :: DialogueItemType?);
 
   React.useEffect(function(): ()
   
+    setSelectedTab(nil);
     local contentScriptConnections: {RBXScriptConnection} = {};
 
     local function cleanupConnections()
@@ -141,77 +144,69 @@ local function DialogueTableBody(props: DialogueTableBodyProperties)
 
   end, {selectedScript});
 
-  -- Create new status
-  local currentZIndex = #redirects + #responses + #messages;
-  local dialogueItems = {};
-  local currentLayoutOrder = 1;
-  for categoryIndex, category in {conversations, redirects, responses, messages} do
+  local tabs = {};
+  local dialogueGroups = {};
+  for categoryIndex, scriptList in {conversations, redirects, responses, messages} do
 
-    for _, childContentScript in category do
+    local dialogueType: DialogueItemType = ({"Conversation", "Redirect", "Response", "Message"})[categoryIndex] :: DialogueItemType;
+    if not selectedTab and #scriptList > 0 then
 
-      -- Make sure the message container is completely visible, even when dropdowns are open.
-      local dialogueItem = React.createElement(DialogueItem, {
-        type = ({"Conversation", "Redirect", "Response", "Message"})[categoryIndex] :: DialogueItem.DialogueItemType;
-        layoutOrder = currentLayoutOrder;
-        zIndex = currentZIndex;
-        contentScript = childContentScript;
-        plugin = props.plugin;
-        key = childContentScript:GetDebugId();
-        setSettingsTarget = setSettingsTarget;
-      });
-
-      table.insert(dialogueItems, dialogueItem);
-
-      currentZIndex -= 1;
-      currentLayoutOrder += 1;
+      setSelectedTab(dialogueType);
+      break;
 
     end;
 
+    local tab = React.createElement(TabSelectorButton, {
+      key = dialogueType;
+      text = `{dialogueType}s` :: string;
+      layoutOrder = categoryIndex;
+      isDisabled = #scriptList == 0;
+      isSelected = selectedTab == dialogueType;
+      onSelected = function()
+
+        setSelectedTab(dialogueType);
+
+      end;
+    });
+
+    table.insert(tabs, tab);
+
+    if selectedTab ~= dialogueType then
+
+      continue;
+
+    end;
+    
+    local dialogueGroup = React.createElement(DialogueGroup, {
+      name = dialogueType :: DialogueItemType;
+      layoutOrder = categoryIndex;
+      plugin = props.plugin;
+      key = dialogueType;
+      scriptList = scriptList;
+      setSettingsTarget = setSettingsTarget;
+    });
+
+    table.insert(dialogueGroups, dialogueGroup);
+
   end;
 
-  return if #dialogueItems > 0 then (
-    React.createElement("ScrollingFrame", {
-      LayoutOrder = 3;
-      Size = UDim2.new(1, 0, 1, 0);
-      BackgroundColor3 = colors.backgroundTableRow;
-      BorderSizePixel = 0;
-      AutomaticCanvasSize = Enum.AutomaticSize.Y;
-      CanvasSize = UDim2.new(0, 0, 0, 0);
-      ScrollingDirection = Enum.ScrollingDirection.Y;
-    }, {
-      UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
-      });
-      UIFlexItem = React.createElement("UIFlexItem", {
-        FlexMode = Enum.UIFlexMode.Shrink;
-      });
-      DialogueItems = React.createElement(React.Fragment, {}, {dialogueItems});
-    })
-  ) else (
-    React.createElement("Frame", {
-      LayoutOrder = 3;
-      Size = UDim2.fromScale(1, 1);
-      BackgroundTransparency = 1;
-    }, {
-      Message = React.createElement("TextLabel", {
-        AutomaticSize = Enum.AutomaticSize.XY;
-        AnchorPoint = Vector2.new(0.5, 0.5);
-        Position = UDim2.new(0.5, 0, 0.5, 0);
-        Size = UDim2.new();
-        BackgroundTransparency = 1;
-        Text = `No dialogue found. Press the "Add message" button to start.`;
-        TextColor3 = colors.textPlaceholder;
-        FontFace = Font.fromId(11702779517);
-        TextSize = 14;
-        TextXAlignment = Enum.TextXAlignment.Center;
-      }, {
-        UIPadding = React.createElement("UIPadding", {
-          PaddingBottom = UDim.new(0, 22);
-        });
-      })
-    })
-  );
+  return React.createElement("ScrollingFrame", {
+    LayoutOrder = 2;
+    Size = UDim2.fromScale(1, 1);
+    BackgroundTransparency = 1;
+    BorderSizePixel = 0;
+    AutomaticCanvasSize = Enum.AutomaticSize.Y;
+    CanvasSize = UDim2.fromScale(0, 0);
+    ScrollingDirection = Enum.ScrollingDirection.Y;
+  }, {
+    UIListLayout = React.createElement("UIListLayout", {
+      SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 15);
+    });
+    TabSelector = React.createElement(TabSelector, {}, tabs);
+    DialogueGroups = React.createElement(React.Fragment, {}, dialogueGroups);
+  });
 
 end;
 
-return React.memo(DialogueTableBody);
+return React.memo(DialogueGroupContainer);
