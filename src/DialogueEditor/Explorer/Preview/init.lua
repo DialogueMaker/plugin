@@ -1,5 +1,7 @@
 --!strict
 
+local Selection = game:GetService("Selection");
+
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Button = require(root.DialogueEditor.components.Button);
@@ -89,7 +91,7 @@ local function Preview(properties: PreviewProperties)
     local conditionButton = React.createElement(Button, {
       key = "ConditionButton";
       text = "Edit condition";
-      layoutOrder = #dropdownOptions + 1;
+      layoutOrder = #dialogueOptions + 1;
       onClick = function()
 
         local conditionScript = selectedScript:FindFirstChild("ConditionScript");
@@ -163,6 +165,22 @@ local function Preview(properties: PreviewProperties)
 
   end;
   local dialogueContentScript = selectedScript:FindFirstChild("DialogueContentScript");
+  local isDialogueContentScriptEnabled = if dialogueContentScript then not dialogueContentScript:GetAttribute("IsDisabled") else false;
+
+  local deleteButton = React.createElement(Button, {
+    key = "DeleteButton";
+    text = "Delete";
+    backgroundColor = colors.backgroundWarning;
+    layoutOrder = #dialogueOptions + 1;
+    onClick = function()
+
+      Selection:Set({selectedScript.Parent});
+      selectedScript:Destroy();
+
+    end;
+  });
+
+  table.insert(dialogueOptions, deleteButton);
 
   return React.createElement("Frame", {
     BackgroundColor3 = colors.toolbar;
@@ -223,26 +241,36 @@ local function Preview(properties: PreviewProperties)
       ShouldUseDynamicContent = if selectedDialogueType == "Message" or selectedDialogueType == "Response" then
         React.createElement(Checkbox, {
           text = "Dynamic content";
-          isChecked = (dialogueContentScript and not dialogueContentScript:GetAttribute("IsDisabled")) == true;
+          isChecked = isDialogueContentScriptEnabled;
           layoutOrder = 3;
           onChanged = function(isChecked: boolean)
 
-            selectedScript:SetAttribute("ShouldAutoTrigger", isChecked);
+            if not dialogueContentScript then
+
+              local newDialogueContentScript = root.Templates.DialogueContentScriptTemplate:Clone();
+              newDialogueContentScript.Name = "DialogueContentScript";
+              newDialogueContentScript.Parent = selectedScript;
+              dialogueContentScript = newDialogueContentScript;
+
+            end;
+
+            assert(dialogueContentScript and dialogueContentScript:IsA("ModuleScript"), `Dialogue content script not found for {selectedScript:GetFullName()}.`);
+
+            dialogueContentScript:SetAttribute("IsDisabled", not isChecked);
 
           end;
         })
       else nil;
     });
-    DialogueContentBox = if selectedDialogueType == "Message" or selectedDialogueType == "Response" then
+    DialogueContentBox = if not isDialogueContentScriptEnabled and selectedDialogueType == "Message" or selectedDialogueType == "Response" then
       React.createElement("TextBox", {
         Text = selectedScript:GetAttribute("DialogueContent") or "";
         PlaceholderText = "Enter dialogue content here. For variables and effects, use a content script instead.";
         TextColor3 = colors.text;
         ClearTextOnFocus = false;
-        AutomaticSize = Enum.AutomaticSize.Y;
         TextSize = 14;
         LayoutOrder = 2;
-        Size = UDim2.fromScale(1, 0);
+        Size = UDim2.new(1, 0, 0, 100);
         BackgroundColor3 = colors.input;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
         TextXAlignment = Enum.TextXAlignment.Left;
@@ -267,10 +295,58 @@ local function Preview(properties: PreviewProperties)
         });
       })
     else nil;
-    Options = if #dialogueOptions > 0 then
+    DynamicContentNotification = if dialogueContentScript and dialogueContentScript:IsA("ModuleScript") and isDialogueContentScriptEnabled then
       React.createElement("Frame", {
         BackgroundTransparency = 1;
         LayoutOrder = 3;
+        Size = UDim2.new(1, 0, 0, 100);
+      }, {
+        UICorner = React.createElement("UICorner", {
+          CornerRadius = UDim.new(0, 5);
+        });
+        UIStroke = React.createElement("UIStroke", {
+          Color = colors.border;
+          Thickness = 1;
+          ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+        });
+        UIListLayout = React.createElement("UIListLayout", {
+          SortOrder = Enum.SortOrder.LayoutOrder;
+          VerticalAlignment = Enum.VerticalAlignment.Center;
+          HorizontalAlignment = Enum.HorizontalAlignment.Center;
+          Padding = UDim.new(0, 10);
+        });
+        UIPadding = React.createElement("UIPadding", {
+          PaddingTop = UDim.new(0, 15);
+          PaddingBottom = UDim.new(0, 15);
+          PaddingLeft = UDim.new(0, 15);
+          PaddingRight = UDim.new(0, 15);
+        });
+        NotificationLabel = React.createElement("TextLabel", {
+          AutomaticSize = Enum.AutomaticSize.XY;
+          Text = "For your safety, dynamic content cannot be previewed in the Dialogue Editor.";
+          TextColor3 = colors.text;
+          TextWrapped = true;
+          FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
+          TextSize = 14;
+          BackgroundTransparency = 1;
+          LayoutOrder = 1;
+        });
+        NotificationButton = React.createElement(Button, {
+          AutomaticSize = Enum.AutomaticSize.XY;
+          text = "Open script editor";
+          layoutOrder = 2;
+          onClick = function()
+
+            plugin:OpenScript(dialogueContentScript);
+
+          end;
+        });
+      })
+    else nil;
+    Options = if #dialogueOptions > 0 then
+      React.createElement("Frame", {
+        BackgroundTransparency = 1;
+        LayoutOrder = 4;
         Size = UDim2.fromScale(1, 0);
         AutomaticSize = Enum.AutomaticSize.Y;
       }, {

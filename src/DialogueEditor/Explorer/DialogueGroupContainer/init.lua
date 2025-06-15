@@ -149,6 +149,12 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   local dialogueGroups = {};
   for categoryIndex, scriptList in {conversations, redirects, responses, messages} do
 
+    if (not selectedScript and categoryIndex > 1) or (selectedScript and categoryIndex == 1) then
+
+      continue;
+
+    end;
+
     local dialogueType: DialogueItemType = ({"Conversation", "Redirect", "Response", "Message"})[categoryIndex] :: DialogueItemType;
     if not selectedTab and #scriptList > 0 then
 
@@ -191,14 +197,11 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
   end;
 
-  return React.createElement("ScrollingFrame", {
+  return React.createElement("Frame", {
     LayoutOrder = layoutOrder;
-    Size = UDim2.fromScale(1, 1);
     BackgroundTransparency = 1;
-    BorderSizePixel = 0;
-    AutomaticCanvasSize = Enum.AutomaticSize.Y;
-    CanvasSize = UDim2.fromScale(0, 0);
-    ScrollingDirection = Enum.ScrollingDirection.Y;
+    Size = UDim2.fromScale(1, 0);
+    AutomaticSize = Enum.AutomaticSize.Y;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;

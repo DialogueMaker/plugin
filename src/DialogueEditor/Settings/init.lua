@@ -6,6 +6,7 @@ local SettingGroup = require(script.SettingGroup);
 local settingsMetadata = require(script.settingsMetadata);
 local SettingsTabSelector = require(script.SettingsTabSelector);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type SettingsProperties = {
   initialSettingsTarget: ModuleScript;
@@ -147,12 +148,17 @@ function Settings(properties: SettingsProperties)
 
   end;
 
+  local colors = useStudioColors();
+
   return React.createElement("ScrollingFrame", {
     Size = UDim2.fromScale(1, 1);
     BackgroundTransparency = 1;
     LayoutOrder = layoutOrder;
     AutomaticCanvasSize = Enum.AutomaticSize.Y;
-    CanvasSize = UDim2.fromScale(1, 1);
+    CanvasSize = UDim2.fromScale(1, 0);
+    ScrollingDirection = Enum.ScrollingDirection.Y;
+    BorderSizePixel = 0;
+    ScrollBarImageColor3 = colors.border;
   }, {
     UIPadding = React.createElement("UIPadding", {
       PaddingLeft = UDim.new(0, 15);
@@ -163,6 +169,9 @@ function Settings(properties: SettingsProperties)
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
       Padding = UDim.new(0, 10);
+    });
+    UIFlexItem = React.createElement("UIFlexItem", {
+      FlexMode = Enum.UIFlexMode.Shrink;
     });
     SettingsTabSelector = React.createElement(SettingsTabSelector, {
       settingsTarget = settingsTarget;

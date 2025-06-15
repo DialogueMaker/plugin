@@ -10,6 +10,7 @@ export type ColorDictionary = {
   text: Color3;
   textDisabled: Color3;
   textPlaceholder: Color3;
+  buttonText: Color3;
   toolbar: Color3;
   toolbarButton: Color3;
   primaryButton: Color3;
@@ -31,6 +32,7 @@ local colors: {[string]: ColorDictionary} = {
     toolbar = Color3.fromRGB(74, 74, 74);
     primaryButton = Color3.fromRGB(79, 161, 255);
     toolbarButton = Color3.fromRGB(74, 74, 74);
+    buttonText = Color3.fromRGB(255, 255, 255);
     border = Color3.fromRGB(34, 34, 34);
     dropdownButton = Color3.fromRGB(201, 201, 201);
     input = Color3.fromRGB(50, 50, 50);
@@ -46,8 +48,9 @@ local colors: {[string]: ColorDictionary} = {
     textDisabled = Color3.fromRGB(145, 145, 145);
     textPlaceholder = Color3.fromRGB(85, 85, 85);
     toolbar = Color3.fromRGB(227, 227, 227);
+    buttonText = Color3.fromRGB(255, 255, 255);
     toolbarButton = Color3.fromRGB(201, 201, 201);
-    border = Color3.fromRGB(227, 227, 227);
+    border = Color3.fromRGB(201, 201, 201);
     dropdownButton = Color3.fromRGB(201, 201, 201);
     primaryButton = Color3.fromRGB(79, 161, 255);
     input = Color3.fromRGB(255, 255, 255);

@@ -48,9 +48,9 @@ local function Button(properties: ButtonProperties)
     TextLabel = React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
       Text = text;
-      TextSize = 12;
-      FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
-      TextColor3 = colors.text;
+      TextSize = 14;
+      FontFace = Font.fromName("BuilderSans");
+      TextColor3 = colors.buttonText;
       BackgroundTransparency = 1;
     });
   })
