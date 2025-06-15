@@ -89,24 +89,31 @@ function Settings(properties: SettingsProperties)
   
     refreshDialogueMakerScripts();
 
+    local function refreshCurrentSettings()
+
+      setCurrentSettings(getCurrentSettings());
+
+    end;
+
+    local connections = {};
+
     if settingsContainer then
 
-      local connections = {};
+      table.insert(connections, settingsContainer.ChildAdded:Once(refreshCurrentSettings));
+      table.insert(connections, settingsContainer.ChildRemoved:Once(refreshCurrentSettings));
+
       for _, child in settingsContainer:GetChildren() do
 
         if child:IsA("Folder") then
 
+          table.insert(connections, child.ChildAdded:Once(refreshCurrentSettings));
+          table.insert(connections, child.ChildRemoved:Once(refreshCurrentSettings));
+
           for _, settingInstance in child:GetChildren() do
 
             if settingInstance:IsA("ValueBase") then
-
-              local connection = settingInstance:GetPropertyChangedSignal("Value"):Connect(function()
-
-                setCurrentSettings(getCurrentSettings());
               
-              end);
-              
-              table.insert(connections, connection);
+              table.insert(connections, settingInstance:GetPropertyChangedSignal("Value"):Once(refreshCurrentSettings));
 
             end;
 
@@ -116,19 +123,22 @@ function Settings(properties: SettingsProperties)
 
       end;
 
-      return function()
+    end;
 
-        for _, connection in connections do
+    table.insert(connections, settingsTarget.ChildAdded:Once(refreshCurrentSettings));
+    table.insert(connections, settingsTarget.ChildRemoved:Once(refreshCurrentSettings));
 
-          connection:Disconnect();
+    return function()
 
-        end;
+      for _, connection in connections do
+
+        connection:Disconnect();
 
       end;
 
     end;
 
-  end, {settingsContainer :: unknown, currentSettings});
+  end, {settingsContainer :: unknown, currentSettings, settingsTarget});
 
   local settingGroups = {};
 
