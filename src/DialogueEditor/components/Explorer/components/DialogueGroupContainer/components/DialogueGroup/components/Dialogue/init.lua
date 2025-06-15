@@ -62,7 +62,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
     for newIndex, child in children do
 
-      if not child:IsA("ModuleScript") then
+      if not child:IsA("ModuleScript") or not child:HasTag("DialogueMakerDialogueScript") then
 
         continue;
 

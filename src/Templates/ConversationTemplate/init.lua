@@ -1,5 +1,5 @@
 --!strict
--- This script is automatically generated and edited by the Dialogue Maker plugin.
+-- This script is managed by the Dialogue Maker plugin.
 -- If you want to edit this script, please do so using the plugin's interface, or mark this script as manually modified first.
 -- Otherwise, your changes shall be sent to the grinder, and ruthlessly overwritten.
 --

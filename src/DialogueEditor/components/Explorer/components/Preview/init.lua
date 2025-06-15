@@ -265,7 +265,7 @@ local function Preview(properties: PreviewProperties)
     DialogueContentBox = if not isDialogueContentScriptEnabled and selectedDialogueType == "Message" or selectedDialogueType == "Response" then
       React.createElement("TextBox", {
         Text = selectedScript:GetAttribute("DialogueContent") or "";
-        PlaceholderText = "Enter dialogue content here. For variables and effects, use a content script instead.";
+        PlaceholderText = "Enter dialogue content here. For variables and effects, use dynamic content.";
         TextColor3 = colors.text;
         ClearTextOnFocus = false;
         TextSize = 14;

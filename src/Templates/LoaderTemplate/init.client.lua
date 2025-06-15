@@ -1,13 +1,11 @@
 --!strict
--- This script is automatically generated and edited by the Dialogue Maker plugin.
+-- This script is managed by the Dialogue Maker plugin.
 -- If you want to edit this script, please do so using the plugin's interface, or mark this script as manually modified first.
 -- Otherwise, your changes shall be sent to the grinder, and ruthlessly overwritten.
 --
 -- Sidenote: If you're a programmer, consider using the Dialogue Maker Kit directly instead of using the plugin.
 -- It might be more suitable for your needs as it provides more flexibility, especially if you're using
 -- external tools like Rojo to manage your code.
--- 
--- See documentation: https://github.com/DialogueMaker/dialogue
 
 local CollectionService = game:GetService("CollectionService");
 
@@ -15,15 +13,13 @@ local packages = script.Parent.Parent.DialogueMakerKit.Packages; -- Automaticall
 local Client = require(packages.Client);
 local DialogueMakerTypes = require(packages.DialogueMakerTypes);
 
-local ThemeComponent = require(packages.StandardTheme); -- Automatically replaced by the plugin.
-
 type Conversation = DialogueMakerTypes.Conversation;
 
 for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerConversationScript") do
 
   task.spawn(function()
 
-    while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoLoad") do
+    while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoTrigger") do
 
       -- Get the proximity prompt location from the script.
       local proximityPromptLocation = possibleConversationScript:FindFirstChild("ProximityPromptLocation");
@@ -46,13 +42,13 @@ for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerC
       local conversation = require(possibleConversationScript) :: Conversation;
       local client = Client.new({
         dialogue = conversation:getNextVerifiedDialogue();
-        -- START PROPERTIES REPLACEMENT
+        -- START SETTINGS REPLACEMENT
         settings = {
           theme = {
-            component = ThemeComponent;
+            component = require(packages.StandardTheme);
           };
         };
-        -- END PROPERTIES REPLACEMENT
+        -- END SETTINGS REPLACEMENT
       });
 
       client.dialogueGUI.Destroying:Wait();
