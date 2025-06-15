@@ -8,13 +8,13 @@ local SettingsTabSelector = require(script.SettingsTabSelector);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 
 export type SettingsProperties = {
-  settingsTarget: ModuleScript;
+  initialSettingsTarget: ModuleScript;
   layoutOrder: number;
 }
 
 function Settings(properties: SettingsProperties)
 
-  local settingsTarget = properties.settingsTarget;
+  local settingsTarget, setSettingsTarget = React.useState(properties.initialSettingsTarget);
   local layoutOrder = properties.layoutOrder;
 
   local targetType = React.useMemo(function()
@@ -166,6 +166,12 @@ function Settings(properties: SettingsProperties)
     });
     SettingsTabSelector = React.createElement(SettingsTabSelector, {
       settingsTarget = settingsTarget;
+      initialSettingsTarget = properties.initialSettingsTarget;
+      onSelectionChanged = function(newTarget: ModuleScript)
+
+        setSettingsTarget(newTarget);
+
+      end;
     });
     Settings = React.createElement(React.Fragment, {}, settingGroups);
   });

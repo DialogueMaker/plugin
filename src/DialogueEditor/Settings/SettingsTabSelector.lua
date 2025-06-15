@@ -9,11 +9,15 @@ local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.Tab
 
 export type SettingTypeSelectorProperties = {
   settingsTarget: ModuleScript;
+  initialSettingsTarget: ModuleScript;
+  onSelectionChanged: (settingsTarget: ModuleScript) -> ();
 };
 
 local function SettingsTabSelector(properties: SettingTypeSelectorProperties)
 
+  local initialSettingsTarget = properties.initialSettingsTarget;
   local settingsTarget = properties.settingsTarget;
+  local onSelectionChanged = properties.onSelectionChanged;
 
   local settingsTargetType = (
     if settingsTarget:HasTag("DialogueMakerLoader") then "Client"
@@ -44,8 +48,39 @@ local function SettingsTabSelector(properties: SettingTypeSelectorProperties)
       isSelected = settingType == settingsTargetType;
       text = settingType;
       layoutOrder = index;
-      isDisabled = settingType == "Client" and not loaderScript;
+      isDisabled = (settingType == "Client" and not loaderScript) or (settingType == "Dialogue" and not initialSettingsTarget:HasTag("DialogueMakerDialogueScript"));
       onSelected = function()
+
+        if settingType == "Client" then
+
+          onSelectionChanged(loaderScript);
+
+        elseif settingType == "Conversation" then
+
+          local possibleConversationScript = settingsTarget;
+          
+          while not possibleConversationScript:HasTag("DialogueMakerConversationScript") and possibleConversationScript.Parent and possibleConversationScript.Parent:IsA("ModuleScript") do
+            
+            possibleConversationScript = possibleConversationScript.Parent;
+
+          end;
+
+          if possibleConversationScript:HasTag("DialogueMakerConversationScript") then
+
+            onSelectionChanged(possibleConversationScript);
+
+          else
+
+            warn(`No valid conversation script found for {properties.settingsTarget.Name}.`);
+            return;
+
+          end;
+
+        elseif settingType == "Dialogue" then
+
+          onSelectionChanged(initialSettingsTarget);
+
+        end;
 
       end;
     });

@@ -40,6 +40,7 @@ local function Toolbar(props: ToolbarProps)
       historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
 
       local newContentScript = root.Templates.ConversationTemplate:Clone();
+      newContentScript:AddTag("DialogueMakerConversationScript");
       newContentScript.Parent = Selection:Get()[1];
       
     elseif selectedScript then
@@ -61,6 +62,7 @@ local function Toolbar(props: ToolbarProps)
 
       -- Create the content script.
       local newContentScript = root.Templates.DialogueTemplate:Clone();
+      newContentScript:AddTag("DialogueMakerDialogueScript");
       newContentScript.Name = targetPriority;
       newContentScript:SetAttribute("DialogueType", type);
       

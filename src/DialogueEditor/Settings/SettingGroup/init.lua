@@ -60,6 +60,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
           local newCategoryFolder = Instance.new("Folder");
           newCategoryFolder.Name = groupName;
           newCategoryFolder.Parent = settingContainer;
+          categoryFolder = newCategoryFolder;
 
         end;
 

@@ -45,7 +45,7 @@ local function DialogueEditor(props: DialogueEditorProperties)
     else nil;
     Settings = if settingsTarget then
       React.createElement(Settings, {
-        settingsTarget = settingsTarget;
+        initialSettingsTarget = settingsTarget;
         layoutOrder = 2;
       })
     else nil;
