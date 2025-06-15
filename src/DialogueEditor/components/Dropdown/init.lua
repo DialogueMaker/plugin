@@ -1,6 +1,6 @@
 --!strict
 
-local root = script.Parent.Parent.Parent.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
@@ -12,36 +12,52 @@ export type DropdownProps = {
   automaticSize: Enum.AutomaticSize?;
   toggleButtonChildren: any;
   isDisabled: boolean?;
-  isOpen: boolean;
-  setIsOpen: (boolean) -> ();
   iconImage: string?;
+  zIndex: number?;
+  isOpen: boolean;
+  setIsOpen: ((boolean) -> ());
 }
 
 local function Dropdown(props: DropdownProps)
 
   local colors = useStudioColors();
 
+  local isOpen = props.isOpen;
+  local setIsOpen = props.setIsOpen;
+
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
     Size = props.size;
     LayoutOrder = props.layoutOrder;
     AutomaticSize = props.automaticSize;
+    ZIndex = props.zIndex or 1;
   }, {
+    UIPadding = React.createElement("UIPadding", {
+      PaddingTop = UDim.new(0, 1);
+      PaddingBottom = UDim.new(0, 1);
+      PaddingLeft = UDim.new(0, 1);
+      PaddingRight = UDim.new(0, 1);
+    });
     Children = React.createElement(React.Fragment, {}, {props.toggleButtonChildren});
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
+      Padding = UDim.new(0, 5);
     });
     ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
       Size = UDim2.new(1, 0, 1, 0);
-      BackgroundTransparency = 1;
+      BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else Color3.new(1, 1, 1);
+      BackgroundTransparency = 0.75;
       [React.Event.Activated] = if props.isDisabled then nil else function()
 
-        props.setIsOpen(not props.isOpen);
+        setIsOpen(not isOpen);
 
       end;
       Text = "";
     }, {
+      UICorner = React.createElement("UICorner", {
+        CornerRadius = UDim.new(0, 5);
+      });
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
         FillDirection = Enum.FillDirection.Horizontal;
@@ -71,16 +87,19 @@ local function Dropdown(props: DropdownProps)
             Image = props.iconImage;
             Size = UDim2.new(0, 20, 0, 20);
             BackgroundTransparency = 1;
+            ImageTransparency = if props.isDisabled then 0.5 else 0;
             ImageColor3 = colors.text;
           })
         else nil;
         TextLabel = if props.text == "" then nil else React.createElement("TextLabel", {
           LayoutOrder = 2;
           Text = props.text;
-          TextXAlignment = if props.text == "" then Enum.TextXAlignment.Center else Enum.TextXAlignment.Left;
+          TextXAlignment = Enum.TextXAlignment.Left;
           TextColor3 = colors.text;
+          TextTransparency = if props.isDisabled then 0.5 else 0;
           FontFace = Font.fromId(11702779517);
           TextSize = 14;
+          BackgroundTransparency = 1;
         });
       });
       DropdownArrowIconContainer = React.createElement("Frame", {
@@ -94,18 +113,13 @@ local function Dropdown(props: DropdownProps)
           Image = "rbxassetid://14098646461";
           Size = UDim2.new(0, 20, 0, 20);
           BackgroundTransparency = 1;
-          Rotation = if props.isOpen then 180 else 0;
+          ImageTransparency = if props.isDisabled then 0.5 else 0;
+          Rotation = if isOpen then 180 else 0;
           ImageColor3 = colors.text;
         });
       });
-      UIStroke = React.createElement("UIStroke", {
-        Color = colors.border;
-        Thickness = 1;
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
-        Transparency = if props.isDisabled then 0.5 else 0;
-      });
     });
-    OptionsFrame = if props.isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
+    OptionsFrame = if isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
       LayoutOrder = 2;
       Size = UDim2.new(1, 0, 0, 0);
       AutomaticCanvasSize = Enum.AutomaticSize.Y;
@@ -115,7 +129,7 @@ local function Dropdown(props: DropdownProps)
 
         if input == Enum.UserInputType.MouseButton1 then
 
-          props.setIsOpen(not props.isOpen);
+          setIsOpen(not isOpen);
 
         end;
 
@@ -123,22 +137,21 @@ local function Dropdown(props: DropdownProps)
     }, {
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;
+        Padding = UDim.new(0, 5);
       });
-      UIStroke = React.createElement("UIStroke", {
-        Color = colors.border;
-        Thickness = 1;
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+      UICorner = React.createElement("UICorner", {
+        CornerRadius = UDim.new(0, 5);
+      });
+      UIPadding = React.createElement("UIPadding", {
+        PaddingTop = UDim.new(0, 5);
+        PaddingBottom = UDim.new(0, 5);
+        PaddingLeft = UDim.new(0, 5);
+        PaddingRight = UDim.new(0, 5);
       });
       Children = React.createElement(React.Fragment, {}, {
         props.children;
       });
     }) else nil;
-    UIPadding = React.createElement("UIPadding", {
-      PaddingTop = UDim.new(0, 1);
-      PaddingBottom = UDim.new(0, 1);
-      PaddingLeft = UDim.new(0, 1);
-      PaddingRight = UDim.new(0, 1);
-    });
   });
 
 end;

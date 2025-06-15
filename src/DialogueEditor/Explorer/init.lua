@@ -3,6 +3,7 @@
 local root = script.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueGroupContainer = require(script.DialogueGroupContainer);
+local Preview = require(script.Preview);
 
 export type DialogueTableProperties = {
   selectedScript: ModuleScript?;
@@ -13,6 +14,7 @@ export type DialogueTableProperties = {
 
 local function Explorer(props: DialogueTableProperties)
 
+  local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
   local layoutOrder = props.layoutOrder;
 
@@ -34,21 +36,15 @@ local function Explorer(props: DialogueTableProperties)
     UIFlexItem = React.createElement("UIFlexItem", {
       FlexMode = Enum.UIFlexMode.Shrink;
     });
-    Visualizer = React.createElement("Frame", {
-      BackgroundTransparency = 1;
-      LayoutOrder = 1;
-      AutomaticSize = Enum.AutomaticSize.Y;
-      Size = UDim2.fromScale(1, 0);
-    }, {
-      UIListLayout = React.createElement("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder;
-        FillDirection = Enum.FillDirection.Vertical;
-        HorizontalAlignment = Enum.HorizontalAlignment.Center;
-        Padding = UDim.new(0, 15);
-      });
-    });
+    Preview = if selectedScript then
+      React.createElement(Preview, {
+        layoutOrder = 1;
+        selectedScript = selectedScript;
+      })
+    else nil;
     DialogueGroupContainer = React.createElement(DialogueGroupContainer, {
-      selectedScript = props.selectedScript;
+      selectedScript = selectedScript;
+      layoutOrder = 2;
       plugin = props.plugin;
       setSettingsTarget = setSettingsTarget;
     });

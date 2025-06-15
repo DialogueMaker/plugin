@@ -1,14 +1,15 @@
 --!strict
 
-local React = require(script.Parent.Parent.Parent.roblox_packages.react);
-local Colors = require(script.Parent.Parent.Parent.Colors);
-type ColorDictionary = Colors.ColorDictionary;
+local root = script.Parent.Parent.Parent;
+local React = require(root.roblox_packages.react);
+local Icons = require(root.Icons);
 
-local function useStudioColors(): ColorDictionary
+local function useStudioIcons()
 
   local themeName, setThemeName = React.useState(settings().Studio.Theme.Name)
 
   React.useEffect(function()
+    
     local function onThemeChanged()
 
       setThemeName(settings().Studio.Theme.Name);
@@ -25,8 +26,8 @@ local function useStudioColors(): ColorDictionary
     
   end, {})
 
-  return Colors[themeName] or Colors.Dark;
+  return Icons[themeName] or Icons.Dark;
 
 end
 
-return useStudioColors;
+return useStudioIcons;

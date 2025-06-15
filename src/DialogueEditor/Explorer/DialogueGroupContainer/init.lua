@@ -12,6 +12,7 @@ local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.Tab
 type DialogueItemType = DialogueGroup.DialogueItemType;
 
 export type DialogueTableBodyProperties = {
+  layoutOrder: number;
   selectedScript: ModuleScript?;
   plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
@@ -19,6 +20,7 @@ export type DialogueTableBodyProperties = {
 
 local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
+  local layoutOrder = props.layoutOrder;
   local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
 
@@ -191,7 +193,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   end;
 
   return React.createElement("ScrollingFrame", {
-    LayoutOrder = 2;
+    LayoutOrder = layoutOrder;
     Size = UDim2.fromScale(1, 1);
     BackgroundTransparency = 1;
     BorderSizePixel = 0;

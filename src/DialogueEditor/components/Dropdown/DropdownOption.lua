@@ -1,6 +1,6 @@
 --!strict
 
-local root = script.Parent.Parent.Parent.Parent.Parent.Parent;
+local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
@@ -33,6 +33,9 @@ local function DropdownOption(props: DropdownOptionProperties)
       VerticalAlignment = Enum.VerticalAlignment.Center;
       Padding = UDim.new(0, 5);
     });
+    UICorner = React.createElement("UICorner", {
+      CornerRadius = UDim.new(0, 5);
+    });
     IconLabel = if props.iconImage then React.createElement("ImageLabel", {
       LayoutOrder = 1;
       Image = props.iconImage;
@@ -46,7 +49,7 @@ local function DropdownOption(props: DropdownOptionProperties)
     });
     TextLabel = React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
-      Size = UDim2.new(0, 0, 0, 0);
+      Size = UDim2.new();
       LayoutOrder = 2;
       Text = props.text;
       FontFace = Font.fromId(11702779517);

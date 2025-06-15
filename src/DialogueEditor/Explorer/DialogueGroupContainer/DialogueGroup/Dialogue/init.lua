@@ -5,6 +5,7 @@ local Selection = game:GetService("Selection");
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
 export type DialogueItemType = "Conversation" | "Response" | "Message" | "Redirect";
 
@@ -20,50 +21,163 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local dialogueType = props.type;
   local dialogueScript = props.dialogueScript;
+  local layoutOrder = props.layoutOrder;
 
+  local icons = useStudioIcons();
   local colors = useStudioColors();
 
   local dialogueContent = dialogueScript:GetAttribute("DialogueContent");
 
-  return React.createElement("TextButton", {
-    BackgroundColor3 = colors.toolbar;
-    BorderSizePixel = 0;
-    LayoutOrder = props.layoutOrder;
-    AutomaticSize = Enum.AutomaticSize.Y;
-    Size = UDim2.fromScale(1, 0);
-    Text = "";
-    [React.Event.Activated] = function()
-      
-      Selection:Set({dialogueScript});
+  local incrementPriority = React.useCallback(function(increment: number)
+    
+    if not dialogueScript.Parent then
+          
+      return;
 
     end;
+
+    local children = dialogueScript.Parent:GetChildren();
+
+    table.sort(children, function(dialogueScriptA, dialogueScriptB)
+    
+      local messageAPriority = tonumber(dialogueScriptA.Name) or math.huge;
+      local messageBPriority = tonumber(dialogueScriptB.Name) or math.huge;
+      
+      return messageAPriority < messageBPriority;
+
+    end);
+
+    local index = table.find(children, dialogueScript);
+
+    if not index or index + increment < 1 or index + increment > #children then
+      
+      return;
+
+    end;
+
+    table.remove(children, index);
+    table.insert(children, index + increment, dialogueScript);
+
+    for newIndex, child in children do
+
+      if not child:IsA("ModuleScript") then
+
+        continue;
+
+      end;
+      
+      child.Name = tostring(newIndex);
+
+    end;
+
+  end, {dialogueType :: unknown, dialogueScript});
+
+  local isDeprioritized = (dialogueType == "Message" or dialogueType == "Redirect") and layoutOrder > 1;
+
+  return React.createElement("Frame", {
+    AutomaticSize = Enum.AutomaticSize.Y;
+    BackgroundTransparency = 1;
+    Size = UDim2.fromScale(1, 0);
+    LayoutOrder = layoutOrder;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
-      FillDirection = Enum.FillDirection.Horizontal;
       Padding = UDim.new(0, 5);
+      FillDirection = Enum.FillDirection.Horizontal;
+      VerticalAlignment = Enum.VerticalAlignment.Center;
     });
-    UICorner = React.createElement("UICorner", {
-      CornerRadius = UDim.new(0, 5);
-    });
-    UIPadding = React.createElement("UIPadding", {
-      PaddingLeft = UDim.new(0, 15);
-      PaddingRight = UDim.new(0, 15);
-      PaddingTop = UDim.new(0, 15);
-      PaddingBottom = UDim.new(0, 15);
-    });
-    LabelTextBox = React.createElement("TextLabel", {
-      Text = if dialogueType == "Conversation" then dialogueScript.Name else (dialogueContent or "Nothing yet...");
-      TextColor3 = colors.text;
-      TextTransparency = if dialogueType == "Conversation" or dialogueContent then 0 else 0.5;
-      LayoutOrder = 2;
-      AutomaticSize = Enum.AutomaticSize.XY;
-      FontFace = Font.fromId(11702779517);
+    IncreasePriorityButton = React.createElement("ImageButton", {
       BackgroundTransparency = 1;
-      TextSize = 14;
-      TextXAlignment = Enum.TextXAlignment.Left;
+      Size = UDim2.fromOffset(20, 20);
+      Image = icons.increasePriority;
+      LayoutOrder = 1;
+      [React.Event.Activated] = function()
+        
+        incrementPriority(-1);
+
+      end;
     });
-  })
+    DecreasePriorityButton = React.createElement("ImageButton", {
+      BackgroundTransparency = 1;
+      Size = UDim2.fromOffset(20, 20);
+      Image = icons.decreasePriority;
+      LayoutOrder = 2;
+      [React.Event.Activated] = function()
+        
+        incrementPriority(1);
+
+      end;
+    });
+    ViewButton = React.createElement("TextButton", {
+      BackgroundColor3 = colors.toolbar;
+      BorderSizePixel = 0;
+      AutomaticSize = Enum.AutomaticSize.Y;
+      Text = "";
+      LayoutOrder = 3;
+      [React.Event.Activated] = function()
+        
+        Selection:Set({dialogueScript});
+
+      end;
+    }, {
+      UIFlexItem = React.createElement("UIFlexItem", {
+        FlexMode = Enum.UIFlexMode.Fill;
+      });
+      UIListLayout = React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        VerticalAlignment = Enum.VerticalAlignment.Center;
+        HorizontalFlex = Enum.UIFlexAlignment.SpaceBetween;
+        Padding = UDim.new(0, 5);
+      });
+      UICorner = React.createElement("UICorner", {
+        CornerRadius = UDim.new(0, 5);
+      });
+      UIPadding = React.createElement("UIPadding", {
+        PaddingLeft = UDim.new(0, 15);
+        PaddingRight = UDim.new(0, 15);
+        PaddingTop = UDim.new(0, 15);
+        PaddingBottom = UDim.new(0, 15);
+      });
+      Information = React.createElement("Frame", {
+        AutomaticSize = Enum.AutomaticSize.XY;
+        LayoutOrder = 1;
+        BackgroundTransparency = 1;
+      }, {
+        UIListLayout = React.createElement("UIListLayout", {
+          SortOrder = Enum.SortOrder.LayoutOrder;
+          FillDirection = Enum.FillDirection.Horizontal;
+          Padding = UDim.new(0, 10);
+          VerticalAlignment = Enum.VerticalAlignment.Center;
+        });
+        Icon = React.createElement("ImageLabel", {
+          LayoutOrder = 1;
+          Image = icons[`{dialogueType:sub(1, 1):lower()}{dialogueType:sub(2)}`];
+          Size = UDim2.fromOffset(20, 20);
+          BackgroundTransparency = 1;
+          ImageColor3 = colors.text;
+          ImageTransparency = if isDeprioritized then 0.5 else 0;
+        });
+        Description = React.createElement("TextLabel", {
+          Text = if dialogueType == "Conversation" then dialogueScript.Name else (dialogueContent or "Nothing yet...");
+          TextColor3 = colors.text;
+          TextTransparency = if not isDeprioritized and (dialogueType == "Conversation" or dialogueContent) then 0 else 0.5;
+          LayoutOrder = 2;
+          AutomaticSize = Enum.AutomaticSize.XY;
+          FontFace = Font.fromId(11702779517);
+          BackgroundTransparency = 1;
+          TextSize = 14;
+          TextXAlignment = Enum.TextXAlignment.Left;
+        });
+      });
+      Indicator = React.createElement("ImageLabel", {
+        LayoutOrder = 2;
+        Image = "rbxassetid://136533602473973";
+        Size = UDim2.fromOffset(20, 20);
+        BackgroundTransparency = 1;
+      })
+    })
+  });
 
 end;
 
