@@ -3,6 +3,7 @@
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
 export type CheckboxProperties = {
   text: string;
@@ -20,6 +21,7 @@ local function Checkbox(properties: CheckboxProperties)
   local layoutOrder = properties.layoutOrder or 0;
   local onChanged = properties.onChanged;
   local colors = useStudioColors();
+  local icons = useStudioIcons();
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -52,6 +54,15 @@ local function Checkbox(properties: CheckboxProperties)
       UICorner = React.createElement("UICorner", {
         CornerRadius = UDim.new(0, 5);
       });
+      CheckImageLabel = if isChecked then
+        React.createElement("ImageLabel", {
+          Size = UDim2.fromScale(1, 1);
+          BackgroundTransparency = 1;
+          Image = icons.check;
+          ImageColor3 = Color3.new(1, 1, 1);
+          ImageTransparency = if isDisabled then 0.5 else 0;
+        })
+      else nil;
     });
     TextLabel = React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;

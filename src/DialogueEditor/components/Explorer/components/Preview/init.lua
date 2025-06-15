@@ -10,6 +10,7 @@ local Dropdown = require(root.DialogueEditor.components.Dropdown);
 local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
+local useDialogueContentScript = require(script.hooks.useDialogueContentScript);
 
 export type PreviewProperties = {
   selectedScript: ModuleScript;
@@ -24,6 +25,7 @@ local function Preview(properties: PreviewProperties)
   local plugin = properties.plugin;
   local colors = useStudioColors();
   local icons = useStudioIcons();
+  local dialogueContentScript, isDialogueContentScriptEnabled = useDialogueContentScript(selectedScript);
 
   local selectedDialogueType: string?, setSelectedDialogueType = React.useState(
     if selectedScript then 
@@ -164,8 +166,6 @@ local function Preview(properties: PreviewProperties)
     table.insert(dialogueOptions, actionsDropdown);
 
   end;
-  local dialogueContentScript = selectedScript:FindFirstChild("DialogueContentScript");
-  local isDialogueContentScriptEnabled = if dialogueContentScript then not dialogueContentScript:GetAttribute("IsDisabled") else false;
 
   local deleteButton = React.createElement(Button, {
     key = "DeleteButton";
@@ -295,7 +295,7 @@ local function Preview(properties: PreviewProperties)
         });
       })
     else nil;
-    DynamicContentNotification = if dialogueContentScript and dialogueContentScript:IsA("ModuleScript") and isDialogueContentScriptEnabled then
+    DynamicContentNotification = if (selectedDialogueType == "Message" or selectedDialogueType == "Response") and dialogueContentScript and isDialogueContentScriptEnabled then
       React.createElement("Frame", {
         BackgroundTransparency = 1;
         LayoutOrder = 3;
