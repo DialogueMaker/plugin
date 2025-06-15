@@ -24,20 +24,15 @@ local function Dropdown(props: DropdownProps)
 
   local isOpen = props.isOpen;
   local setIsOpen = props.setIsOpen;
+  local layoutOrder = props.layoutOrder or 0;
 
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
     Size = props.size;
-    LayoutOrder = props.layoutOrder;
+    LayoutOrder = layoutOrder;
     AutomaticSize = props.automaticSize;
     ZIndex = props.zIndex or 1;
   }, {
-    UIPadding = React.createElement("UIPadding", {
-      PaddingTop = UDim.new(0, 1);
-      PaddingBottom = UDim.new(0, 1);
-      PaddingLeft = UDim.new(0, 1);
-      PaddingRight = UDim.new(0, 1);
-    });
     Children = React.createElement(React.Fragment, {}, {props.toggleButtonChildren});
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
@@ -45,7 +40,7 @@ local function Dropdown(props: DropdownProps)
     });
     ToggleButton = React.createElement(if props.isDisabled then "TextLabel" else "TextButton", {
       LayoutOrder = 1;
-      Size = UDim2.new(1, 0, 1, 0);
+      Size = UDim2.fromScale(1, 1);
       BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else colors.input;
       BackgroundTransparency = if props.isDisabled then 0.75 else 0;
       [React.Event.Activated] = if props.isDisabled then nil else function()
@@ -85,7 +80,7 @@ local function Dropdown(props: DropdownProps)
           React.createElement("ImageLabel", {
             LayoutOrder = 1;
             Image = props.iconImage;
-            Size = UDim2.new(0, 20, 0, 20);
+            Size = UDim2.fromOffset(20, 20);
             BackgroundTransparency = 1;
             ImageTransparency = if props.isDisabled then 0.5 else 0;
             ImageColor3 = colors.text;
@@ -111,7 +106,7 @@ local function Dropdown(props: DropdownProps)
         DropdownArrowIconLabel = React.createElement("ImageLabel", {
           LayoutOrder = 2;
           Image = "rbxassetid://14098646461";
-          Size = UDim2.new(0, 20, 0, 20);
+          Size = UDim2.fromOffset(20, 20);
           BackgroundTransparency = 1;
           ImageTransparency = if props.isDisabled then 0.5 else 0;
           Rotation = if isOpen then 180 else 0;
@@ -122,10 +117,10 @@ local function Dropdown(props: DropdownProps)
     OptionsFrame = if isOpen and not props.isDisabled then React.createElement("ScrollingFrame", {
       BackgroundColor3 = colors.input;
       LayoutOrder = 2;
-      Size = UDim2.new(1, 0, 0, 0);
+      Size = UDim2.fromScale(1, 0);
       AutomaticCanvasSize = Enum.AutomaticSize.Y;
       AutomaticSize = Enum.AutomaticSize.Y;
-      CanvasSize = UDim2.new(1, 0, 1, 0);
+      CanvasSize = UDim2.fromScale(1, 1);
       [React.Event.InputEnded] = function(self, input)
 
         if input == Enum.UserInputType.MouseButton1 then

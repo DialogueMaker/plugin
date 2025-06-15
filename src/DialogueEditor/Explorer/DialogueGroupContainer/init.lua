@@ -76,7 +76,6 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
             
             else
             
-              warn(`{possibleDialogueScript:GetFullName()} is not a valid DialogueMaker script.`);
               continue;
 
             end;

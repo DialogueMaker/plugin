@@ -3,8 +3,8 @@
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent.Parent.Parent;
+local Button = require(root.DialogueEditor.components.Button);
 local React = require(root.roblox_packages.react);
-local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type InstanceInputProperties = {
   value: Instance?;
@@ -16,8 +16,6 @@ export type InstanceInputProperties = {
 local function InstanceInput(properties: InstanceInputProperties)
 
   local onChanged = properties.onChanged;
-
-  local colors = useStudioColors();
 
   local className = properties.className or "Instance";
   local isSelecting, setIsSelecting = React.useState(false);
@@ -64,34 +62,14 @@ local function InstanceInput(properties: InstanceInputProperties)
 
   end, {isSelecting});
 
-  return React.createElement("TextButton", {
-    AutomaticSize = Enum.AutomaticSize.XY;
-    BackgroundColor3 = colors.primaryButton;
-    Text = "";
-    LayoutOrder = 2;
-    [React.Event.Activated] = function()
+  return React.createElement(Button, {
+    layoutOrder = 2;
+    text = properties.value and properties.value.Name or properties.defaultValue and properties.defaultValue.Name or `Select{if isSelecting then "ing" else ""} {className}`;
+    onClick = function()
     
       setIsSelecting(not isSelecting);
 
     end;
-  }, {
-    UICorner = React.createElement("UICorner", {
-      CornerRadius = UDim.new(0, 5);
-    });
-    UIPadding = React.createElement("UIPadding", {
-      PaddingTop = UDim.new(0, 5);
-      PaddingBottom = UDim.new(0, 5);
-      PaddingLeft = UDim.new(0, 5);
-      PaddingRight = UDim.new(0, 5);
-    });
-    ObjectName = React.createElement("TextLabel", {
-      AutomaticSize = Enum.AutomaticSize.XY;
-      Text = properties.value and properties.value.Name or properties.defaultValue and properties.defaultValue.Name or `Select{if isSelecting then "ing" else ""} {className}`;
-      TextSize = 12;
-      FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
-      TextColor3 = colors.text;
-      BackgroundTransparency = 1;
-    });
   });
 
 end;

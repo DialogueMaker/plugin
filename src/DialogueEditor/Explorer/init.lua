@@ -14,6 +14,7 @@ export type DialogueTableProperties = {
 
 local function Explorer(props: DialogueTableProperties)
 
+  local plugin = props.plugin;
   local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
   local layoutOrder = props.layoutOrder;
@@ -40,12 +41,13 @@ local function Explorer(props: DialogueTableProperties)
       React.createElement(Preview, {
         layoutOrder = 1;
         selectedScript = selectedScript;
+        plugin = plugin;
       })
     else nil;
     DialogueGroupContainer = React.createElement(DialogueGroupContainer, {
       selectedScript = selectedScript;
       layoutOrder = 2;
-      plugin = props.plugin;
+      plugin = plugin;
       setSettingsTarget = setSettingsTarget;
     });
   })
