@@ -19,6 +19,14 @@ local function useDialogueMakerScriptSelection()
 
         local selectedInstance = selection[1];
         local isSelectionAModuleScript = selectedInstance:IsA("ModuleScript");
+
+        if not isSelectionAModuleScript and selectedInstance:IsA("Folder") and selectedInstance.Parent and selectedInstance.Parent:IsA("ModuleScript") then
+
+          selectedInstance = selectedInstance.Parent;
+          isSelectionAModuleScript = true;
+
+        end;
+
         local conversationScript = if isSelectionAModuleScript and selectedInstance:HasTag("DialogueMakerConversationScript") then selectedInstance else nil;
         if not conversationScript then
 

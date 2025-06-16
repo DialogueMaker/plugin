@@ -1,5 +1,7 @@
 --!strict
 
+local Selection = game:GetService("Selection");
+
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Dropdown = require(root.DialogueEditor.components.Dropdown);
@@ -35,6 +37,36 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
         onClick = function()
 
           selectedScript:SetAttribute("DialogueType", dialogueType);
+
+          local currentFolder = selectedScript.Parent;
+          assert(currentFolder, `Dialogue script parent not found for {selectedScript:GetFullName()}.`);
+
+          local parentDialogueScript = currentFolder.Parent;
+          assert(parentDialogueScript, `Dialogue script parent not found for {selectedScript:GetFullName()}.`);
+
+          local targetFolder = parentDialogueScript:FindFirstChild(`{dialogueType}s`);
+          if not targetFolder then
+
+            local newTargetFolder = Instance.new("Folder");
+            newTargetFolder.Name = `{dialogueType}s`;
+            newTargetFolder.Parent = parentDialogueScript;
+            targetFolder = newTargetFolder;
+
+          end;
+
+          assert(targetFolder, `Target folder not found for {selectedScript:GetFullName()}.`);
+
+          selectedScript.Parent = targetFolder;
+
+          if #currentFolder:GetChildren() == 0 then
+
+            currentFolder:Destroy();
+
+          end;
+
+          task.wait();
+          Selection:Set({selectedScript});
+
           setIsDialogueTypeDropdownOpen(false);
 
         end;

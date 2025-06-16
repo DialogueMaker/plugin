@@ -17,8 +17,8 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
   local layoutOrder = properties.layoutOrder;
   
   local getDestinationScript = React.useCallback(function(): ModuleScript?
-    
-    local destinationScript = selectedScript:FindFirstChild("DialogueRedirectValue");
+
+    local destinationScript = selectedScript:FindFirstChild("RedirectValue");
     if not destinationScript or not destinationScript:IsA("ObjectValue") or not destinationScript.Value or not destinationScript.Value:IsA("ModuleScript") then
 
       return;
@@ -78,18 +78,17 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
 
         end;
 
-        local destinationScriptValue = selectedScript:FindFirstChild("DialogueRedirectValue");
+        local destinationScriptValue = selectedScript:FindFirstChild("RedirectValue");
         if not destinationScriptValue then
 
           local newDestinationScriptValue = Instance.new("ObjectValue");
-          newDestinationScriptValue:AddTag("DialogueRedirectValue");
-          newDestinationScriptValue.Name = "DialogueRedirectValue";
+          newDestinationScriptValue.Name = "RedirectValue";
           newDestinationScriptValue.Parent = selectedScript;
           destinationScriptValue = newDestinationScriptValue;
 
         end;
 
-        assert(destinationScriptValue and destinationScriptValue:IsA("ObjectValue"), "Expected DialogueRedirectValue to be an ObjectValue");
+        assert(destinationScriptValue and destinationScriptValue:IsA("ObjectValue"), "Expected RedirectValue to be an ObjectValue");
 
         destinationScriptValue.Value = instance;
         setDestinationScript(getDestinationScript());

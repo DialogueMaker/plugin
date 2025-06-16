@@ -34,6 +34,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   React.useEffect(function(): ()
   
     setSelectedTab(nil);
+
     local contentScriptConnections: {RBXScriptConnection} = {};
 
     local function cleanupConnections()
@@ -61,36 +62,58 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
       if selectedScript then
 
-        for _, possibleDialogueScript in selectedScript:GetChildren() do
+        for _, folderName in {"Messages", "Responses", "Redirects"} do
           
-          if possibleDialogueScript:IsA("ModuleScript") then
+          local dialogueFolder = selectedScript:FindFirstChild(folderName);
+          if not dialogueFolder then
 
-            if possibleDialogueScript:HasTag("DialogueMakerDialogueScript") then
-            
-              local dialogueType = possibleDialogueScript:GetAttribute("DialogueType");
-              local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
-              table.insert(targetTable, possibleDialogueScript);
-              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
-              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
-            
-            else
-            
+            continue;
+
+          end;
+
+          for _, possibleDialogueScript in dialogueFolder:GetChildren() do
+
+            if not possibleDialogueScript:HasTag("DialogueMakerDialogueScript") then
+
               continue;
 
             end;
-
+            
+            local dialogueType = possibleDialogueScript:GetAttribute("DialogueType");
+            local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
+            table.insert(targetTable, possibleDialogueScript);
+            table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
+            table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
             table.insert(contentScriptConnections, possibleDialogueScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
 
-          end
+          end;
+
+          table.insert(contentScriptConnections, dialogueFolder.ChildAdded:Connect(refreshTable));
+          table.insert(contentScriptConnections, dialogueFolder.ChildRemoved:Connect(refreshTable));
           
         end;
+
+        table.insert(contentScriptConnections, selectedScript.ChildAdded:Connect(refreshTable));
+        table.insert(contentScriptConnections, selectedScript.ChildRemoved:Connect(refreshTable));
 
       else
         
         local selection = Selection:Get();
         if #selection == 1 then
 
-          for _, possibleConversationScript in selection[1]:GetChildren() do
+          local conversationsParent = if selection[1]:IsA("Folder") then selection[1] else selection[1]:FindFirstChild("Conversations");
+
+          if not conversationsParent then
+
+            table.insert(contentScriptConnections, selection[1].ChildAdded:Connect(refreshTable));
+            return;
+
+          end;
+
+          table.insert(contentScriptConnections, conversationsParent.ChildAdded:Connect(refreshTable));
+          table.insert(contentScriptConnections, conversationsParent.ChildRemoved:Connect(refreshTable));
+
+          for _, possibleConversationScript in conversationsParent:GetChildren() do
 
             if possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:HasTag("DialogueMakerConversationScript") then
               
@@ -125,20 +148,11 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     end;
     
-    local selection = Selection:Get();
-    if selection[1] then
+    refreshTable();
 
-      local childAddedEvent = selection[1].ChildAdded:Connect(refreshTable);
-      local childRemovedEvent = selection[1].ChildRemoved:Connect(refreshTable);
-      refreshTable();
+    return function()
 
-      return function()
-
-        cleanupConnections();
-        childAddedEvent:Disconnect();
-        childRemovedEvent:Disconnect();
-
-      end;
+      cleanupConnections();
 
     end;
 

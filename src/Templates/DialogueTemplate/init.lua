@@ -27,7 +27,7 @@ local properties = {
 local content = script:GetAttribute("DialogueContent");
 
 local children: {Dialogue} = {};
-local redirectValue = script:FindFirstChild("DialogueRedirectValue");
+local redirectValue = script:FindFirstChild("RedirectValue");
 
 if redirectValue and redirectValue:IsA("ObjectValue") and dialogueType == "Redirect" then
 
@@ -37,7 +37,7 @@ if redirectValue and redirectValue:IsA("ObjectValue") and dialogueType == "Redir
 
   end;
 
-  assert(redirectValue.Value:IsA("ModuleScript"), "DialogueRedirectValue must be a ModuleScript");
+  assert(redirectValue.Value:IsA("ModuleScript"), "RedirectValue must be a ModuleScript");
 
   local destinationDialogue = require(redirectValue.Value) :: Dialogue;
 

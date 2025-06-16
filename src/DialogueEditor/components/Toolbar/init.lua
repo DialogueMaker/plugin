@@ -43,9 +43,27 @@ local function Toolbar(props: ToolbarProps)
 
       historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
 
+      local parent = Selection:Get()[1];
+      if not parent:IsA("Folder") or parent.Name ~= "Conversations" then
+
+        local conversationsFolder = parent:FindFirstChild("Conversations");
+        if not conversationsFolder then
+
+          local newConversationsFolder = Instance.new("Folder");
+          newConversationsFolder.Name = "Conversations";
+          newConversationsFolder.Parent = parent;
+          conversationsFolder = newConversationsFolder;
+
+        end;
+
+        parent = conversationsFolder;
+
+      end;
+
       local newContentScript = root.Templates.ConversationTemplate:Clone();
+      newContentScript.Name = "Conversation";
       newContentScript:AddTag("DialogueMakerConversationScript");
-      newContentScript.Parent = Selection:Get()[1];
+      newContentScript.Parent = parent;
       
     elseif selectedScript then
 
@@ -76,7 +94,17 @@ local function Toolbar(props: ToolbarProps)
 
       end;
 
-      newContentScript.Parent = selectedScript;
+      local targetFolder = selectedScript:FindFirstChild(`{type}s`);
+      if not targetFolder then
+
+        local newTargetFolder = Instance.new("Folder");
+        newTargetFolder.Name = `{type}s`;
+        newTargetFolder.Parent = selectedScript;
+        targetFolder = newTargetFolder;
+
+      end;
+
+      newContentScript.Parent = targetFolder;
 
     end;
 
