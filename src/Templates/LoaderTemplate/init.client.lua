@@ -19,7 +19,7 @@ for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerC
 
   task.spawn(function()
 
-    while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoTrigger") do
+    while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoTriggerConversation") do
 
       -- Get the proximity prompt location from the script.
       local proximityPromptLocation = possibleConversationScript:FindFirstChild("ProximityPromptLocation");

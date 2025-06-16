@@ -13,6 +13,7 @@ local useDialogueContentScript = require(script.hooks.useDialogueContentScript);
 local DialogueTypeDropdown = require(script.components.DialogueTypeDropdown);
 local DialogueOptions = require(script.components.DialogueOptions);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+local AutoTriggerCheckbox = require(script.components.AutoTriggerCheckbox);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
@@ -72,16 +73,10 @@ local function Preview(properties: PreviewProperties)
         selectedScript = selectedScript;
         selectedDialogueType = dialogueScriptType;
       });
-      ShouldAutoTriggerCheckbox = if dialogueScriptType == "Conversation" then
-        React.createElement(Checkbox, {
-          text = "Auto-trigger";
-          isChecked = selectedScript:GetAttribute("ShouldAutoTrigger") == true;
+      ShouldAutoTriggerConversationCheckbox = if dialogueScriptType == "Conversation" then
+        React.createElement(AutoTriggerCheckbox, {
           layoutOrder = 2;
-          onChanged = function(isChecked: boolean)
-
-            selectedScript:SetAttribute("ShouldAutoTrigger", isChecked);
-
-          end;
+          selectedScript = selectedScript;
         })
       else nil;
       ShouldUseDynamicContent = if dialogueScriptType == "Message" or dialogueScriptType == "Response" then
