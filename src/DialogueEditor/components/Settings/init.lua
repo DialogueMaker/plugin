@@ -42,13 +42,15 @@ function Settings(properties: SettingsProperties)
 
   local metadataCollection = settingsMetadata[targetType];
   
-  local settingsContainer = React.useMemo(function()
+  local getSettingsContainer = React.useCallback(function()
 
     return settingsTarget:FindFirstChild("Settings");
 
   end, { settingsTarget });
 
   local getCurrentSettings = React.useCallback(function(): { [string]: {[string]: any} }
+
+    local settingsContainer = getSettingsContainer();
 
     if not settingsContainer then
 
@@ -80,7 +82,7 @@ function Settings(properties: SettingsProperties)
 
     return currentSettings;
 
-  end, { settingsContainer });
+  end, { getSettingsContainer });
 
   local currentSettings, setCurrentSettings = React.useState(getCurrentSettings());
 
@@ -96,7 +98,7 @@ function Settings(properties: SettingsProperties)
     end;
 
     local connections = {};
-
+    local settingsContainer = getSettingsContainer();
     if settingsContainer then
 
       table.insert(connections, settingsContainer.ChildAdded:Once(refreshCurrentSettings));
@@ -138,7 +140,7 @@ function Settings(properties: SettingsProperties)
 
     end;
 
-  end, {settingsContainer :: unknown, currentSettings, settingsTarget});
+  end, {getSettingsContainer :: unknown, currentSettings, settingsTarget});
 
   local settingGroups = {};
 
@@ -147,7 +149,7 @@ function Settings(properties: SettingsProperties)
     local settingGroup = React.createElement(SettingGroup, {
       name = groupName;
       items = categoryContent;
-      settingContainer = settingsContainer;
+      settingContainer = getSettingsContainer();
       currentSettings = currentSettings;
       settingsTarget = settingsTarget;
       key = groupName;
