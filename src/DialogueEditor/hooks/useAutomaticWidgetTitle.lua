@@ -11,7 +11,7 @@ local function useAutomaticWidgetTitle(pluginGUI: DockWidgetPluginGui, conversat
 
       local function updateTitle()
 
-        pluginGUI.Title = `Dialogue Editor • {conversationScript.Name}`;
+        pluginGUI.Title = `Dialogue Maker • {conversationScript.Name}`;
 
       end;
 
@@ -26,7 +26,7 @@ local function useAutomaticWidgetTitle(pluginGUI: DockWidgetPluginGui, conversat
 
     else
 
-      pluginGUI.Title = "Dialogue Editor";
+      pluginGUI.Title = "Dialogue Maker";
 
     end;
 

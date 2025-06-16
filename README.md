@@ -9,7 +9,7 @@ Run the show with the Dialogue Maker: an open-source plugin for creating RPG-lik
 
 ## Features
 ### Responsive dialogue editor
-The Dialogue Editor uses the power of Roblox Studio's Explorer to help you navigate dialogue trees. We let you create labels per dialogue item, which can help if you need to know which message is which before you open the script.
+The Dialogue Maker uses the power of Roblox Studio's Explorer to help you navigate dialogue trees. We let you create labels per dialogue item, which can help if you need to know which message is which before you open the script.
 
 ![alt text](image.png)
 

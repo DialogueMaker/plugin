@@ -5,7 +5,7 @@ export type IconDictionary = {
   message: string;
   response: string;
   redirect: string;
-  createDialogueButton: string;
+  logo: string;
   increasePriority: string;
   decreasePriority: string;
   check: string;
@@ -15,8 +15,8 @@ export type IconDictionary = {
 
 local icons: {[string]: IconDictionary} = {
   Dark = {
-    createDialogueButton = "rbxassetid://96115609800319";
-    conversation = "rbxassetid://14099768265";
+    logo = "rbxassetid://77494276227199";
+    conversation = "rbxassetid://77494276227199";
     message = "rbxassetid://14099768265";
     response = "rbxassetid://14099769224";
     redirect = "rbxassetid://14099768484";
@@ -27,8 +27,8 @@ local icons: {[string]: IconDictionary} = {
     close = "rbxassetid://129602911342076";
   };
   Light = {
-    createDialogueButton = "rbxassetid://105482129208897";
-    conversation = "rbxassetid://14099768265";
+    logo = "rbxassetid://98624626622893";
+    conversation = "rbxassetid://98624626622893";
     message = "rbxassetid://14099768265";
     response = "rbxassetid://14099769224";
     redirect = "rbxassetid://14099768484";

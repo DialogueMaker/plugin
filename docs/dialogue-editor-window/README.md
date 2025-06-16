@@ -1,13 +1,13 @@
-# Dialogue Editor
-You can use the **Dialogue Editor** to easily change dialogue priorities, initialize and label [`Conversation`](/src/DialogueClientScript/Classes/Conversation/README.md) objects, and change dialogue types.
+# Dialogue Maker
+You can use the **Dialogue Maker** to easily change dialogue priorities, initialize and label [`Conversation`](/src/DialogueClientScript/Classes/Conversation/README.md) objects, and change dialogue types.
 
 You can open it by pressing the [Create Conversation](/docs/toolbar/README.md#create-conversation) or [Edit Conversation](/docs/toolbar/README.md#edit-conversation) buttons on the plugin toolbar.
 
 The dialogue editor window automatically closes if the Explorer selection changes to an instance that isn't a ModuleScript and a descendant of a [`Conversation`](/src/DialogueClientScript/Classes/Conversation/README.md) ModuleScript. 
 
-![An example of the Dialogue Editor interface. The buttons shown are "View parent", "Add message", and "Adjust settings".](dialogue-editor-example.png)
+![An example of the Dialogue Maker interface. The buttons shown are "View parent", "Add message", and "Adjust settings".](dialogue-editor-example.png)
 
-## Why can't I edit text or settings in the Dialogue Editor?
+## Why can't I edit text or settings in the Dialogue Maker?
 Short reason: To protect you from malicious code. 
 
 Long reason: See [issue #98](https://github.com/DialogueMaker/plugin/issues/98).

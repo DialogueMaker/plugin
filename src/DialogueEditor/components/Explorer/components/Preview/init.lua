@@ -141,7 +141,7 @@ local function Preview(properties: PreviewProperties)
         layoutOrder = 3;
       }, {
         NotificationLabel = React.createElement(Paragraph, {
-          text = "For your safety, dynamic content cannot be previewed in the Dialogue Editor.";
+          text = "For your safety, dynamic content cannot be previewed in the Dialogue Maker.";
         });
         NotificationButton = React.createElement(Button, {
           text = "Open script editor";
