@@ -78,6 +78,7 @@ local function openDialogueEditor(): ()
   newPluginGUIRoot:render(React.createElement(DialogueEditor, {
     plugin = plugin;
     pluginGUI = newPluginGui;
+    closeDialogueEditor = closeDialogueEditor;
   }));
   pluginGUIRoot = newPluginGUIRoot;
 

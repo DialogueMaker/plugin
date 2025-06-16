@@ -7,18 +7,22 @@ local Explorer = require(script.components.Explorer);
 local Settings = require(script.components.Settings);
 local useDialogueMakerScriptSelection = require(script.hooks.useDialogueMakerScriptSelection);
 local useAutomaticWidgetTitle = require(script.hooks.useAutomaticWidgetTitle);
+local useAutomaticClose = require(script.hooks.useAutomaticClose);
 
 export type DialogueEditorProperties = {
   plugin: Plugin;
   pluginGUI: DockWidgetPluginGui;
+  closeDialogueEditor: () -> ();
 }
 
 local function DialogueEditor(props: DialogueEditorProperties)
 
   local selectedScript, conversationScript = useDialogueMakerScriptSelection();
   local settingsTarget, setSettingsTarget = React.useState(nil :: ModuleScript?);
+  local closeDialogueEditor = props.closeDialogueEditor;
 
   useAutomaticWidgetTitle(props.pluginGUI, conversationScript);
+  useAutomaticClose(closeDialogueEditor);
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 1, 0);
