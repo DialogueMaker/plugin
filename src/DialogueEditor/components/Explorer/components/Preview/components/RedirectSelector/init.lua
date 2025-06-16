@@ -29,7 +29,7 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
 
   end, {selectedScript});
 
-  local destinationScript, setDestinationScript = React.useState(getDestinationScript());
+  local destinationScript: ModuleScript?, setDestinationScript = React.useState(getDestinationScript());
 
   React.useEffect(function()
 
@@ -52,16 +52,23 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
   
   end, {selectedScript :: unknown, getDestinationScript});
 
+  local destinationDialogueType: string? = if destinationScript then destinationScript:GetAttribute("DialogueType") :: string? else nil;
+  if typeof(destinationDialogueType) ~= "string" then
+
+    destinationDialogueType = nil;
+
+  end;
+
   return React.createElement(ContentPreview, {
     layoutOrder = layoutOrder;
   }, {
     NotificationLabel = React.createElement(Paragraph, {
-      text = "The conversation should continue from the following dialogue:";
+      text = `The conversation should continue from the following {(destinationDialogueType or "dialogue"):lower()}:`;
       layoutOrder = 1;
     });
     NotificationButton = React.createElement(InstanceInput, {
       layoutOrder = 2;
-      value = destinationScript;
+      value = destinationScript :: Instance?;
       className = "ModuleScript";
       onChanged = function(instance)
 

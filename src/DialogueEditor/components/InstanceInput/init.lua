@@ -13,7 +13,7 @@ export type InstanceInputProperties = {
   onChanged: (value: Instance?) -> ();
 }
 
-local function InstanceInput(properties: InstanceInputProperties)
+local function InstanceInput<InstanceType>(properties: InstanceInputProperties)
 
   local onChanged = properties.onChanged;
 
