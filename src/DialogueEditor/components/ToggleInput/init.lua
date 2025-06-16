@@ -7,17 +7,19 @@ local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 export type ToggleInputProperties = {
   isEnabled: boolean;
   onChanged: (value: boolean) -> ();
+  layoutOrder: number;
 }
 
 local function ToggleInput(properties: ToggleInputProperties)
 
   local isEnabled = properties.isEnabled;
   local colors = useStudioColors();
+  local layoutOrder = properties.layoutOrder or 1;
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
     BackgroundTransparency = 1;
-    LayoutOrder = 2;
+    LayoutOrder = layoutOrder;
   }, {
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;

@@ -10,12 +10,14 @@ export type InstanceInputProperties = {
   value: Instance?;
   defaultValue: Instance?;
   className: string?;
+  layoutOrder: number;
   onChanged: (value: Instance?) -> ();
 }
 
 local function InstanceInput<InstanceType>(properties: InstanceInputProperties)
 
   local onChanged = properties.onChanged;
+  local layoutOrder = properties.layoutOrder or 1;
 
   local className = properties.className or "Instance";
   local isSelecting, setIsSelecting = React.useState(false);
@@ -61,7 +63,7 @@ local function InstanceInput<InstanceType>(properties: InstanceInputProperties)
   end, {isSelecting});
 
   return React.createElement(Button, {
-    layoutOrder = 2;
+    layoutOrder = layoutOrder;
     text = if isSelecting then `Selecting {className}...` else (if properties.value then properties.value.Name elseif properties.defaultValue then properties.defaultValue.Name else nil) or `Select {className}`;
     onClick = function()
     

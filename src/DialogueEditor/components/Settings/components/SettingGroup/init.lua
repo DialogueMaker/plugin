@@ -39,6 +39,43 @@ local function SettingGroup(properties: SettingsContainerProperties)
       placeholder = settingMetadata.defaultValue;
       type = settingMetadata.type;
       className = settingMetadata.className;
+      onReset = function()
+        
+        if not settingContainer then
+
+          return;
+
+        end;
+
+        local categoryFolder = settingContainer:FindFirstChild(groupName);
+        if not categoryFolder then
+          
+          return;
+
+        end;
+
+        local settingInstance = categoryFolder:FindFirstChild(settingName);
+        if not settingInstance then
+
+          return;
+
+        end;
+
+        settingInstance:Destroy();
+
+        if #categoryFolder:GetChildren() == 0 then
+          
+          categoryFolder:Destroy();
+
+        end;
+
+        if #settingContainer:GetChildren() == 0 then
+          
+          settingContainer:Destroy();
+
+        end;
+
+      end;
       onChanged = function(newValue)
 
         -- Create the settings folder if it doesn't exist.

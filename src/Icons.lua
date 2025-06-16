@@ -10,6 +10,7 @@ export type IconDictionary = {
   decreasePriority: string;
   check: string;
   link: string;
+  close: string;
 };
 
 local icons: {[string]: IconDictionary} = {
@@ -23,6 +24,7 @@ local icons: {[string]: IconDictionary} = {
     decreasePriority = "rbxassetid://94586875773370";
     check = "rbxassetid://124828915127251";
     link = "rbxassetid://139085883308962";
+    close = "rbxassetid://129602911342076";
   };
   Light = {
     createDialogueButton = "rbxassetid://105482129208897";
@@ -34,6 +36,7 @@ local icons: {[string]: IconDictionary} = {
     decreasePriority = "rbxassetid://94586875773370";
     check = "rbxassetid://124828915127251";
     link = "rbxassetid://139085883308962";
+    close = "rbxassetid://75787427205555";
   };
 };
 

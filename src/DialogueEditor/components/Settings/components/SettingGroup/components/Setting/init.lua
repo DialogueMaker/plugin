@@ -6,6 +6,7 @@ local React = require(packages.react);
 local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
 local ToggleInput = require(root.DialogueEditor.components.ToggleInput);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
 export type SettingProperties = {
   name: string;
@@ -15,12 +16,14 @@ export type SettingProperties = {
   value: any?;
   className: string?;
   onChanged: (value: any) -> ();
+  onReset: () -> ();
   layoutOrder: number;
 }
 
 local function Setting(properties: SettingProperties)
 
   local colors = useStudioColors();
+  local icons = useStudioIcons();
 
   local inputValue = React.useMemo(function(): React.ReactElement
     
@@ -30,6 +33,7 @@ local function Setting(properties: SettingProperties)
 
       return React.createElement(ToggleInput, {
         isEnabled = isEnabled;
+        layoutOrder = 1;
         onChanged = function(value: boolean): ()
         
           properties.onChanged(value);
@@ -44,7 +48,7 @@ local function Setting(properties: SettingProperties)
         PlaceholderText = properties.defaultValue;
         TextSize = 12;
         BackgroundTransparency = 0.5;
-        LayoutOrder = 2;
+        LayoutOrder = 1;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
         Size = UDim2.new(1, 0, 0, 30);
         [React.Event.FocusLost] = function(self: TextBox): ()
@@ -69,6 +73,7 @@ local function Setting(properties: SettingProperties)
 
       return React.createElement(InstanceInput, {
         value = properties.value;
+        layoutOrder = 1;
         defaultValue = properties.defaultValue;
         className = properties.className;
         onChanged = function(value: Instance?): ()
@@ -116,6 +121,7 @@ local function Setting(properties: SettingProperties)
       CornerRadius = UDim.new(0, 5);
     });
     Information = React.createElement("Frame", {
+      Size = UDim2.fromScale(1, 0);
       AutomaticSize = Enum.AutomaticSize.Y;
       LayoutOrder = 1;
       BackgroundTransparency = 1;
@@ -150,7 +156,32 @@ local function Setting(properties: SettingProperties)
         TextXAlignment = Enum.TextXAlignment.Left;
       }),
     });
-    InputValue = inputValue;
+    RightGroup = React.createElement("Frame", {
+      AutomaticSize = Enum.AutomaticSize.XY;
+      LayoutOrder = 2;
+      BackgroundTransparency = 1;
+    }, {
+      UIListLayout = React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        FillDirection = Enum.FillDirection.Horizontal;
+        VerticalAlignment = Enum.VerticalAlignment.Center;
+        HorizontalAlignment = Enum.HorizontalAlignment.Right;
+        Padding = UDim.new(0, 5);
+      });
+      InputValue = inputValue;
+      ResetButton = React.createElement("ImageButton", {
+        LayoutOrder = 2;
+        BackgroundTransparency = 1;
+        Size = UDim2.fromOffset(20, 20);
+        ImageTransparency = if properties.value == nil then 0.75 else 0;
+        Image = icons.close;
+        [React.Event.Activated] = function()
+
+          properties.onReset();
+
+        end;
+      });
+    })
   });
 
 end;
