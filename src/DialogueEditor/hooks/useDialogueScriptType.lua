@@ -3,8 +3,8 @@
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 
-type DialogueScriptType = "Conversation" | "Message" | "Response" | "Redirect";
-local function useDialogueScriptType(dialogueScript: ModuleScript?): DialogueScriptType?
+export type DialogueScriptType = "Conversation" | "Message" | "Response" | "Redirect";
+local function useDialogueScriptType(dialogueScript: ModuleScript?)
 
   local getType = React.useCallback(function(): DialogueScriptType?
 
@@ -28,7 +28,7 @@ local function useDialogueScriptType(dialogueScript: ModuleScript?): DialogueScr
 
   end, { dialogueScript });
 
-  local dialogueType, setDialogueType = React.useState(getType());
+  local dialogueType: DialogueScriptType?, setDialogueType = React.useState(getType());
 
   React.useEffect(function(): ()
 

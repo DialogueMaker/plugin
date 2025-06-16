@@ -19,22 +19,20 @@ local function InstanceInput(properties: InstanceInputProperties)
 
   local className = properties.className or "Instance";
   local isSelecting, setIsSelecting = React.useState(false);
-  local previousSelection, setPreviousSelection = React.useState(nil :: Instance?);
   
   React.useEffect(function(): ()
   
     if isSelecting then
 
-      setPreviousSelection(Selection:Get()[1]);
+      local previousSelection = Selection:Get()[1];
 
-      local selectionChangedConnection = Selection.SelectionChanged:Connect(function()
+      local selectionChangedConnection = Selection.SelectionChanged:Once(function()
         
         local selectedInstance = Selection:Get()[1];
 
         if previousSelection then
 
           Selection:Set({previousSelection});
-          setPreviousSelection(nil);
 
         end;
 
@@ -64,7 +62,7 @@ local function InstanceInput(properties: InstanceInputProperties)
 
   return React.createElement(Button, {
     layoutOrder = 2;
-    text = properties.value and properties.value.Name or properties.defaultValue and properties.defaultValue.Name or `Select{if isSelecting then "ing" else ""} {className}`;
+    text = if isSelecting then `Selecting {className}...` else (if properties.value then properties.value.Name elseif properties.defaultValue then properties.defaultValue.Name else nil) or `Select {className}`;
     onClick = function()
     
       setIsSelecting(not isSelecting);

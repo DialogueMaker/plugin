@@ -1,0 +1,96 @@
+--!strict
+
+local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
+local React = require(root.roblox_packages.react);
+local ContentPreview = require(script.Parent.ContentPreview);
+local Paragraph = require(root.DialogueEditor.components.Paragraph);
+local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
+
+export type RedirectSelectorProperties = {
+  selectedScript: ModuleScript;
+  layoutOrder: number;
+}
+
+local function RedirectSelector(properties: RedirectSelectorProperties)
+
+  local selectedScript = properties.selectedScript;
+  local layoutOrder = properties.layoutOrder;
+  
+  local getDestinationScript = React.useCallback(function(): ModuleScript?
+    
+    local destinationScript = selectedScript:FindFirstChild("DialogueRedirectValue");
+    if not destinationScript or not destinationScript:IsA("ObjectValue") or not destinationScript.Value or not destinationScript.Value:IsA("ModuleScript") then
+
+      return;
+
+    end
+
+    return destinationScript.Value;
+
+  end, {selectedScript});
+
+  local destinationScript, setDestinationScript = React.useState(getDestinationScript());
+
+  React.useEffect(function()
+
+    local function refreshDestinationScript()
+
+      setDestinationScript(getDestinationScript());
+    
+    end;
+
+    refreshDestinationScript();
+    local childAddedConnection = selectedScript.ChildAdded:Connect(refreshDestinationScript);
+    local childRemovedConnection = selectedScript.ChildRemoved:Connect(refreshDestinationScript);
+
+    return function()
+      
+      childAddedConnection:Disconnect();
+      childRemovedConnection:Disconnect();
+   
+    end;
+  
+  end, {selectedScript :: unknown, getDestinationScript});
+
+  return React.createElement(ContentPreview, {
+    layoutOrder = layoutOrder;
+  }, {
+    NotificationLabel = React.createElement(Paragraph, {
+      text = "The conversation should continue from the following dialogue:";
+      layoutOrder = 1;
+    });
+    NotificationButton = React.createElement(InstanceInput, {
+      layoutOrder = 2;
+      value = destinationScript;
+      className = "ModuleScript";
+      onChanged = function(instance)
+
+        if instance and not instance:HasTag("DialogueMakerDialogueScript") then
+
+          return;
+
+        end;
+
+        local destinationScriptValue = selectedScript:FindFirstChild("DialogueRedirectValue");
+        if not destinationScriptValue then
+
+          local newDestinationScriptValue = Instance.new("ObjectValue");
+          newDestinationScriptValue:AddTag("DialogueRedirectValue");
+          newDestinationScriptValue.Name = "DialogueRedirectValue";
+          newDestinationScriptValue.Parent = selectedScript;
+          destinationScriptValue = newDestinationScriptValue;
+
+        end;
+
+        assert(destinationScriptValue and destinationScriptValue:IsA("ObjectValue"), "Expected DialogueRedirectValue to be an ObjectValue");
+
+        destinationScriptValue.Value = instance;
+        setDestinationScript(getDestinationScript());
+
+      end;
+    });
+  });
+
+end;
+
+return React.memo(RedirectSelector);

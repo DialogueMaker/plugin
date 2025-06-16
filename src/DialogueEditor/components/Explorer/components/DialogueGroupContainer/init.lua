@@ -23,7 +23,6 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   local layoutOrder = props.layoutOrder;
   local selectedScript = props.selectedScript;
   local setSettingsTarget = props.setSettingsTarget;
-
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
 
   local conversations, setConversations = React.useState({} :: {ModuleScript});

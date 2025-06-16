@@ -5,6 +5,9 @@ local React = require(root.roblox_packages.react);
 local DialogueGroupContainer = require(script.components.DialogueGroupContainer);
 local Preview = require(script.components.Preview);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+
+type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
 export type DialogueTableProperties = {
   selectedScript: ModuleScript?;
@@ -20,6 +23,7 @@ local function Explorer(props: DialogueTableProperties)
   local setSettingsTarget = props.setSettingsTarget;
   local layoutOrder = props.layoutOrder;
   local colors = useStudioColors();
+  local dialogueScriptType: DialogueScriptType? = useDialogueScriptType(selectedScript) :: DialogueScriptType?;
 
   return React.createElement("ScrollingFrame", {
     Size = UDim2.fromScale(1, 1);
@@ -48,15 +52,18 @@ local function Explorer(props: DialogueTableProperties)
       React.createElement(Preview, {
         layoutOrder = 1;
         selectedScript = selectedScript;
+        dialogueScriptType = dialogueScriptType;
         plugin = plugin;
       })
     else nil;
-    DialogueGroupContainer = React.createElement(DialogueGroupContainer, {
-      selectedScript = selectedScript;
-      layoutOrder = 2;
-      plugin = plugin;
-      setSettingsTarget = setSettingsTarget;
-    });
+    DialogueGroupContainer = if dialogueScriptType ~= "Redirect" then
+      React.createElement(DialogueGroupContainer, {
+        selectedScript = selectedScript;
+        layoutOrder = 2;
+        plugin = plugin;
+        setSettingsTarget = setSettingsTarget;
+      })
+    else nil;
   })
 
 end;

@@ -1,18 +1,23 @@
 --!strict
 
-local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Button = require(root.DialogueEditor.components.Button);
 local Checkbox = require(root.DialogueEditor.components.Checkbox);
-local Dropdown = require(root.DialogueEditor.components.Dropdown);
-local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
+local ContentPreview = require(script.components.ContentPreview);
+local Paragraph = require(root.DialogueEditor.components.Paragraph);
+local RedirectSelector = require(script.components.RedirectSelector);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
-local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 local useDialogueContentScript = require(script.hooks.useDialogueContentScript);
+local DialogueTypeDropdown = require(script.components.DialogueTypeDropdown);
+local DialogueOptions = require(script.components.DialogueOptions);
+local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+
+type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
 export type PreviewProperties = {
+  dialogueScriptType: DialogueScriptType?;
   selectedScript: ModuleScript;
   layoutOrder: number;
   plugin: Plugin;
@@ -24,163 +29,8 @@ local function Preview(properties: PreviewProperties)
   local layoutOrder = properties.layoutOrder;
   local plugin = properties.plugin;
   local colors = useStudioColors();
-  local icons = useStudioIcons();
   local dialogueContentScript, isDialogueContentScriptEnabled = useDialogueContentScript(selectedScript);
-
-  local selectedDialogueType: string?, setSelectedDialogueType = React.useState(
-    if selectedScript then 
-      (selectedScript:GetAttribute("DialogueType") :: string?) or (
-        if selectedScript:HasTag("DialogueMakerConversationScript") then "Conversation" else nil
-      )
-    else nil
-  );
-  React.useEffect(function(): ()
-  
-    local function refreshDialogueType()
-
-      setSelectedDialogueType(
-        if selectedScript then 
-          (selectedScript:GetAttribute("DialogueType") :: string?) or (
-            if selectedScript:HasTag("DialogueMakerConversationScript") then "Conversation" else nil
-          )
-        else nil
-      );
-
-    end;
-
-    refreshDialogueType();
-
-    local dialogueTypeChangedConnection = selectedScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshDialogueType);
-
-    return function()
-
-      dialogueTypeChangedConnection:Disconnect();
-
-    end;
-
-  end, {selectedScript});
-
-  local dropdownOptions = {};
-  local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
-  if selectedDialogueType ~= "Conversation" then
-
-    local dialogueTypes = {"Message", "Response", "Redirect"};
-    for index, dialogueType in dialogueTypes do
-
-      local option = React.createElement(DropdownOption, {
-        key = dialogueType;
-        text = dialogueType;
-        layoutOrder = index;
-        iconImage = icons[`{dialogueType:sub(1, 1):upper()}{dialogueType:sub(2)}`];
-        onClick = function()
-
-          selectedScript:SetAttribute("DialogueType", dialogueType);
-          setIsDialogueTypeDropdownOpen(false);
-
-        end;
-      });
-
-      table.insert(dropdownOptions, option);
-
-    end;
-
-  end;
-
-  local dialogueOptions: {React.ReactNode} = {};
-  local isActionsDropdownOpen, setIsActionsDropdownOpen = React.useState(false);
-  if selectedDialogueType ~= "Conversation" then
-
-    local conditionButton = React.createElement(Button, {
-      key = "ConditionButton";
-      text = "Edit condition";
-      layoutOrder = #dialogueOptions + 1;
-      onClick = function()
-
-        local conditionScript = selectedScript:FindFirstChild("ConditionScript");
-        if not conditionScript then
-
-          local newConditionScript = root.Templates.DialogueConditionScriptTemplate:Clone();
-          newConditionScript.Name = "ConditionScript";
-          newConditionScript.Parent = selectedScript;
-          conditionScript = newConditionScript;
-
-        end;
-
-        assert(conditionScript and conditionScript:IsA("ModuleScript"), `Condition script not found for {selectedScript:GetFullName()}.`);
-
-        plugin:OpenScript(conditionScript);
-
-      end;
-    });
-
-    table.insert(dialogueOptions, conditionButton);
-
-    local actionsDropdownOptions = {};
-    local actionTypes = {"Initialization", "Completion", "Cleanup"};
-    for index, actionType in actionTypes do
-
-      -- Redirects only have initialization actions.
-      if selectedDialogueType == "Redirect" and actionType ~= "Initialization" then
-
-        continue; 
-      
-      end;
-
-      local option = React.createElement(DropdownOption, {
-        key = actionType :: string;
-        text = actionType :: string;
-        layoutOrder = index;
-        onClick = function()
-
-          -- Make sure the script is there.
-          local actionScript = selectedScript:FindFirstChild(`{actionType}ActionScript`);
-          if not actionScript then
-
-            local newActionScript = root.Templates:FindFirstChild(`Dialogue{actionType}ActionScriptTemplate`):Clone();
-            newActionScript.Name = `{actionType}ActionScript`;
-            newActionScript.Parent = selectedScript;
-            actionScript = newActionScript;
-
-          end;
-
-          assert(actionScript and actionScript:IsA("ModuleScript"), `{actionType} action script not found for {selectedScript:GetFullName()}.`);
-
-          plugin:OpenScript(actionScript);
-
-        end;
-      });
-
-      table.insert(actionsDropdownOptions, option);
-
-    end;
-
-    local actionsDropdown = React.createElement(Dropdown, {
-      layoutOrder = #dialogueOptions + 1;
-      key = "ActionsDropdown";
-      text = "Edit actions";
-      size = UDim2.fromOffset(125, 30);
-      isOpen = isActionsDropdownOpen;
-      setIsOpen = setIsActionsDropdownOpen;
-    }, actionsDropdownOptions);
-
-    table.insert(dialogueOptions, actionsDropdown);
-
-  end;
-
-  local deleteButton = React.createElement(Button, {
-    key = "DeleteButton";
-    text = "Delete";
-    backgroundColor = colors.backgroundWarning;
-    layoutOrder = #dialogueOptions + 1;
-    onClick = function()
-
-      Selection:Set({selectedScript.Parent});
-      selectedScript:Destroy();
-
-    end;
-  });
-
-  table.insert(dialogueOptions, deleteButton);
+  local dialogueScriptType: DialogueScriptType? = properties.dialogueScriptType :: DialogueScriptType?;
 
   return React.createElement("Frame", {
     BackgroundColor3 = colors.toolbar;
@@ -217,16 +67,12 @@ local function Preview(properties: PreviewProperties)
         Padding = UDim.new(0, 15);
         Wraps = true;
       });
-      DialogueTypeDropdown = React.createElement(Dropdown, {
-        iconImage = if selectedDialogueType then icons[`{selectedDialogueType:sub(1, 1):lower()}{selectedDialogueType:sub(2)}`] else icons.conversation;
-        text = selectedDialogueType or "Conversation";
-        isDisabled = not selectedDialogueType or selectedDialogueType == "Conversation";
-        size = UDim2.fromOffset(150, 30);
+      DialogueTypeDropdown = React.createElement(DialogueTypeDropdown, {
         layoutOrder = 1;
-        isOpen = isDialogueTypeDropdownOpen;
-        setIsOpen = setIsDialogueTypeDropdownOpen;
-      }, dropdownOptions);
-      ShouldAutoTriggerCheckbox = if selectedDialogueType == "Conversation" then
+        selectedScript = selectedScript;
+        selectedDialogueType = dialogueScriptType;
+      });
+      ShouldAutoTriggerCheckbox = if dialogueScriptType == "Conversation" then
         React.createElement(Checkbox, {
           text = "Auto-trigger";
           isChecked = selectedScript:GetAttribute("ShouldAutoTrigger") == true;
@@ -238,7 +84,7 @@ local function Preview(properties: PreviewProperties)
           end;
         })
       else nil;
-      ShouldUseDynamicContent = if selectedDialogueType == "Message" or selectedDialogueType == "Response" then
+      ShouldUseDynamicContent = if dialogueScriptType == "Message" or dialogueScriptType == "Response" then
         React.createElement(Checkbox, {
           text = "Dynamic content";
           isChecked = isDialogueContentScriptEnabled;
@@ -262,7 +108,7 @@ local function Preview(properties: PreviewProperties)
         })
       else nil;
     });
-    DialogueContentBox = if not isDialogueContentScriptEnabled and selectedDialogueType == "Message" or selectedDialogueType == "Response" then
+    DialogueContentBox = if not isDialogueContentScriptEnabled and dialogueScriptType == "Message" or dialogueScriptType == "Response" then
       React.createElement("TextBox", {
         Text = selectedScript:GetAttribute("DialogueContent") or "";
         PlaceholderText = "Enter dialogue content here. For variables and effects, use dynamic content.";
@@ -295,44 +141,14 @@ local function Preview(properties: PreviewProperties)
         });
       })
     else nil;
-    DynamicContentNotification = if (selectedDialogueType == "Message" or selectedDialogueType == "Response") and dialogueContentScript and isDialogueContentScriptEnabled then
-      React.createElement("Frame", {
-        BackgroundTransparency = 1;
-        LayoutOrder = 3;
-        Size = UDim2.new(1, 0, 0, 100);
+    DynamicContentGuide = if (dialogueScriptType == "Message" or dialogueScriptType == "Response") and dialogueContentScript and isDialogueContentScriptEnabled then
+      React.createElement(ContentPreview, {
+        layoutOrder = 3;
       }, {
-        UICorner = React.createElement("UICorner", {
-          CornerRadius = UDim.new(0, 5);
-        });
-        UIStroke = React.createElement("UIStroke", {
-          Color = colors.border;
-          Thickness = 1;
-          ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
-        });
-        UIListLayout = React.createElement("UIListLayout", {
-          SortOrder = Enum.SortOrder.LayoutOrder;
-          VerticalAlignment = Enum.VerticalAlignment.Center;
-          HorizontalAlignment = Enum.HorizontalAlignment.Center;
-          Padding = UDim.new(0, 10);
-        });
-        UIPadding = React.createElement("UIPadding", {
-          PaddingTop = UDim.new(0, 15);
-          PaddingBottom = UDim.new(0, 15);
-          PaddingLeft = UDim.new(0, 15);
-          PaddingRight = UDim.new(0, 15);
-        });
-        NotificationLabel = React.createElement("TextLabel", {
-          AutomaticSize = Enum.AutomaticSize.XY;
-          Text = "For your safety, dynamic content cannot be previewed in the Dialogue Editor.";
-          TextColor3 = colors.text;
-          TextWrapped = true;
-          FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
-          TextSize = 14;
-          BackgroundTransparency = 1;
-          LayoutOrder = 1;
+        NotificationLabel = React.createElement(Paragraph, {
+          text = "For your safety, dynamic content cannot be previewed in the Dialogue Editor.";
         });
         NotificationButton = React.createElement(Button, {
-          AutomaticSize = Enum.AutomaticSize.XY;
           text = "Open script editor";
           layoutOrder = 2;
           onClick = function()
@@ -343,22 +159,18 @@ local function Preview(properties: PreviewProperties)
         });
       })
     else nil;
-    Options = if #dialogueOptions > 0 then
-      React.createElement("Frame", {
-        BackgroundTransparency = 1;
-        LayoutOrder = 4;
-        Size = UDim2.fromScale(1, 0);
-        AutomaticSize = Enum.AutomaticSize.Y;
-      }, {
-        UIListLayout = React.createElement("UIListLayout", {
-          SortOrder = Enum.SortOrder.LayoutOrder;
-          FillDirection = Enum.FillDirection.Horizontal;
-          Padding = UDim.new(0, 10);
-          Wraps = true;
-        });
-        DialogueOptions = React.createElement(React.Fragment, {}, dialogueOptions);
+    RedirectSelector = if dialogueScriptType == "Redirect" then
+      React.createElement(RedirectSelector, {
+        selectedScript = selectedScript;
+        layoutOrder = 3;
       })
     else nil;
+    Options = React.createElement(DialogueOptions, {
+      layoutOrder = 4;
+      selectedScript = selectedScript;
+      plugin = plugin;
+      selectedDialogueType = dialogueScriptType;
+    });
   });
 
 end;

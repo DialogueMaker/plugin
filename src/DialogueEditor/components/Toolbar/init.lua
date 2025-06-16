@@ -180,19 +180,6 @@ local function Toolbar(props: ToolbarProps)
         end;
       })
     else nil;
-    LinkDialogueButton = if dialogueScriptType == "Redirect" then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.link;
-        text = "Link dialogue";
-        layoutOrder = 7;
-        isDisabled = settingsTarget ~= nil or not selectedScript;
-        onClick = function()
-
-          
-
-        end;
-      })
-    else nil;
   });
 
 end;
