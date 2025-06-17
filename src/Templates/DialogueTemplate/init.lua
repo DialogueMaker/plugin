@@ -45,9 +45,12 @@ if redirectValue and redirectValue:IsA("ObjectValue") and dialogueType == "Redir
 
 else
   
-  local messages = script:FindFirstChild("Messages");
-  local responses = script:FindFirstChild("Responses");
-  local redirects = script:FindFirstChild("Redirects");
+  local messagesFolder = script:FindFirstChild("Messages");
+  local responsesFolder = script:FindFirstChild("Responses");
+  local redirectsFolder = script:FindFirstChild("Redirects");
+  local messages = if messagesFolder then messagesFolder:GetChildren() else {};
+  local responses = if responsesFolder then responsesFolder:GetChildren() else {};
+  local redirects = if redirectsFolder then redirectsFolder:GetChildren() else {};
 
   local function sortByPriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
         
@@ -62,7 +65,7 @@ else
   table.sort(responses, sortByPriority);
   table.sort(redirects, sortByPriority);
 
-  for _, folder in {redirects, responses, messages} do
+  for _, folder in {redirectsFolder, responsesFolder, messagesFolder} do
 
     for _, childInstance in folder:GetChildren() do
 

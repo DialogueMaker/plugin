@@ -15,48 +15,94 @@ local DialogueMakerTypes = require(packages.DialogueMakerTypes);
 
 type Conversation = DialogueMakerTypes.Conversation;
 
-for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerConversationScript") do
+local triggerTasks: {thread} = {};
 
-  task.spawn(function()
+local function refreshTriggers()
 
-    while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoTriggerConversation") do
+  for _, triggerTask in triggerTasks do
 
-      -- Get the proximity prompt location from the script.
-      local proximityPromptLocation = possibleConversationScript:FindFirstChild("ProximityPromptLocation");
-      local proximityPrompt: ProximityPrompt;
-      if proximityPromptLocation and proximityPromptLocation:IsA("ObjectValue") then
+    if coroutine.status(triggerTask) == "running" then
 
-        proximityPrompt = proximityPromptLocation.Value;
+      task.cancel(triggerTask);
 
-      end;
+    end;
 
-      assert(proximityPrompt and proximityPrompt:IsA("ProximityPrompt"), "");
+  end;
 
-      -- Disable the prompt to prevent multiple triggers after the proximity prompt is triggered.
-      proximityPrompt.Triggered:Wait();
-      
-      local oldProximityPromptState = proximityPrompt.Enabled;
-      proximityPrompt.Enabled = false; 
+  triggerTasks = {};
 
-      -- Load the conversation.
-      local conversation = require(possibleConversationScript) :: Conversation;
-      local client = Client.new({
-        dialogue = conversation:getNextVerifiedDialogue();
-        -- START SETTINGS REPLACEMENT
-        settings = {
-          theme = {
-            component = require(packages.StandardTheme);
+  for _, possibleConversationScript in CollectionService:GetTagged("DialogueMakerConversationScript") do
+
+    local triggerTask = task.spawn(function()
+
+      while possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:GetAttribute("ShouldAutoTriggerConversation") do
+
+        -- Get the proximity prompt location from the script.
+        local proximityPromptLocation = possibleConversationScript:FindFirstChild("ProximityPromptLocation");
+        local proximityPrompt: ProximityPrompt?;
+        if proximityPromptLocation and proximityPromptLocation:IsA("ObjectValue") then
+
+          proximityPrompt = proximityPromptLocation.Value;
+
+        end;
+        
+        if not proximityPrompt then
+
+          local parent = possibleConversationScript;
+          repeat
+            
+            parent = parent.Parent;
+          
+          until not parent or (parent:IsA("Model") and parent.PrimaryPart) or parent:IsA("BasePart");
+
+          assert(parent, "No valid parent found for proximity prompt in conversation script: " .. possibleConversationScript.Name);
+
+          local newProximityPrompt = Instance.new("ProximityPrompt");
+          newProximityPrompt.Parent = parent;
+          proximityPrompt = newProximityPrompt;
+
+          local newProximityPromptLocation = Instance.new("ObjectValue");
+          newProximityPromptLocation.Name = "ProximityPromptLocation";
+          newProximityPromptLocation.Value = proximityPrompt;
+          newProximityPromptLocation.Parent = possibleConversationScript;
+
+        end;
+
+        assert(proximityPrompt, `No proximity prompt found at {possibleConversationScript:GetFullName()}.`);
+
+        -- Disable the prompt to prevent multiple triggers after the proximity prompt is triggered.
+        proximityPrompt.Triggered:Wait();
+        
+        local oldProximityPromptState = proximityPrompt.Enabled;
+        proximityPrompt.Enabled = false; 
+
+        -- Load the conversation.
+        local conversation = require(possibleConversationScript) :: Conversation;
+        local client = Client.new({
+          dialogue = conversation:getNextVerifiedDialogue();
+          -- START SETTINGS REPLACEMENT
+          settings = {
+            theme = {
+              component = require(packages.StandardTheme);
+            };
           };
-        };
-        -- END SETTINGS REPLACEMENT
-      });
+          -- END SETTINGS REPLACEMENT
+        });
 
-      client.dialogueGUI.Destroying:Wait();
-      
-      proximityPrompt.Enabled = oldProximityPromptState;
+        client.dialogueGUI.Destroying:Wait();
+        
+        proximityPrompt.Enabled = oldProximityPromptState;
 
-    end
+      end
 
-  end);
+    end);
 
-end
+    table.insert(triggerTasks, triggerTask);
+
+  end
+
+end;
+
+CollectionService:GetInstanceAddedSignal("DialogueMakerConversationScript"):Connect(refreshTriggers);
+CollectionService:GetInstanceRemovedSignal("DialogueMakerConversationScript"):Connect(refreshTriggers);
+refreshTriggers();
