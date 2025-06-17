@@ -32,6 +32,7 @@ local function useDialogueScriptType(dialogueScript: ModuleScript?)
 
   React.useEffect(function(): ()
 
+    setDialogueType(getType());
     if not dialogueScript then
 
       return;
@@ -43,8 +44,6 @@ local function useDialogueScriptType(dialogueScript: ModuleScript?)
       setDialogueType(getType());
       
     end);
-  
-    setDialogueType(getType());
 
     return function()
     

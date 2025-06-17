@@ -57,7 +57,7 @@ local function useDialogueMakerScriptSelection()
         setConversationScript(conversationScript);
         setSelectedScript(selectedScript);
 
-      elseif #selection == 0 then
+      else
 
         setConversationScript(nil);
         setSelectedScript(nil);

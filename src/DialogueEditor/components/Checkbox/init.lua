@@ -37,7 +37,7 @@ local function Checkbox(properties: CheckboxProperties)
     });
     Checkbox = React.createElement("TextButton", {
       Size = UDim2.fromOffset(20, 20);
-      BackgroundColor3 = if isChecked then Color3.new(0.2, 0.6, 0.2) else Color3.new(0.4, 0.4, 0.4);
+      BackgroundColor3 = if isChecked then colors.primaryButton else Color3.new(0.4, 0.4, 0.4);
       BackgroundTransparency = if isDisabled then 0.5 else 0;
       LayoutOrder = 1;
       Text = "";

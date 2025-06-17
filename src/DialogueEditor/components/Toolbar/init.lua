@@ -138,7 +138,8 @@ local function Toolbar(props: ToolbarProps)
 
       end;
     });
-    SettingsButton = React.createElement(ToolbarButton, {
+    SettingsButton = if dialogueScriptType then
+      React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14099277263";
       text = if settingsTarget == nil then "Settings" else "Close settings";
       layoutOrder = 2;
@@ -148,14 +149,15 @@ local function Toolbar(props: ToolbarProps)
 
           setSettingsTarget(nil);
 
-        elseif selectedScript then
+        else
 
           setSettingsTarget(selectedScript);
 
         end;
 
       end;
-    });
+      })
+    else nil;
     AddConversationButton = if not selectedScript then
       React.createElement(ToolbarButton, {
         iconImage = "rbxassetid://14099284898";
