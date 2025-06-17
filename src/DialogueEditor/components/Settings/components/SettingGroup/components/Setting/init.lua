@@ -5,6 +5,7 @@ local packages = root.roblox_packages;
 local React = require(packages.react);
 local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
 local ToggleInput = require(root.DialogueEditor.components.ToggleInput);
+local TextInput = require(root.DialogueEditor.components.TextInput);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
@@ -43,31 +44,15 @@ local function Setting(properties: SettingProperties)
 
     elseif properties.type == "string" or properties.type == "number" then
 
-      return React.createElement("TextBox", {
-        Text = properties.value or "";
-        PlaceholderText = properties.defaultValue;
-        TextSize = 12;
-        BackgroundTransparency = 0.5;
-        LayoutOrder = 1;
-        FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
-        Size = UDim2.new(1, 0, 0, 30);
-        BackgroundColor3 = colors.input;
-        [React.Event.FocusLost] = function(self: TextBox): ()
+      return React.createElement(TextInput, {
+        value = properties.value;
+        placeholder = properties.defaultValue;
+        layoutOrder = 1;
+        onChanged = function(value: string): ()
         
-          properties.onChanged(self.Text);
+          properties.onChanged(if value == "" then nil elseif properties.type == "number" then tonumber(value) else value);
 
         end;
-      }, {
-        UIPadding = React.createElement("UIPadding", {
-          PaddingLeft = UDim.new(0, 10);
-          PaddingRight = UDim.new(0, 10);
-        });
-        UICorner = React.createElement("UICorner", {
-          CornerRadius = UDim.new(0, 5);
-        });
-        UISizeConstraint = React.createElement("UISizeConstraint", {
-          MaxSize = Vector2.new(100, math.huge);
-        });
       });
 
     elseif properties.type == "Instance" then

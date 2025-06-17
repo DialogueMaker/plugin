@@ -126,6 +126,10 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
               newSettingInstance = Instance.new("NumberValue");
 
+            elseif settingMetadata.type == "string" then
+
+              newSettingInstance = Instance.new("StringValue");
+
             elseif settingMetadata.className then
 
               newSettingInstance = Instance.new("ObjectValue");
@@ -160,10 +164,9 @@ local function SettingGroup(properties: SettingsContainerProperties)
             assert(typeof(newValue) == "boolean", "Expected newValue to be a boolean.");
             settingInstance.Value = newValue;
             
-          elseif settingInstance:IsA("IntValue") then
+          elseif settingInstance:IsA("StringValue") then
 
-            assert(typeof(newValue) == "number", "Expected newValue to be a number.");
-            assert(math.floor(newValue) == newValue, "Expected newValue to be an integer.");
+            assert(typeof(newValue) == "string", "Expected newValue to be a string.");
             settingInstance.Value = newValue;
 
           elseif settingInstance:IsA("NumberValue") then

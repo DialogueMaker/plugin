@@ -64,7 +64,7 @@ local function StaticContentEditor(properties: StaticContentEditorProperties)
     FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
     TextXAlignment = Enum.TextXAlignment.Left;
     TextYAlignment = Enum.TextYAlignment.Top;
-    [React.Change.Text] = function(self: TextBox)
+    [React.Event.FocusLost] = function(self: TextBox)
 
       local historyIdentifier = beginHistoryRecording("Set static dialogue content");
 
