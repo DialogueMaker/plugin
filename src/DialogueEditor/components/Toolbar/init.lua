@@ -124,8 +124,8 @@ local function Toolbar(props: ToolbarProps)
       VerticalAlignment = Enum.VerticalAlignment.Center;
     });
     UIPadding = React.createElement("UIPadding", {
-      PaddingLeft = UDim.new(0, 10);
-      PaddingRight = UDim.new(0, 10);
+      PaddingLeft = UDim.new(0, 15);
+      PaddingRight = UDim.new(0, 15);
       PaddingBottom = UDim.new(0, 5);
     });
     ViewParentButton = React.createElement(ToolbarButton, {

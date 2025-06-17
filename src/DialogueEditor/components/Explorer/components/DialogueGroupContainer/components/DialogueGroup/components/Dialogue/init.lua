@@ -94,42 +94,46 @@ local function DialogueItem(props: DialogueItemProperties)
       FillDirection = Enum.FillDirection.Horizontal;
       VerticalAlignment = Enum.VerticalAlignment.Center;
     });
-    IncreasePriorityButton = React.createElement("ImageButton", {
-      BackgroundTransparency = 1;
-      Size = UDim2.fromOffset(20, 20);
-      Image = icons.increasePriority;
-      ImageTransparency = if layoutOrder <= 1 then 0.5 else 0;
-      LayoutOrder = 1;
-      [React.Event.Activated] = function()
-        
-        if layoutOrder <= 1 then
+    IncreasePriorityButton = if dialogueType ~= "Conversation" then
+      React.createElement("ImageButton", {
+        BackgroundTransparency = 1;
+        Size = UDim2.fromOffset(20, 20);
+        Image = icons.increasePriority;
+        ImageTransparency = if layoutOrder <= 1 then 0.5 else 0;
+        LayoutOrder = 1;
+        [React.Event.Activated] = function()
           
-          return;
+          if layoutOrder <= 1 then
+            
+            return;
+
+          end;
+
+          incrementPriority(-1);
 
         end;
-
-        incrementPriority(-1);
-
-      end;
-    });
-    DecreasePriorityButton = React.createElement("ImageButton", {
-      BackgroundTransparency = 1;
-      Size = UDim2.fromOffset(20, 20);
-      Image = icons.decreasePriority;
-      ImageTransparency = if layoutOrder >= dialogueScriptCount then 0.5 else 0;
-      LayoutOrder = 2;
-      [React.Event.Activated] = function()
-        
-        if layoutOrder >= dialogueScriptCount then
+      })
+    else nil;
+    DecreasePriorityButton = if dialogueType ~= "Conversation" then
+      React.createElement("ImageButton", {
+        BackgroundTransparency = 1;
+        Size = UDim2.fromOffset(20, 20);
+        Image = icons.decreasePriority;
+        ImageTransparency = if layoutOrder >= dialogueScriptCount then 0.5 else 0;
+        LayoutOrder = 2;
+        [React.Event.Activated] = function()
           
-          return;
+          if layoutOrder >= dialogueScriptCount then
+            
+            return;
+
+          end;
+
+          incrementPriority(1);
 
         end;
-
-        incrementPriority(1);
-
-      end;
-    });
+      })
+    else nil;
     ViewButton = React.createElement("TextButton", {
       BackgroundColor3 = colors.toolbar;
       BorderSizePixel = 0;

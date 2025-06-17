@@ -181,29 +181,41 @@ function Settings(properties: SettingsProperties)
     BorderSizePixel = 0;
     ScrollBarImageColor3 = colors.border;
   }, {
-    UIPadding = React.createElement("UIPadding", {
-      PaddingLeft = UDim.new(0, 15);
-      PaddingRight = UDim.new(0, 15);
-      PaddingTop = UDim.new(0, 15);
-      PaddingBottom = UDim.new(0, 15);
-    });
     UIListLayout = React.createElement("UIListLayout", {
-      SortOrder = Enum.SortOrder.LayoutOrder;
-      Padding = UDim.new(0, 10);
+      HorizontalAlignment = Enum.HorizontalAlignment.Center;
     });
     UIFlexItem = React.createElement("UIFlexItem", {
       FlexMode = Enum.UIFlexMode.Shrink;
     });
-    SettingsTabSelector = React.createElement(SettingsTabSelector, {
-      settingsTarget = settingsTarget;
-      initialSettingsTarget = properties.initialSettingsTarget;
-      onSelectionChanged = function(newTarget: ModuleScript)
+    Content = React.createElement("Frame", {
+      Size = UDim2.fromScale(1, 1);
+      AutomaticSize = Enum.AutomaticSize.Y;
+      BackgroundTransparency = 1;
+    }, {
+      UISizeConstraint = React.createElement("UISizeConstraint", {
+        MaxSize = Vector2.new(750, math.huge);
+      });
+      UIPadding = React.createElement("UIPadding", {
+        PaddingLeft = UDim.new(0, 15);
+        PaddingRight = UDim.new(0, 15);
+        PaddingTop = UDim.new(0, 15);
+        PaddingBottom = UDim.new(0, 15);
+      });
+      UIListLayout = React.createElement("UIListLayout", {
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        Padding = UDim.new(0, 10);
+      });
+      SettingsTabSelector = React.createElement(SettingsTabSelector, {
+        settingsTarget = settingsTarget;
+        initialSettingsTarget = properties.initialSettingsTarget;
+        onSelectionChanged = function(newTarget: ModuleScript)
 
-        setSettingsTarget(newTarget);
+          setSettingsTarget(newTarget);
 
-      end;
+        end;
+      });
+      Settings = React.createElement(React.Fragment, {}, settingGroups);
     });
-    Settings = React.createElement(React.Fragment, {}, settingGroups);
   });
 
 end;
