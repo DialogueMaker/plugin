@@ -34,7 +34,6 @@ local metadata: SettingMetadataGroupMap = {
           label = "Action key";
           description = "The key that the player can press to interact with the dialogue.";
           type = "string";
-          defaultValue = Client.defaultSettings.keybinds.interactKey.Name;
           validator = validateKey;
         };
         {
@@ -42,7 +41,6 @@ local metadata: SettingMetadataGroupMap = {
           label = "Gamepad action key";
           description = "The key that the player can press on a gamepad to interact with the dialogue.";
           type = "string";
-          defaultValue = Client.defaultSettings.keybinds.interactKeyGamepad.Name;
           validator = validateKey;
         };
       };
@@ -87,79 +85,107 @@ local metadata: SettingMetadataGroupMap = {
     };
   };
   conversation = {
-    speaker = {
-      name = {
-        name = "Speaker name";
-        description = "The name of the speaker in the conversation.";
-        type = "string";
-        defaultValue = Conversation.defaultSettings.speaker.name;
-      }
-    };
-    theme = {
-      componentScript = {
-        name = "Component script";
-        type = "Instance";
-        description = "The script that contains the theme component.";
-        className = "ModuleScript";
+    {
+      name = "speaker";
+      settings = {
+        {
+          name = "name";
+          label = "Speaker name";
+          description = "The name of the speaker in the conversation.";
+          type = "string";
+          defaultValue = Conversation.defaultSettings.speaker.name;
+        };
       };
     };
-    typewriter = {
-      canPlayerSkipDelay = {
-        name = "Allow player to skip delay";
-        description = "If enabled, the player can skip the delay between characters being typed out in the conversation.";
-        type = "boolean";
-        defaultValue = Conversation.defaultSettings.typewriter.canPlayerSkipDelay;
+    {
+      name = "theme";
+      settings = {
+        {
+          name = "componentScript";
+          label = "Component script";
+          type = "Instance";
+          description = "The script that contains the theme component.";
+          className = "ModuleScript";
+        };
       };
-      characterDelaySeconds = {
-        name = "Character delay in seconds";
-        description = "The delay between each character being typed out in the conversation.";
-        type = "number";
-        defaultValue = Conversation.defaultSettings.typewriter.characterDelaySeconds;
-      };
-      shouldShowResponseWhileTyping = {
-        name = "Show response while typing";
-        description = "If enabled, responses will be shown while the typewriter effect is typing out the text.";
-        type = "boolean";
-        defaultValue = Conversation.defaultSettings.typewriter.shouldShowResponseWhileTyping;
+    };
+    {
+      name = "typewriter";
+      settings = {
+        {
+          name = "canPlayerSkipDelay";
+          label = "Allow player to skip delay";
+          description = "If enabled, the player can skip the delay between characters being typed out in the conversation.";
+          type = "boolean";
+          defaultValue = Conversation.defaultSettings.typewriter.canPlayerSkipDelay;
+        };
+        {
+          name = "characterDelaySeconds";
+          label = "Character delay in seconds";
+          description = "The delay between each character being typed out in the conversation.";
+          type = "number";
+          defaultValue = Conversation.defaultSettings.typewriter.characterDelaySeconds;
+        };
+        {
+          name = "shouldShowResponseWhileTyping";
+          label = "Show response while typing";
+          description = "If enabled, responses will be shown while the typewriter effect is typing out the text.";
+          type = "boolean";
+          defaultValue = Conversation.defaultSettings.typewriter.shouldShowResponseWhileTyping;
+        };
       };
     };
   };
   dialogue = {
-    theme = {
-      componentScript = {
-        name = "Component script";
-        type = "Instance";
-        description = "The script that contains the theme component.";
-        className = "ModuleScript";
+    {
+      name = "speaker";
+      settings = {
+        {
+          name = "name";
+          label = "Speaker name";
+          description = "The name of the speaker in the conversation.";
+          type = "string";
+          defaultValue = Dialogue.defaultSettings.speaker.name;
+        };
       };
     };
-    typewriter = {
-      canPlayerSkipDelay = {
-        name = "Allow player to skip delay";
-        description = "If enabled, the player can skip the delay between characters being typed out in the conversation.";
-        type = "boolean";
-        defaultValue = Dialogue.defaultSettings.typewriter.canPlayerSkipDelay;
-      };
-      characterDelaySeconds = {
-        name = "Character delay in seconds";
-        description = "The delay between each character being typed out in the conversation.";
-        type = "number";
-        defaultValue = Dialogue.defaultSettings.typewriter.characterDelaySeconds;
-      };
-      shouldShowResponseWhileTyping = {
-        name = "Show response while typing";
-        description = "If enabled, responses will be shown while the typewriter effect is typing out the text.";
-        type = "boolean";
-        defaultValue = Dialogue.defaultSettings.typewriter.shouldShowResponseWhileTyping;
+    {
+      name = "theme";
+      settings = {
+        {
+          name = "componentScript";
+          label = "Component script";
+          type = "Instance";
+          description = "The script that contains the theme component.";
+          className = "ModuleScript";
+        };
       };
     };
-    speaker = {
-      name = {
-        name = "Speaker name";
-        description = "The name of the speaker in the dialogue.";
-        type = "string";
-        defaultValue = Dialogue.defaultSettings.speaker.name;
-      }
+    {
+      name = "typewriter";
+      settings = {
+        {
+          name = "canPlayerSkipDelay";
+          label = "Allow player to skip delay";
+          description = "If enabled, the player can skip the delay between characters being typed out in the conversation.";
+          type = "boolean";
+          defaultValue = Dialogue.defaultSettings.typewriter.canPlayerSkipDelay;
+        };
+        {
+          name = "characterDelaySeconds";
+          label = "Character delay in seconds";
+          description = "The delay between each character being typed out in the conversation.";
+          type = "number";
+          defaultValue = Dialogue.defaultSettings.typewriter.characterDelaySeconds;
+        };
+        {
+          name = "shouldShowResponseWhileTyping";
+          label = "Show response while typing";
+          description = "If enabled, responses will be shown while the typewriter effect is typing out the text.";
+          type = "boolean";
+          defaultValue = Dialogue.defaultSettings.typewriter.shouldShowResponseWhileTyping;
+        };
+      };
     };
   };
 };

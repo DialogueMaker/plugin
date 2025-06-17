@@ -126,7 +126,7 @@ local function Setting(properties: SettingProperties)
       NameLabel = React.createElement("TextLabel", {
         AutomaticSize = Enum.AutomaticSize.XY;
         LayoutOrder = 1;
-        Text = settingMetadata.name;
+        Text = settingMetadata.label;
         TextSize = 14;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Bold);
         TextColor3 = colors.text;
