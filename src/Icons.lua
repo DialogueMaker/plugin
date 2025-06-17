@@ -11,6 +11,7 @@ export type IconDictionary = {
   check: string;
   link: string;
   close: string;
+  settings: string;
 };
 
 local icons: {[string]: IconDictionary} = {
@@ -25,6 +26,7 @@ local icons: {[string]: IconDictionary} = {
     check = "rbxassetid://124828915127251";
     link = "rbxassetid://139085883308962";
     close = "rbxassetid://129602911342076";
+    settings = "rbxassetid://14099277263";
   };
   Light = {
     logo = "rbxassetid://98624626622893";
@@ -37,6 +39,7 @@ local icons: {[string]: IconDictionary} = {
     check = "rbxassetid://124828915127251";
     link = "rbxassetid://139085883308962";
     close = "rbxassetid://75787427205555";
+    settings = "rbxassetid://14099277263";
   };
 };
 

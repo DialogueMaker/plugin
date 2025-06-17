@@ -48,6 +48,7 @@ local function DialogueEditor(props: DialogueEditorProperties)
     });
     Toolbar = React.createElement(Toolbar, {
       plugin = props.plugin;
+      pluginGUI = props.pluginGUI;
       selectedScript = selectedScript;
       settingsTarget = settingsTarget;
       setSettingsTarget = setSettingsTarget;

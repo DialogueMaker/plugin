@@ -8,7 +8,7 @@ local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 
 export type ToolbarButtonProps = {
   iconImage: string;
-  text: string;
+  text: string?;
   layoutOrder: number;
   isDisabled: boolean?;
   isHighlighted: boolean?;
@@ -71,6 +71,9 @@ local function ToolbarButton(props: ToolbarButtonProps)
       VerticalAlignment = Enum.VerticalAlignment.Center;
       Padding = UDim.new(0, 5);
     });
+    UISizeConstraint = React.createElement("UISizeConstraint", {
+      MinSize = Vector2.new(0, 35);
+    });
     IconImageLabel = React.createElement("ImageLabel", {
       LayoutOrder = 1;
       BackgroundTransparency = 1;
@@ -78,16 +81,18 @@ local function ToolbarButton(props: ToolbarButtonProps)
       Size = UDim2.new(0, 24, 0, 24);
       ImageColor3 = if props.isDisabled then colors.textDisabled else colors.text;
     });
-    TextLabel = React.createElement("TextLabel", {
-      LayoutOrder = 2;
-      BackgroundTransparency = 1;
-      Text = props.text;
-      TextSize = 12;
-      Size = UDim2.new(0, 0, 1, 0);
-      AutomaticSize = Enum.AutomaticSize.X;
-      TextColor3 = if props.isDisabled then colors.textDisabled else colors.text;
-      FontFace = Font.fromId(11702779517);
-    });
+    TextLabel = if props.text then
+      React.createElement("TextLabel", {
+        LayoutOrder = 2;
+        BackgroundTransparency = 1;
+        Text = props.text;
+        TextSize = 12;
+        Size = UDim2.new(0, 0, 1, 0);
+        AutomaticSize = Enum.AutomaticSize.X;
+        TextColor3 = if props.isDisabled then colors.textDisabled else colors.text;
+        FontFace = Font.fromId(11702779517);
+      })
+    else nil;
     UICorner = React.createElement("UICorner", {
       CornerRadius = UDim.new(0, 5);
     });

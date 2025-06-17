@@ -9,10 +9,13 @@ local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local useDynamicSize = require(root.DialogueEditor.hooks.useDynamicSize);
+local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
 export type ToolbarProps = {
   selectedScript: ModuleScript?;
   plugin: Plugin;
+  pluginGUI: DockWidgetPluginGui;
   settingsTarget: ModuleScript?;
   setSettingsTarget: (target: ModuleScript?) -> ();
   layoutOrder: number;
@@ -20,6 +23,8 @@ export type ToolbarProps = {
 
 local function Toolbar(props: ToolbarProps)
 
+  local icons = useStudioIcons();
+  local pluginGUI = props.pluginGUI;
   local colors = useStudioColors();
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   local selectedScript = props.selectedScript;
@@ -28,6 +33,7 @@ local function Toolbar(props: ToolbarProps)
   local setSettingsTarget = props.setSettingsTarget;
   local dialogueScriptType = useDialogueScriptType(selectedScript);
   local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
+  local shouldShowLabels = useDynamicSize(pluginGUI, 570);
 
   local addDialogueScript = React.useCallback(function(type: "Message" | "Response" | "Redirect" | "Conversation")
 
@@ -115,10 +121,16 @@ local function Toolbar(props: ToolbarProps)
     UIListLayout = React.createElement("UIListLayout", {
       SortOrder = Enum.SortOrder.LayoutOrder;
       FillDirection = Enum.FillDirection.Horizontal;
+      VerticalAlignment = Enum.VerticalAlignment.Center;
+    });
+    UIPadding = React.createElement("UIPadding", {
+      PaddingLeft = UDim.new(0, 10);
+      PaddingRight = UDim.new(0, 10);
+      PaddingBottom = UDim.new(0, 5);
     });
     ViewParentButton = React.createElement(ToolbarButton, {
       iconImage = "rbxassetid://14098871159";
-      text = "View parent";
+      text = if shouldShowLabels then "View parent" else nil;
       layoutOrder = 1;
       isDisabled = settingsTarget ~= nil or not selectedScript;
       onClick = function()
@@ -133,28 +145,28 @@ local function Toolbar(props: ToolbarProps)
     });
     SettingsButton = if dialogueScriptType then
       React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14099277263";
-      text = if settingsTarget == nil then "Settings" else "Close settings";
-      layoutOrder = 2;
-      onClick = function()
+        iconImage = icons.settings;
+        text = if shouldShowLabels then (if settingsTarget == nil then "Settings" else "Close settings") else nil;
+        layoutOrder = 2;
+        onClick = function()
 
-        if settingsTarget then
+          if settingsTarget then
 
-          setSettingsTarget(nil);
+            setSettingsTarget(nil);
 
-        else
+          else
 
-          setSettingsTarget(selectedScript);
+            setSettingsTarget(selectedScript);
+
+          end;
 
         end;
-
-      end;
       })
     else nil;
     AddConversationButton = if not selectedScript then
       React.createElement(ToolbarButton, {
-        iconImage = "rbxassetid://14099284898";
-        text = "Add conversation";
+        iconImage = icons.conversation;
+        text = if shouldShowLabels then "Add conversation" else nil;
         layoutOrder = 3;
         isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
         onClick = function()
@@ -166,8 +178,8 @@ local function Toolbar(props: ToolbarProps)
     else nil;
     AddMessageButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
-        iconImage = "rbxassetid://14099284898";
-        text = "Add message";
+        iconImage = icons.message;
+        text = if shouldShowLabels then "Add message" else nil;
         layoutOrder = 4;
         isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
         onClick = function()
@@ -179,8 +191,8 @@ local function Toolbar(props: ToolbarProps)
     else nil;
     AddResponseButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
-        iconImage = "rbxassetid://14099284898";
-        text = "Add response";
+        iconImage = icons.response;
+        text = if shouldShowLabels then "Add response" else nil;
         layoutOrder = 5;
         isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
         onClick = function()
@@ -192,8 +204,8 @@ local function Toolbar(props: ToolbarProps)
     else nil;
     AddRedirectButton = if selectedScript and dialogueScriptType ~= "Redirect" then
       React.createElement(ToolbarButton, {
-        iconImage = "rbxassetid://14099284898";
-        text = "Add redirect";
+        iconImage = icons.redirect;
+        text = if shouldShowLabels then (if shouldShowLabels then "Add redirect" else nil) else nil;
         layoutOrder = 6;
         isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
         onClick = function()
