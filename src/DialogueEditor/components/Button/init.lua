@@ -26,6 +26,7 @@ local function Button(properties: ButtonProperties)
     BackgroundColor3 = backgroundColor;
     Text = "";
     LayoutOrder = layoutOrder;
+    Size = UDim2.fromOffset(0, 30);
     [React.Event.Activated] = function()
     
       if not isDisabled then
@@ -40,8 +41,8 @@ local function Button(properties: ButtonProperties)
       CornerRadius = UDim.new(0, 5);
     });
     UIPadding = React.createElement("UIPadding", {
-      PaddingTop = UDim.new(0, 10);
-      PaddingBottom = UDim.new(0, 10);
+      PaddingTop = UDim.new(0, 8);
+      PaddingBottom = UDim.new(0, 8);
       PaddingLeft = UDim.new(0, 10);
       PaddingRight = UDim.new(0, 10);
     });
