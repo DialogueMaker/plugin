@@ -1,6 +1,5 @@
 --!strict
 
-local ChangeHistoryService = game:GetService("ChangeHistoryService");
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent;
@@ -8,8 +7,8 @@ local React = require(root.roblox_packages.react);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local ToolbarButton = require(script.ToolbarButton);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
-local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 export type ToolbarProps = {
   selectedScript: ModuleScript?;
@@ -22,26 +21,20 @@ export type ToolbarProps = {
 local function Toolbar(props: ToolbarProps)
 
   local colors = useStudioColors();
-  local icons = useStudioIcons();
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   local selectedScript = props.selectedScript;
   local settingsTarget = props.settingsTarget;
   local layoutOrder = props.layoutOrder;
   local setSettingsTarget = props.setSettingsTarget;
   local dialogueScriptType = useDialogueScriptType(selectedScript);
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   local addDialogueScript = React.useCallback(function(type: "Message" | "Response" | "Redirect" | "Conversation")
-  
-    if ChangeHistoryService:IsRecordingInProgress() then
-
-      ChangeHistoryService:FinishRecording("", Enum.FinishRecordingOperation.Cancel);
-
-    end;
 
     local historyIdentifier;
     if type == "Conversation" then
 
-      historyIdentifier = ChangeHistoryService:TryBeginRecording("Add conversation");
+      historyIdentifier = beginHistoryRecording("Add conversation");
 
       local parent = Selection:Get()[1];
       if not parent:IsA("Folder") or parent.Name ~= "Conversations" then
@@ -67,7 +60,7 @@ local function Toolbar(props: ToolbarProps)
       
     elseif selectedScript then
 
-      historyIdentifier = ChangeHistoryService:TryBeginRecording(`Add {type:lower()} to NPC`);
+      historyIdentifier = beginHistoryRecording(`Add {type:lower()} to NPC`);
 
       -- Find a name for the content script.
       local targetPriority = 1;
@@ -108,7 +101,7 @@ local function Toolbar(props: ToolbarProps)
 
     end;
 
-    ChangeHistoryService:FinishRecording(historyIdentifier, Enum.FinishRecordingOperation.Commit);
+    finishHistoryRecording(historyIdentifier);
     refreshDialogueMakerScripts();
 
   end, {selectedScript :: unknown, refreshDialogueMakerScripts});

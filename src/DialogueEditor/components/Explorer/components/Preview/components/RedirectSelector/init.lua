@@ -5,6 +5,7 @@ local React = require(root.roblox_packages.react);
 local ContentPreview = require(script.Parent.ContentPreview);
 local Paragraph = require(root.DialogueEditor.components.Paragraph);
 local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 export type RedirectSelectorProperties = {
   selectedScript: ModuleScript;
@@ -15,6 +16,7 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
 
   local selectedScript = properties.selectedScript;
   local layoutOrder = properties.layoutOrder;
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
   
   local getDestinationScript = React.useCallback(function(): ModuleScript?
 
@@ -78,6 +80,8 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
 
         end;
 
+        local historyIdentifier = beginHistoryRecording("Set redirect value");
+
         local destinationScriptValue = selectedScript:FindFirstChild("RedirectValue");
         if not destinationScriptValue then
 
@@ -91,6 +95,9 @@ local function RedirectSelector(properties: RedirectSelectorProperties)
         assert(destinationScriptValue and destinationScriptValue:IsA("ObjectValue"), "Expected RedirectValue to be an ObjectValue");
 
         destinationScriptValue.Value = instance;
+
+        finishHistoryRecording(historyIdentifier);
+
         setDestinationScript(getDestinationScript());
 
       end;

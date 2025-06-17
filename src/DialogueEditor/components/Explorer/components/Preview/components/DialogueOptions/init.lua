@@ -9,12 +9,13 @@ local Dropdown = require(root.DialogueEditor.components.Dropdown);
 local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
 export type DialogueOptionsProperties = {
   selectedScript: ModuleScript;
-  selectedDialogueType: DialogueScriptType?;
+  selectedDialogueType: DialogueScriptType;
   layoutOrder: number;
   plugin: Plugin;
 }
@@ -26,6 +27,7 @@ local function DialogueOptions(properties: DialogueOptionsProperties)
   local layoutOrder = properties.layoutOrder;
   local plugin = properties.plugin;
   local colors = useStudioColors();
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   local dialogueOptions: {React.ReactNode} = {};
   local isActionsDropdownOpen, setIsActionsDropdownOpen = React.useState(false);
@@ -40,10 +42,14 @@ local function DialogueOptions(properties: DialogueOptionsProperties)
         local conditionScript = selectedScript:FindFirstChild("ConditionScript");
         if not conditionScript then
 
+          local historyIdentifier = beginHistoryRecording("Add condition script");
+
           local newConditionScript = root.Templates.DialogueConditionScriptTemplate:Clone();
           newConditionScript.Name = "ConditionScript";
           newConditionScript.Parent = selectedScript;
           conditionScript = newConditionScript;
+
+          finishHistoryRecording(historyIdentifier);
 
         end;
 
@@ -115,8 +121,12 @@ local function DialogueOptions(properties: DialogueOptionsProperties)
     layoutOrder = #dialogueOptions + 1;
     onClick = function()
 
+      local historyIdentifier = beginHistoryRecording(`Delete {selectedDialogueType:lower()} script`);
+
       Selection:Set({selectedScript.Parent});
-      selectedScript:Destroy();
+      selectedScript.Parent = nil;
+
+      finishHistoryRecording(historyIdentifier);
 
     end;
   });

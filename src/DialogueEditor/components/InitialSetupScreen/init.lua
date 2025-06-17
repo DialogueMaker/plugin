@@ -7,8 +7,11 @@ local React = require(root.roblox_packages.react);
 local Paragraph = require(root.DialogueEditor.components.Paragraph);
 local Button = require(root.DialogueEditor.components.Button);
 local InstanceInput = require(root.DialogueEditor.components.InstanceInput);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 local function InitialSetupScreen()
+
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 1, 0);
@@ -56,10 +59,16 @@ local function InitialSetupScreen()
         layoutOrder = 1;
         onClick = function()
           
+          local historyIdentifier = beginHistoryRecording("Add Dialogue Maker Kit");
+
           local dialogueMakerKit = root.DialogueMakerKit:Clone();
           dialogueMakerKit:AddTag("DialogueMakerKit");
           dialogueMakerKit.Parent = ReplicatedStorage;
+          
+          finishHistoryRecording(historyIdentifier);
+
           print(`[Dialogue Maker] Added Dialogue Maker Kit to ReplicatedStorage. Feel free to move it if it doesn't work there. If you use Rojo, you may need to add the folder to your project using "Save to File".`);
+
 
         end;
       });
@@ -68,6 +77,8 @@ local function InitialSetupScreen()
         layoutOrder = 2;
         onChanged = function(folder)
 
+          local historyIdentifier = beginHistoryRecording("Select Dialogue Maker plugin packages folder");
+
           if not folder then
 
             return;
@@ -75,6 +86,8 @@ local function InitialSetupScreen()
           end;
 
           folder:AddTag("DialogueMakerPackages");
+
+          finishHistoryRecording(historyIdentifier);
           
         end;
       });

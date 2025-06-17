@@ -4,6 +4,7 @@ local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Setting = require(script.components.Setting);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 export type SettingsContainerProperties = {
   name: string;
@@ -22,8 +23,8 @@ local function SettingGroup(properties: SettingsContainerProperties)
   local currentSettings = properties.currentSettings;
   local settingsTarget = properties.settingsTarget;
   local layoutOrder = properties.layoutOrder;
-
   local colors = useStudioColors();
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   local settingComponents = {};
 
@@ -61,111 +62,130 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
         end;
 
-        settingInstance:Destroy();
+        local historyIdentifier = beginHistoryRecording(`Reset setting {groupName}.{settingName} to default`);
+
+        settingInstance.Parent = nil;
 
         if #categoryFolder:GetChildren() == 0 then
           
-          categoryFolder:Destroy();
+          categoryFolder.Parent = nil;
 
         end;
 
         if #settingContainer:GetChildren() == 0 then
           
-          settingContainer:Destroy();
+          settingContainer.Parent = nil;
 
         end;
+
+        finishHistoryRecording(historyIdentifier);
 
       end;
       onChanged = function(newValue)
 
-        -- Create the settings folder if it doesn't exist.
-        if not settingContainer then
-            
-          local newSettingsContainer = Instance.new("Folder");
-          newSettingsContainer.Name = "Settings";
-          newSettingsContainer.Parent = settingsTarget;
-          settingContainer = newSettingsContainer;
+        local historyIdentifier = beginHistoryRecording(`Edit setting {groupName}.{settingName}`);
 
-        end;
+        local didChange, errorMessage = pcall(function()
 
-        assert(settingContainer, "Settings folder not found even after creating it.");
-
-        -- Create the category folder if it doesn't exist.
-        local categoryFolder = settingContainer:FindFirstChild(groupName);
-        if not categoryFolder then
-
-          local newCategoryFolder = Instance.new("Folder");
-          newCategoryFolder.Name = groupName;
-          newCategoryFolder.Parent = settingContainer;
-          categoryFolder = newCategoryFolder;
-
-        end;
-
-        assert(categoryFolder, "Category folder not found even after creating it.");
-
-        -- Create the setting instance if it doesn't exist.
-        local settingInstance = categoryFolder:FindFirstChild(settingName);
-        if not settingInstance then
-
-          local newSettingInstance: Instance;
-
-          if settingMetadata.type == "boolean" then
-
-            newSettingInstance = Instance.new("BoolValue");
-
-          elseif settingMetadata.type == "number" then
-
-            newSettingInstance = Instance.new("NumberValue");
-
-          elseif settingMetadata.className then
-
-            newSettingInstance = Instance.new("ObjectValue");
-
-          else
-
-            error(`Unsupported setting type: {settingMetadata.type}`);
+          -- Create the settings folder if it doesn't exist.
+          if not settingContainer then
+              
+            local newSettingsContainer = Instance.new("Folder");
+            newSettingsContainer.Name = "Settings";
+            newSettingsContainer.Parent = settingsTarget;
+            settingContainer = newSettingsContainer;
 
           end;
 
-          newSettingInstance.Name = settingName;
-          newSettingInstance.Parent = categoryFolder;
-          settingInstance = newSettingInstance;
+          assert(settingContainer, "Settings folder not found even after creating it.");
 
-        end;
+          -- Create the category folder if it doesn't exist.
+          local categoryFolder = settingContainer:FindFirstChild(groupName);
+          if not categoryFolder then
 
-        assert(settingInstance, "Setting instance not found even after creating it.");
-
-        -- Update the value of the setting instance.
-        if newValue == nil then
-          
-          settingInstance:Destroy();
-
-          if #categoryFolder:GetChildren() == 0 then
-            
-            categoryFolder:Destroy();
+            local newCategoryFolder = Instance.new("Folder");
+            newCategoryFolder.Name = groupName;
+            newCategoryFolder.Parent = settingContainer;
+            categoryFolder = newCategoryFolder;
 
           end;
 
-        elseif settingInstance:IsA("BoolValue") then
+          assert(categoryFolder, "Category folder not found even after creating it.");
 
-          assert(typeof(newValue) == "boolean", "Expected newValue to be a boolean.");
-          settingInstance.Value = newValue;
-          
-        elseif settingInstance:IsA("IntValue") then
+          -- Create the setting instance if it doesn't exist.
+          local settingInstance = categoryFolder:FindFirstChild(settingName);
+          if not settingInstance then
 
-          assert(typeof(newValue) == "number", "Expected newValue to be a number.");
-          assert(math.floor(newValue) == newValue, "Expected newValue to be an integer.");
-          settingInstance.Value = newValue;
+            local newSettingInstance: Instance;
 
-        elseif settingInstance:IsA("NumberValue") then
+            if settingMetadata.type == "boolean" then
 
-          assert(typeof(newValue) == "number", "Expected newValue to be a number.");
-          settingInstance.Value = newValue;
+              newSettingInstance = Instance.new("BoolValue");
 
-        elseif settingInstance:IsA("ObjectValue") then
+            elseif settingMetadata.type == "number" then
 
-          assert(typeof(newValue) == "Instance" or newValue == nil, "Expected newValue to be an Instance or nil.");
-          settingInstance.Value = newValue;
+              newSettingInstance = Instance.new("NumberValue");
+
+            elseif settingMetadata.className then
+
+              newSettingInstance = Instance.new("ObjectValue");
+
+            else
+
+              error(`Unsupported setting type: {settingMetadata.type}`);
+
+            end;
+
+            newSettingInstance.Name = settingName;
+            newSettingInstance.Parent = categoryFolder;
+            settingInstance = newSettingInstance;
+
+          end;
+
+          assert(settingInstance, "Setting instance not found even after creating it.");
+
+          -- Update the value of the setting instance.
+          if newValue == nil then
+            
+            settingInstance.Parent = nil;
+
+            if #categoryFolder:GetChildren() == 0 then
+              
+              categoryFolder.Parent = nil;
+
+            end;
+
+          elseif settingInstance:IsA("BoolValue") then
+
+            assert(typeof(newValue) == "boolean", "Expected newValue to be a boolean.");
+            settingInstance.Value = newValue;
+            
+          elseif settingInstance:IsA("IntValue") then
+
+            assert(typeof(newValue) == "number", "Expected newValue to be a number.");
+            assert(math.floor(newValue) == newValue, "Expected newValue to be an integer.");
+            settingInstance.Value = newValue;
+
+          elseif settingInstance:IsA("NumberValue") then
+
+            assert(typeof(newValue) == "number", "Expected newValue to be a number.");
+            settingInstance.Value = newValue;
+
+          elseif settingInstance:IsA("ObjectValue") then
+
+            assert(typeof(newValue) == "Instance" or newValue == nil, "Expected newValue to be an Instance or nil.");
+            settingInstance.Value = newValue;
+
+          end;
+
+          finishHistoryRecording(historyIdentifier);
+
+        end);
+
+        if not didChange then
+
+          finishHistoryRecording(historyIdentifier, Enum.FinishRecordingOperation.Cancel);
+          error(`Failed to change setting {groupName}.{settingName}: {errorMessage}`);
 
         end;
 

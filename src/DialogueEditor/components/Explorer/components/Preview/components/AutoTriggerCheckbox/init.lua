@@ -3,6 +3,7 @@
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Checkbox = require(root.DialogueEditor.components.Checkbox);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 export type AutoTriggerCheckboxProperties = {
   layoutOrder: number;
@@ -14,6 +15,7 @@ local function AutoTriggerCheckbox(properties: AutoTriggerCheckboxProperties)
   local selectedScript = properties.selectedScript;
   local layoutOrder = properties.layoutOrder;
   local shouldAutoTriggerConversation, setShouldAutoTriggerConversation = React.useState(selectedScript:GetAttribute("ShouldAutoTriggerConversation"));
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   React.useEffect(function()
 
@@ -37,7 +39,11 @@ local function AutoTriggerCheckbox(properties: AutoTriggerCheckboxProperties)
     layoutOrder = layoutOrder;
     onChanged = function(isChecked: boolean)
 
+      local historyIdentifier = beginHistoryRecording("Set auto-trigger conversation");
+
       selectedScript:SetAttribute("ShouldAutoTriggerConversation", isChecked);
+
+      finishHistoryRecording(historyIdentifier);
 
     end;
   });

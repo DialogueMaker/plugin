@@ -6,6 +6,7 @@ local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Pare
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 export type DialogueItemType = "Conversation" | "Response" | "Message" | "Redirect";
 
@@ -27,6 +28,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local icons = useStudioIcons();
   local colors = useStudioColors();
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   local dialogueContent = dialogueScript:GetAttribute("DialogueContent");
 
@@ -57,6 +59,8 @@ local function DialogueItem(props: DialogueItemProperties)
 
     end;
 
+    local historyIdentifier = beginHistoryRecording("Change dialogue script priority");
+
     table.remove(children, index);
     table.insert(children, index + increment, dialogueScript);
 
@@ -71,6 +75,8 @@ local function DialogueItem(props: DialogueItemProperties)
       child.Name = tostring(newIndex);
 
     end;
+
+    finishHistoryRecording(historyIdentifier);
 
   end, {dialogueType :: unknown, dialogueScript, dialogueScriptCount});
 

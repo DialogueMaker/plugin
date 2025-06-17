@@ -8,6 +8,7 @@ local Dropdown = require(root.DialogueEditor.components.Dropdown);
 local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
@@ -21,6 +22,7 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
   local selectedScript = properties.selectedScript;
   local selectedDialogueType = properties.selectedDialogueType;
   local icons = useStudioIcons();
+  local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   local dropdownOptions = {};
   local isDialogueTypeDropdownOpen, setIsDialogueTypeDropdownOpen = React.useState(false);
@@ -35,6 +37,8 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
         layoutOrder = index;
         iconImage = icons[`{dialogueType:sub(1, 1):upper()}{dialogueType:sub(2)}`];
         onClick = function()
+
+          local historyIdentifier = beginHistoryRecording(`Set dialogue type to {dialogueType}`);
 
           selectedScript:SetAttribute("DialogueType", dialogueType);
 
@@ -60,12 +64,14 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
 
           if #currentFolder:GetChildren() == 0 then
 
-            currentFolder:Destroy();
+            currentFolder.Parent = nil;
 
           end;
 
           task.wait();
           Selection:Set({selectedScript});
+
+          finishHistoryRecording(historyIdentifier);
 
           setIsDialogueTypeDropdownOpen(false);
 

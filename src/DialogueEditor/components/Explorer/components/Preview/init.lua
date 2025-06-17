@@ -4,7 +4,6 @@
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Button = require(root.DialogueEditor.components.Button);
-local Checkbox = require(root.DialogueEditor.components.Checkbox);
 local ContentPreview = require(script.components.ContentPreview);
 local Paragraph = require(root.DialogueEditor.components.Paragraph);
 local RedirectSelector = require(script.components.RedirectSelector);
@@ -14,6 +13,8 @@ local DialogueTypeDropdown = require(script.components.DialogueTypeDropdown);
 local DialogueOptions = require(script.components.DialogueOptions);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local AutoTriggerCheckbox = require(script.components.AutoTriggerCheckbox);
+local DynamicContentCheckbox = require(script.components.DynamicContentCheckbox);
+local StaticContentEditor = require(script.components.StaticContentEditor);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
@@ -80,63 +81,21 @@ local function Preview(properties: PreviewProperties)
         })
       else nil;
       ShouldUseDynamicContent = if dialogueScriptType == "Message" or dialogueScriptType == "Response" then
-        React.createElement(Checkbox, {
-          text = "Dynamic content";
-          isChecked = isDialogueContentScriptEnabled;
+        React.createElement(DynamicContentCheckbox, {
           layoutOrder = 3;
-          onChanged = function(isChecked: boolean)
-
-            if not dialogueContentScript then
-
-              local newDialogueContentScript = root.Templates.DialogueContentScriptTemplate:Clone();
-              newDialogueContentScript.Name = "ContentScript";
-              newDialogueContentScript.Parent = selectedScript;
-              dialogueContentScript = newDialogueContentScript;
-
-            end;
-
-            assert(dialogueContentScript and dialogueContentScript:IsA("ModuleScript"), `Dialogue content script not found for {selectedScript:GetFullName()}.`);
-
-            dialogueContentScript:SetAttribute("IsDisabled", not isChecked);
-
-          end;
+          selectedScript = selectedScript;
+          isChecked = isDialogueContentScriptEnabled;
+          dialogueContentScript = dialogueContentScript;
         })
       else nil;
     });
-    DialogueContentBox = if not isDialogueContentScriptEnabled and dialogueScriptType == "Message" or dialogueScriptType == "Response" then
-      React.createElement("TextBox", {
-        Text = selectedScript:GetAttribute("DialogueContent") or "";
-        PlaceholderText = "Enter dialogue content here. For variables and effects, use dynamic content.";
-        TextColor3 = colors.text;
-        ClearTextOnFocus = false;
-        TextSize = 14;
-        LayoutOrder = 2;
-        Size = UDim2.new(1, 0, 0, 100);
-        BackgroundColor3 = colors.input;
-        FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
-        TextXAlignment = Enum.TextXAlignment.Left;
-        TextYAlignment = Enum.TextYAlignment.Top;
-        [React.Change.Text] = function(self: TextBox)
-
-          selectedScript:SetAttribute("DialogueContent", self.Text);
-
-        end;
-      }, {
-        UIPadding = React.createElement("UIPadding", {
-          PaddingTop = UDim.new(0, 15);
-          PaddingBottom = UDim.new(0, 15);
-          PaddingLeft = UDim.new(0, 15);
-          PaddingRight = UDim.new(0, 15);
-        });
-        UISizeConstraint = React.createElement("UISizeConstraint", {
-          MinSize = Vector2.new(0, 30);
-        });
-        UICorner = React.createElement("UICorner", {
-          CornerRadius = UDim.new(0, 5);
-        });
+    StaticContentEditor = if not isDialogueContentScriptEnabled and dialogueScriptType == "Message" or dialogueScriptType == "Response" then
+      React.createElement(StaticContentEditor, {
+        layoutOrder = 2;
+        selectedScript = selectedScript;
       })
     else nil;
-    DynamicContentGuide = if (dialogueScriptType == "Message" or dialogueScriptType == "Response") and dialogueContentScript and isDialogueContentScriptEnabled then
+    DynamicContentEditor = if (dialogueScriptType == "Message" or dialogueScriptType == "Response") and dialogueContentScript and isDialogueContentScriptEnabled then
       React.createElement(ContentPreview, {
         layoutOrder = 3;
       }, {
@@ -160,12 +119,14 @@ local function Preview(properties: PreviewProperties)
         layoutOrder = 3;
       })
     else nil;
-    Options = React.createElement(DialogueOptions, {
-      layoutOrder = 4;
-      selectedScript = selectedScript;
-      plugin = plugin;
-      selectedDialogueType = dialogueScriptType;
-    });
+    Options = if dialogueScriptType then
+      React.createElement(DialogueOptions, {
+        layoutOrder = 4;
+        selectedScript = selectedScript;
+        plugin = plugin;
+        selectedDialogueType = dialogueScriptType;
+      })
+    else nil;
   });
 
 end;
