@@ -57,7 +57,7 @@ local function SettingsTabSelector(properties: SettingTypeSelectorProperties)
 
         elseif settingType == "Conversation" then
 
-          local possibleConversationScript = settingsTarget;
+          local possibleConversationScript = initialSettingsTarget;
           
           while not possibleConversationScript:HasTag("DialogueMakerConversationScript") and possibleConversationScript.Parent and possibleConversationScript.Parent:IsA("Folder") and possibleConversationScript.Parent.Parent and possibleConversationScript.Parent.Parent:IsA("ModuleScript") do
             
@@ -67,7 +67,7 @@ local function SettingsTabSelector(properties: SettingTypeSelectorProperties)
 
           if not possibleConversationScript:HasTag("DialogueMakerConversationScript") then
 
-            error(`No valid conversation script found for {properties.settingsTarget.Name}.`);
+            error(`No valid conversation script found for {initialSettingsTarget.Name}.`);
 
           end
 
