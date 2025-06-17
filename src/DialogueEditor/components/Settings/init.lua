@@ -91,31 +91,43 @@ function Settings(properties: SettingsProperties)
   
     refreshDialogueMakerScripts();
 
+    local connections: {RBXScriptConnection} = {};
+    local function disconnectConnections()
+
+      for _, connection in connections do
+
+        connection:Disconnect();
+
+      end;
+
+      connections = {};
+
+    end;
+
     local function refreshCurrentSettings()
 
       setCurrentSettings(getCurrentSettings());
 
     end;
 
-    local connections = {};
     local settingsContainer = getSettingsContainer();
     if settingsContainer then
 
-      table.insert(connections, settingsContainer.ChildAdded:Once(refreshCurrentSettings));
-      table.insert(connections, settingsContainer.ChildRemoved:Once(refreshCurrentSettings));
+      table.insert(connections, settingsContainer.ChildAdded:Connect(refreshCurrentSettings));
+      table.insert(connections, settingsContainer.ChildRemoved:Connect(refreshCurrentSettings));
 
       for _, child in settingsContainer:GetChildren() do
 
         if child:IsA("Folder") then
 
-          table.insert(connections, child.ChildAdded:Once(refreshCurrentSettings));
-          table.insert(connections, child.ChildRemoved:Once(refreshCurrentSettings));
+          table.insert(connections, child.ChildAdded:Connect(refreshCurrentSettings));
+          table.insert(connections, child.ChildRemoved:Connect(refreshCurrentSettings));
 
           for _, settingInstance in child:GetChildren() do
 
             if settingInstance:IsA("ValueBase") then
               
-              table.insert(connections, settingInstance:GetPropertyChangedSignal("Value"):Once(refreshCurrentSettings));
+              table.insert(connections, settingInstance:GetPropertyChangedSignal("Value"):Connect(refreshCurrentSettings));
 
             end;
 
@@ -127,20 +139,17 @@ function Settings(properties: SettingsProperties)
 
     end;
 
-    table.insert(connections, settingsTarget.ChildAdded:Once(refreshCurrentSettings));
-    table.insert(connections, settingsTarget.ChildRemoved:Once(refreshCurrentSettings));
+    table.insert(connections, settingsTarget.ChildAdded:Connect(refreshCurrentSettings));
+    table.insert(connections, settingsTarget.ChildRemoved:Connect(refreshCurrentSettings));
+    refreshCurrentSettings();
 
     return function()
 
-      for _, connection in connections do
-
-        connection:Disconnect();
-
-      end;
+      disconnectConnections();
 
     end;
 
-  end, {getSettingsContainer :: unknown, currentSettings, settingsTarget});
+  end, {getSettingsContainer :: unknown, settingsTarget});
 
   local settingGroups = {};
 

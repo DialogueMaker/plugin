@@ -51,6 +51,7 @@ local function Setting(properties: SettingProperties)
         LayoutOrder = 1;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
         Size = UDim2.new(1, 0, 0, 30);
+        BackgroundColor3 = colors.input;
         [React.Event.FocusLost] = function(self: TextBox): ()
         
           properties.onChanged(self.Text);
