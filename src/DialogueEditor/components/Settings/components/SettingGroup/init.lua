@@ -5,11 +5,12 @@ local React = require(root.roblox_packages.react);
 local Setting = require(script.components.Setting);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
-local useDialogueMakerPackages = require(root.DialogueEditor.hooks.useDialogueMakerPackages);
+local settingsMetadata = require(script.Parent.Parent.settingsMetadata);
+
+type SettingsMetadataGroup = settingsMetadata.SettingMetadataGroup;
 
 export type SettingsContainerProperties = {
-  name: string;
-  items: any;
+  metadataGroup: SettingsMetadataGroup;
   settingContainer: Instance?;
   currentSettings: { [string]: {[string]: any} };
   settingsTarget: ModuleScript;
@@ -18,30 +19,25 @@ export type SettingsContainerProperties = {
 
 local function SettingGroup(properties: SettingsContainerProperties)
 
-  local groupName = properties.name;
-  local items = properties.items;
+  local metadataGroup = properties.metadataGroup;
   local settingContainer = properties.settingContainer;
   local currentSettings = properties.currentSettings;
   local settingsTarget = properties.settingsTarget;
   local layoutOrder = properties.layoutOrder;
   local colors = useStudioColors();
   local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
-  local dialogueMakerPackages = useDialogueMakerPackages();
 
   local settingComponents = {};
 
-  for settingName, settingMetadata in items do
+  for _, settingMetadata in metadataGroup.settings do
 
-    local currentValue = if currentSettings[groupName] then currentSettings[groupName][settingName] else nil;
+    local currentValue = if currentSettings[metadataGroup.name] then currentSettings[metadataGroup.name][settingMetadata.name] else nil;
     local settingComponent = React.createElement(Setting, {
-      key = `{groupName}.{settingName}`;
-      name = settingMetadata.name;
-      description = settingMetadata.description;
+      key = `{metadataGroup.name}.{settingMetadata.name}`;
+      settingMetadata = settingMetadata;
+      settingsTarget = settingsTarget;
       layoutOrder = #settingComponents + 1;
       value = currentValue;
-      defaultValue = if settingsTarget:HasTag("DialogueMakerLoader") and settingName == "componentScript" and dialogueMakerPackages then dialogueMakerPackages:FindFirstChild("StandardTheme") else settingMetadata.defaultValue;
-      type = settingMetadata.type;
-      className = settingMetadata.className;
       onReset = function()
         
         if not settingContainer then
@@ -50,21 +46,21 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
         end;
 
-        local categoryFolder = settingContainer:FindFirstChild(groupName);
+        local categoryFolder = settingContainer:FindFirstChild(metadataGroup.name);
         if not categoryFolder then
           
           return;
 
         end;
 
-        local settingInstance = categoryFolder:FindFirstChild(settingName);
+        local settingInstance = categoryFolder:FindFirstChild(settingMetadata.name);
         if not settingInstance then
 
           return;
 
         end;
 
-        local historyIdentifier = beginHistoryRecording(`Reset setting {groupName}.{settingName} to default`);
+        local historyIdentifier = beginHistoryRecording(`Reset setting {metadataGroup.name}.{settingMetadata.name} to default`);
 
         settingInstance.Parent = nil;
 
@@ -85,7 +81,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
       end;
       onChanged = function(newValue)
 
-        local historyIdentifier = beginHistoryRecording(`Edit setting {groupName}.{settingName}`);
+        local historyIdentifier = beginHistoryRecording(`Edit setting {metadataGroup.name}.{settingMetadata.name}`);
 
         local didChange, errorMessage = pcall(function()
 
@@ -102,11 +98,11 @@ local function SettingGroup(properties: SettingsContainerProperties)
           assert(settingContainer, "Settings folder not found even after creating it.");
 
           -- Create the category folder if it doesn't exist.
-          local categoryFolder = settingContainer:FindFirstChild(groupName);
+          local categoryFolder = settingContainer:FindFirstChild(metadataGroup.name);
           if not categoryFolder then
 
             local newCategoryFolder = Instance.new("Folder");
-            newCategoryFolder.Name = groupName;
+            newCategoryFolder.Name = metadataGroup.name;
             newCategoryFolder.Parent = settingContainer;
             categoryFolder = newCategoryFolder;
 
@@ -115,7 +111,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
           assert(categoryFolder, "Category folder not found even after creating it.");
 
           -- Create the setting instance if it doesn't exist.
-          local settingInstance = categoryFolder:FindFirstChild(settingName);
+          local settingInstance = categoryFolder:FindFirstChild(metadataGroup.name);
           if not settingInstance then
 
             local newSettingInstance: Instance;
@@ -132,7 +128,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
               newSettingInstance = Instance.new("StringValue");
 
-            elseif settingMetadata.className then
+            elseif settingMetadata.type == "Instance" then
 
               newSettingInstance = Instance.new("ObjectValue");
 
@@ -142,7 +138,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
             end;
 
-            newSettingInstance.Name = settingName;
+            newSettingInstance.Name = settingMetadata.name;
             newSettingInstance.Parent = categoryFolder;
             settingInstance = newSettingInstance;
 
@@ -190,7 +186,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
         if not didChange then
 
           finishHistoryRecording(historyIdentifier, Enum.FinishRecordingOperation.Cancel);
-          error(`Failed to change setting {groupName}.{settingName}: {errorMessage}`);
+          error(`Failed to change setting {metadataGroup.name}.{settingMetadata.name}: {errorMessage}`);
 
         end;
 
@@ -213,7 +209,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
     });
     Header = React.createElement("TextLabel", {
       AutomaticSize = Enum.AutomaticSize.XY;
-      Text = `{groupName:sub(1, 1):upper()}{groupName:sub(2)} settings`;
+      Text = `{metadataGroup.name:sub(1, 1):upper()}{metadataGroup.name:sub(2)} settings`;
       TextSize = 14;
       FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Bold);
       LayoutOrder = 1;

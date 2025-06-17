@@ -8,14 +8,15 @@ local ToggleInput = require(root.DialogueEditor.components.ToggleInput);
 local TextInput = require(root.DialogueEditor.components.TextInput);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
+local settingsMetadata = require(script.Parent.Parent.Parent.Parent.settingsMetadata);
+local useDialogueMakerPackages = require(root.DialogueEditor.hooks.useDialogueMakerPackages);
+
+type SettingMetadata = settingsMetadata.SettingMetadata;
 
 export type SettingProperties = {
-  name: string;
-  description: string;
-  defaultValue: any;
-  type: "boolean" | "string" | "number" | "Instance";
+  settingMetadata: SettingMetadata;
+  settingsTarget: ModuleScript;
   value: any?;
-  className: string?;
   onChanged: (value: any) -> ();
   onReset: () -> ();
   layoutOrder: number;
@@ -23,14 +24,18 @@ export type SettingProperties = {
 
 local function Setting(properties: SettingProperties)
 
+  local settingMetadata = properties.settingMetadata;
+  local settingsTarget = properties.settingsTarget;
   local colors = useStudioColors();
   local icons = useStudioIcons();
+  local dialogueMakerPackages = useDialogueMakerPackages();
+  local defaultValue = if settingsTarget:HasTag("DialogueMakerLoader") and settingMetadata.name == "componentScript" and dialogueMakerPackages then dialogueMakerPackages:FindFirstChild("StandardTheme") else settingMetadata.defaultValue;
 
   local inputValue = React.useMemo(function(): React.ReactElement
     
-    if properties.type == "boolean" then
+    if settingMetadata.type == "boolean" then
 
-      local isEnabled = if properties.value ~= nil then properties.value else properties.defaultValue;
+      local isEnabled = if properties.value ~= nil then properties.value else defaultValue;
 
       return React.createElement(ToggleInput, {
         isEnabled = isEnabled;
@@ -42,26 +47,26 @@ local function Setting(properties: SettingProperties)
         end;
       });
 
-    elseif properties.type == "string" or properties.type == "number" then
+    elseif settingMetadata.type == "string" or settingMetadata.type == "number" then
 
       return React.createElement(TextInput, {
         value = properties.value;
-        placeholder = properties.defaultValue;
+        placeholder = settingMetadata.defaultValue;
         layoutOrder = 1;
         onChanged = function(value: string): ()
         
-          properties.onChanged(if value == "" then nil elseif properties.type == "number" then tonumber(value) else value);
+          properties.onChanged(if value == "" then nil elseif settingMetadata.type == "number" then tonumber(value) else value);
 
         end;
       });
 
-    elseif properties.type == "Instance" then
+    elseif settingMetadata.type == "Instance" then
 
       return React.createElement(InstanceInput, {
         value = properties.value;
         layoutOrder = 1;
-        defaultValue = properties.defaultValue;
-        className = properties.className;
+        defaultValue = defaultValue;
+        className = settingMetadata["className"];
         onChanged = function(value: Instance?): ()
         
           properties.onChanged(value);
@@ -71,11 +76,11 @@ local function Setting(properties: SettingProperties)
 
     else
 
-      error(`Unsupported setting type: {properties.type}`);
+      error(`Unsupported setting type: {settingMetadata.type}`);
 
     end;
 
-  end, {properties.type :: unknown, properties.value, properties.defaultValue, properties.onChanged});
+  end, {settingMetadata.type :: unknown, properties.value, settingMetadata.defaultValue, properties.onChanged});
 
   return React.createElement("Frame", {
     BackgroundTransparency = 0;
@@ -121,7 +126,7 @@ local function Setting(properties: SettingProperties)
       NameLabel = React.createElement("TextLabel", {
         AutomaticSize = Enum.AutomaticSize.XY;
         LayoutOrder = 1;
-        Text = properties.name;
+        Text = settingMetadata.name;
         TextSize = 14;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Bold);
         TextColor3 = colors.text;
@@ -132,7 +137,7 @@ local function Setting(properties: SettingProperties)
       DescriptionLabel = React.createElement("TextLabel", {
         LayoutOrder = 2;
         AutomaticSize = Enum.AutomaticSize.XY;
-        Text = properties.description;
+        Text = settingMetadata.description;
         TextSize = 12;
         FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
         TextColor3 = colors.text;

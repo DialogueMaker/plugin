@@ -17,6 +17,7 @@ function Settings(properties: SettingsProperties)
 
   local settingsTarget, setSettingsTarget = React.useState(properties.initialSettingsTarget);
   local layoutOrder = properties.layoutOrder;
+  local colors = useStudioColors();
 
   local targetType = React.useMemo(function()
   
@@ -39,8 +40,6 @@ function Settings(properties: SettingsProperties)
     end;
 
   end, { settingsTarget });
-
-  local metadataCollection = settingsMetadata[targetType];
   
   local getSettingsContainer = React.useCallback(function()
 
@@ -85,6 +84,23 @@ function Settings(properties: SettingsProperties)
   end, { getSettingsContainer });
 
   local currentSettings, setCurrentSettings = React.useState(getCurrentSettings());
+  local metadataGroupMap = settingsMetadata[targetType];
+  local settingGroups = {};
+
+  for _, metadataGroup in metadataGroupMap do
+
+    local settingGroup = React.createElement(SettingGroup, {
+      metadataGroup = metadataGroup;
+      settingContainer = getSettingsContainer();
+      currentSettings = currentSettings;
+      settingsTarget = settingsTarget;
+      key = metadataGroup.name;
+      layoutOrder = #settingGroups + 1;
+    });
+
+    table.insert(settingGroups, settingGroup);
+
+  end;
 
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   React.useEffect(function(): ()
@@ -150,26 +166,6 @@ function Settings(properties: SettingsProperties)
     end;
 
   end, {getSettingsContainer :: unknown, settingsTarget});
-
-  local settingGroups = {};
-
-  for groupName, categoryContent in metadataCollection do
-
-    local settingGroup = React.createElement(SettingGroup, {
-      name = groupName;
-      items = categoryContent;
-      settingContainer = getSettingsContainer();
-      currentSettings = currentSettings;
-      settingsTarget = settingsTarget;
-      key = groupName;
-      layoutOrder = #settingGroups + 1;
-    });
-
-    table.insert(settingGroups, settingGroup);
-
-  end;
-
-  local colors = useStudioColors();
 
   return React.createElement("ScrollingFrame", {
     Size = UDim2.fromScale(1, 1);
