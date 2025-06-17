@@ -7,7 +7,7 @@ local function useDialogueContentScript(dialogueScript: ModuleScript): (ModuleSc
 
   local getDialogueContentScript = React.useCallback(function(): ModuleScript?
   
-    local contentScript = dialogueScript:FindFirstChild("DialogueContentScript");
+    local contentScript = dialogueScript:FindFirstChild("ContentScript");
     if contentScript and contentScript:IsA("ModuleScript") then
     
       return contentScript;

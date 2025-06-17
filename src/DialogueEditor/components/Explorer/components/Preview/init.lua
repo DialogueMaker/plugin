@@ -89,7 +89,7 @@ local function Preview(properties: PreviewProperties)
             if not dialogueContentScript then
 
               local newDialogueContentScript = root.Templates.DialogueContentScriptTemplate:Clone();
-              newDialogueContentScript.Name = "DialogueContentScript";
+              newDialogueContentScript.Name = "ContentScript";
               newDialogueContentScript.Parent = selectedScript;
               dialogueContentScript = newDialogueContentScript;
 
