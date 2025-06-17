@@ -68,7 +68,7 @@ function Settings(properties: SettingsProperties)
 
         for _, settingInstance in categoryFolder:GetChildren() do
 
-          if settingInstance:IsA("BoolValue") or settingInstance:IsA("ObjectValue") or settingInstance:IsA("NumberValue") then
+          if settingInstance:IsA("BoolValue") or settingInstance:IsA("ObjectValue") or settingInstance:IsA("NumberValue") or settingInstance:IsA("StringValue") then
 
             currentSettings[categoryFolder.Name][settingInstance.Name] = settingInstance.Value;
 

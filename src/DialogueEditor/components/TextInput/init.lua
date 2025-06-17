@@ -22,7 +22,7 @@ local function TextInput(properties: TextInputProperties)
     Text = properties.value or "";
     TextColor3 = colors.text;
     PlaceholderText = placeholderText;
-    TextSize = 12;
+    TextSize = 14;
     BackgroundTransparency = 0;
     LayoutOrder = layoutOrder;
     FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
