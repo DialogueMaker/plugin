@@ -23,7 +23,7 @@ local function useDialogueMakerPackages()
     end;
 
     local dialogueMakerPackageContainers = CollectionService:GetTagged("DialogueMakerPackages");
-    local dialogueMakerPackages: Instance? = if dialogueMakerKit then dialogueMakerKit:FindFirstChild("Packages") else nil;
+    local dialogueMakerPackages = if dialogueMakerKit then dialogueMakerKit:FindFirstChild("Packages") else nil;
 
     if not dialogueMakerPackages then
 
@@ -44,7 +44,7 @@ local function useDialogueMakerPackages()
 
   end, {});
 
-  local dialogueMakerPackages, setDialogueMakerPackages = React.useState(getDialogueMakerPackages());
+  local dialogueMakerPackages: Instance?, setDialogueMakerPackages = React.useState(getDialogueMakerPackages());
 
   React.useEffect(function()
 

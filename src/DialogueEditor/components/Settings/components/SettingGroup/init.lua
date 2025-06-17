@@ -5,6 +5,7 @@ local React = require(root.roblox_packages.react);
 local Setting = require(script.components.Setting);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local useDialogueMakerPackages = require(root.DialogueEditor.hooks.useDialogueMakerPackages);
 
 export type SettingsContainerProperties = {
   name: string;
@@ -25,6 +26,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
   local layoutOrder = properties.layoutOrder;
   local colors = useStudioColors();
   local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
+  local dialogueMakerPackages = useDialogueMakerPackages();
 
   local settingComponents = {};
 
@@ -37,7 +39,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
       description = settingMetadata.description;
       layoutOrder = #settingComponents + 1;
       value = currentValue;
-      placeholder = settingMetadata.defaultValue;
+      defaultValue = if settingsTarget:HasTag("DialogueMakerLoader") and settingName == "componentScript" and dialogueMakerPackages then dialogueMakerPackages:FindFirstChild("StandardTheme") else settingMetadata.defaultValue;
       type = settingMetadata.type;
       className = settingMetadata.className;
       onReset = function()
