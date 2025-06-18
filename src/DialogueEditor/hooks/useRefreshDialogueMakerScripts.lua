@@ -104,7 +104,11 @@ local function useRefreshDialogueMakerScripts()
                     local key = settingInstance.Name;
                     key = if key == "componentScript" then "component" else key;
 
-                    local value = `script.Settings.{categoryFolder.Name}.{settingInstance.Name}.Value`;
+                    local enumName = settingInstance:GetAttribute("Enum");
+                    local enumPrefix = if enumName then `Enum.{enumName}:FromName(` else "";
+                    local valueFullName = `script.Settings.{categoryFolder.Name}.{settingInstance.Name}.Value`;
+                    local enumSuffix = if enumName then ")" else "";
+                    local value = `{enumPrefix}{valueFullName}{enumSuffix}`;
                     value = if key == "component" then `require({if settingInstance.Value then value else "packages.StandardTheme"})` else value;
                     settingsString = `{settingsString}\n      {extraSpaces}{key} = {value};`;
 

@@ -6,23 +6,9 @@ local Conversation = require(root.DialogueMakerKit.Packages.Conversation);
 local Dialogue = require(root.DialogueMakerKit.Packages.Dialogue);
 
 export type Validator = (value: any) -> ();
-export type SettingMetadata = {name: string; label: string; description: string; type: string; defaultValue: any; validator: Validator?};
+export type SettingMetadata = {name: string; label: string; description: string; type: string; defaultValue: any; validator: Validator?; enum: Enum?};
 export type SettingMetadataGroup = {name: string; settings: {SettingMetadata}};
 export type SettingMetadataGroupMap = {[string]: {SettingMetadataGroup}};
-
-local function validateKey(key: string?): ()
-  
-  if not key then
-    
-    return;
-
-  end
-
-  local keyCode = Enum.KeyCode:FromName(key);
-
-  assert(keyCode, `Invalid key: {key}`);
-  
-end
 
 local metadata: SettingMetadataGroupMap = {
   loader = {
@@ -34,14 +20,14 @@ local metadata: SettingMetadataGroupMap = {
           label = "Action key";
           description = "The key that the player can press to interact with the dialogue.";
           type = "string";
-          validator = validateKey;
+          enum = Enum.KeyCode;
         };
         {
           name = "interactKeyGamepad";
           label = "Gamepad action key";
           description = "The key that the player can press on a gamepad to interact with the dialogue.";
           type = "string";
-          validator = validateKey;
+          enum = Enum.KeyCode;
         };
       };
     };

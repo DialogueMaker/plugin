@@ -85,6 +85,17 @@ local function SettingGroup(properties: SettingsContainerProperties)
 
         local didChange, errorMessage = pcall(function()
 
+          if settingMetadata.enum and newValue ~= "" then
+
+            local enum = settingMetadata.enum:FromName(newValue);
+            if not enum then
+              
+              error(`{newValue} is not valid for enum {settingMetadata.enum}`, 0);
+
+            end;
+
+          end;
+
           -- Create the settings folder if it doesn't exist.
           if not settingContainer then
               
@@ -111,7 +122,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
           assert(categoryFolder, "Category folder not found even after creating it.");
 
           -- Create the setting instance if it doesn't exist.
-          local settingInstance = categoryFolder:FindFirstChild(metadataGroup.name);
+          local settingInstance = categoryFolder:FindFirstChild(settingMetadata.name);
           if not settingInstance then
 
             local newSettingInstance: Instance;
@@ -127,6 +138,12 @@ local function SettingGroup(properties: SettingsContainerProperties)
             elseif settingMetadata.type == "string" then
 
               newSettingInstance = Instance.new("StringValue");
+
+              if settingMetadata.enum then
+
+                newSettingInstance:SetAttribute("Enum", tostring(settingMetadata.enum));
+
+              end;
 
             elseif settingMetadata.type == "Instance" then
 
@@ -186,7 +203,7 @@ local function SettingGroup(properties: SettingsContainerProperties)
         if not didChange then
 
           finishHistoryRecording(historyIdentifier, Enum.FinishRecordingOperation.Cancel);
-          error(`Failed to change setting {metadataGroup.name}.{settingMetadata.name}: {errorMessage}`);
+          error(`Failed to change setting {metadataGroup.name}.{settingMetadata.name}: {errorMessage}`, 0);
 
         end;
 

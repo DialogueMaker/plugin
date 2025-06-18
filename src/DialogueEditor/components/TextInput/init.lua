@@ -17,9 +17,16 @@ local function TextInput(properties: TextInputProperties)
   local placeholderText = properties.placeholder or "";
   local layoutOrder = properties.layoutOrder or 1;
   local onChanged = properties.onChanged;
+  local text, setText = React.useState(properties.value or "");
+
+  React.useEffect(function()
+  
+    setText(properties.value or "");
+
+  end, { properties.value });
 
   return React.createElement("TextBox", {
-    Text = properties.value or "";
+    Text = text;
     TextColor3 = colors.text;
     PlaceholderText = placeholderText;
     TextSize = 14;
@@ -27,9 +34,17 @@ local function TextInput(properties: TextInputProperties)
     LayoutOrder = layoutOrder;
     FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
     Size = UDim2.new(1, 0, 0, 30);
+    ClearTextOnFocus = false;
     BackgroundColor3 = colors.input;
+    [React.Change.Text] = function(self: TextBox)
+    
+      local newText = self.Text;
+      setText(newText);
+
+    end,
     [React.Event.FocusLost] = function(self: TextBox)
     
+      setText(properties.value or "");
       onChanged(self.Text);
 
     end;
