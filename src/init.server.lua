@@ -63,7 +63,7 @@ end;
 
 local function openDialogueEditor(): ()
 
-  local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 512, 241, 512, 150);
+  local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 584, 300, 1, 1);
   local newPluginGui = plugin:CreateDockWidgetPluginGui(`Dialogue Maker`, widgetInfo);
   pluginGUI = newPluginGui;
 
