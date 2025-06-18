@@ -64,11 +64,12 @@ end;
 local function openDialogueEditor(): ()
 
   local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 584, 300, 1, 1);
-  local newPluginGui = plugin:CreateDockWidgetPluginGui(`Dialogue Maker`, widgetInfo);
+  local title = `Dialogue Maker {script:GetAttribute("Version")}`;
+  local newPluginGui = plugin:CreateDockWidgetPluginGui(title, widgetInfo);
   pluginGUI = newPluginGui;
 
   newPluginGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
-  newPluginGui.Title = "Dialogue Maker";
+  newPluginGui.Title = title;
   newPluginGui:BindToClose(closeDialogueEditor);
   
   local newPluginGUIRoot = ReactRoblox.createRoot(newPluginGui);

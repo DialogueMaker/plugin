@@ -7,7 +7,6 @@ local Explorer = require(script.components.Explorer);
 local Settings = require(script.components.Settings);
 local InitialSetupScreen = require(script.components.InitialSetupScreen);
 local useDialogueMakerScriptSelection = require(script.hooks.useDialogueMakerScriptSelection);
-local useAutomaticWidgetTitle = require(script.hooks.useAutomaticWidgetTitle);
 local useAutomaticClose = require(script.hooks.useAutomaticClose);
 local useDialogueMakerPackages = require(script.hooks.useDialogueMakerPackages);
 
@@ -23,7 +22,6 @@ local function DialogueEditor(props: DialogueEditorProperties)
   local settingsTarget, setSettingsTarget = React.useState(nil :: ModuleScript?);
   local closeDialogueEditor = props.closeDialogueEditor;
 
-  useAutomaticWidgetTitle(props.pluginGUI, conversationScript);
   useAutomaticClose(closeDialogueEditor);
 
   local dialogueMakerPackages = useDialogueMakerPackages();
