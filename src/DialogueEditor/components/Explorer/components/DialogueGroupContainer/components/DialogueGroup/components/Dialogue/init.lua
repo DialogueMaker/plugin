@@ -176,6 +176,9 @@ local function DialogueItem(props: DialogueItemProperties)
           Padding = UDim.new(0, 10);
           VerticalAlignment = Enum.VerticalAlignment.Center;
         });
+        UIFlexItem = React.createElement("UIFlexItem", {
+          FlexMode = Enum.UIFlexMode.Fill;
+        });
         Icon = React.createElement("ImageLabel", {
           LayoutOrder = 1;
           Image = icons[`{dialogueType:sub(1, 1):lower()}{dialogueType:sub(2)}`];
@@ -194,6 +197,7 @@ local function DialogueItem(props: DialogueItemProperties)
           BackgroundTransparency = 1;
           TextSize = 14;
           TextXAlignment = Enum.TextXAlignment.Left;
+          TextTruncate = Enum.TextTruncate.AtEnd;
         });
       });
       Indicator = React.createElement("ImageLabel", {
@@ -201,6 +205,10 @@ local function DialogueItem(props: DialogueItemProperties)
         Image = "rbxassetid://136533602473973";
         Size = UDim2.fromOffset(20, 20);
         BackgroundTransparency = 1;
+      }, {
+        UIFlexItem = React.createElement("UIFlexItem", {
+          FlexMode = Enum.UIFlexMode.Shrink;
+        });
       })
     })
   });

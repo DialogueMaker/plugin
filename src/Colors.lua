@@ -29,13 +29,13 @@ local colors: {[string]: ColorDictionary} = {
     text = Color3.new(1, 1, 1);
     textDisabled = Color3.fromRGB(182, 182, 182);
     textPlaceholder = Color3.fromRGB(175, 175, 175);
-    toolbar = Color3.fromRGB(74, 74, 74);
+    toolbar = Color3.fromRGB(53, 53, 53);
     primaryButton = Color3.fromRGB(61, 137, 223);
     toolbarButton = Color3.fromRGB(74, 74, 74);
     buttonText = Color3.fromRGB(255, 255, 255);
     border = Color3.fromRGB(44, 44, 44);
     dropdownButton = Color3.fromRGB(201, 201, 201);
-    input = Color3.fromRGB(50, 50, 50);
+    input = Color3.fromRGB(37, 37, 37);
   };
   Light = {
     backgroundResponse = Color3.fromRGB(30, 103, 19);

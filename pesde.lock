@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 format = 2
 name = "dialoguemaker/plugin"
-version = "5.0.0"
+version = "5.0.0-rc.1"
 target = "roblox"
 
 [workspace."dialoguemaker/kit"]
