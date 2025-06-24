@@ -1,0 +1,3 @@
+[submodule "src/DialogueMakerKit"]
+	path = src/DialogueMakerKit
+	url = https://github.com/dialoguemaker/kit
