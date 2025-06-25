@@ -1,9 +1,9 @@
 {
-  "name": "DialoguePluginScript",
+  "name": "DialogueMakerPlugin",
   "tree": {
     "$className": "DataModel",
     "ServerStorage": {
-      "DialoguePluginScript": {
+      "DialogueMakerPlugin": {
         "$path": "src",
         "roblox_packages": {
           "$path": "roblox_packages"

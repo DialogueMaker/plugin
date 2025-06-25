@@ -3,6 +3,7 @@
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
+local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
@@ -15,11 +16,14 @@ export type DialogueItemProperties = {
   dialogueScript: ModuleScript;
   dialogueScriptCount: number;
   layoutOrder: number;
-  plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueItem(props: DialogueItemProperties)
+
+  -- Replace services with VirtualService services for testing.
+  -- VirtualService services are used to mock specific Roblox services in tests.
+  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
 
   local dialogueType = props.type;
   local dialogueScript = props.dialogueScript;
@@ -34,7 +38,7 @@ local function DialogueItem(props: DialogueItemProperties)
 
   local incrementPriority = React.useCallback(function(increment: number)
     
-    if not dialogueScript.Parent then
+    if not dialogueScript.Parent or (increment < 0 and layoutOrder <= 1) or (increment > 0 and layoutOrder >= dialogueScriptCount) then
           
       return;
 
@@ -78,9 +82,74 @@ local function DialogueItem(props: DialogueItemProperties)
 
     finishHistoryRecording(historyIdentifier);
 
-  end, {dialogueType :: unknown, dialogueScript, dialogueScriptCount});
+  end, {dialogueType :: unknown, dialogueScript, dialogueScriptCount, layoutOrder});
+
+  local increasePriority = React.useCallback(function()
+    
+    incrementPriority(-1);
+    
+  end, {incrementPriority});
+
+  local decreasePriority = React.useCallback(function()
+    
+    incrementPriority(1);
+    
+  end, {incrementPriority});
+
+  local viewDialogue = React.useCallback(function()
+
+    Selection:Set({dialogueScript});
+
+  end, {Selection, dialogueScript});
 
   local isDeprioritized = (dialogueType == "Message" or dialogueType == "Redirect") and layoutOrder > 1;
+
+  local increasePriorityButtonRef = React.useRef(nil :: ImageButton?);
+  local decreasePriorityButtonRef = React.useRef(nil :: ImageButton?);
+  local viewButtonRef = React.useRef(nil :: TextButton?);
+
+  React.useEffect(function()
+  
+    local increasePriorityButton = increasePriorityButtonRef.current;
+    local increasePriorityButtonConnection;
+    if increasePriorityButton then
+
+      increasePriorityButtonConnection = VirtualService.events.GuiButton.Activated:getSignal(increasePriorityButton):Connect(increasePriority);
+
+    end;
+
+    local decreasePriorityButton = decreasePriorityButtonRef.current;
+    local decreasePriorityButtonConnection;
+    if decreasePriorityButton then
+
+      decreasePriorityButtonConnection = VirtualService.events.GuiButton.Activated:getSignal(decreasePriorityButton):Connect(decreasePriority);
+
+    end;
+
+    local viewButton = viewButtonRef.current;
+    assert(viewButton, "View button reference is nil");
+
+    local viewButtonConnection = VirtualService.events.GuiButton.Activated:getSignal(viewButton):Connect(viewDialogue);
+
+    return function()
+      
+      if increasePriorityButtonConnection then
+
+        increasePriorityButtonConnection:Disconnect();
+
+      end;
+
+      if decreasePriorityButtonConnection then
+
+        decreasePriorityButtonConnection:Disconnect();
+
+      end;
+      
+      viewButtonConnection:Disconnect();
+
+    end;
+
+  end, {increasePriority, decreasePriority, viewDialogue});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.Y;
@@ -101,17 +170,7 @@ local function DialogueItem(props: DialogueItemProperties)
         Image = icons.increasePriority;
         ImageTransparency = if layoutOrder <= 1 then 0.5 else 0;
         LayoutOrder = 1;
-        [React.Event.Activated] = function()
-          
-          if layoutOrder <= 1 then
-            
-            return;
-
-          end;
-
-          incrementPriority(-1);
-
-        end;
+        ref = increasePriorityButtonRef;
       })
     else nil;
     DecreasePriorityButton = if dialogueType ~= "Conversation" then
@@ -121,17 +180,7 @@ local function DialogueItem(props: DialogueItemProperties)
         Image = icons.decreasePriority;
         ImageTransparency = if layoutOrder >= dialogueScriptCount then 0.5 else 0;
         LayoutOrder = 2;
-        [React.Event.Activated] = function()
-          
-          if layoutOrder >= dialogueScriptCount then
-            
-            return;
-
-          end;
-
-          incrementPriority(1);
-
-        end;
+        ref = decreasePriorityButtonRef;
       })
     else nil;
     ViewButton = React.createElement("TextButton", {
@@ -140,11 +189,7 @@ local function DialogueItem(props: DialogueItemProperties)
       AutomaticSize = Enum.AutomaticSize.Y;
       Text = "";
       LayoutOrder = 3;
-      [React.Event.Activated] = function()
-        
-        Selection:Set({dialogueScript});
-
-      end;
+      ref = viewButtonRef;
     }, {
       UIFlexItem = React.createElement("UIFlexItem", {
         FlexMode = Enum.UIFlexMode.Fill;

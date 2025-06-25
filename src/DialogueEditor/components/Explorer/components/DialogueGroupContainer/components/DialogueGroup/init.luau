@@ -2,7 +2,7 @@
 
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local Dialogue = require(script.components.Dialogue);
+local Dialogue = require(script.components.DialogueItem);
 
 export type DialogueItemType = Dialogue.DialogueItemType;
 

@@ -1,0 +1,122 @@
+name: Run Luau tests
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - production
+    paths:
+      - "src/**"
+      - "pesde.toml"
+      - "development.project.json"
+      - ".github/workflows/run-luau-tests.yml"
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    paths:
+      - "src/**"
+      - "pesde.toml"
+      - "development.project.json"
+      - ".github/workflows/run-luau-tests.yml"
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  build:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Build testing place
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Set up pesde
+        uses: ernisto/setup-pesde@5f9a3399d5ae0fe78b014f5f13cd913f27755fb4
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: pesde install
+
+      - name: Build Rojo project
+        run: rojo build development.project.json -o build.rbxl
+
+      - name: Upload project
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: build.rbxl
+          path: build.rbxl
+    
+  publish:
+    name: Deploy testing place to Roblox
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    needs: build
+    steps:
+      - name: Download project
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: build.rbxl
+
+      - name: POST to Roblox API
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_DEPLOYMENT_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: | 
+          curl \
+          --fail-with-body \
+          -H "x-api-key: $ROBLOX_API_KEY" \
+          -H "Content-Type: application/xml" \
+          --data-binary @build.rbxl \
+          "https://apis.roblox.com/universes/v1/""$ROBLOX_UNIVERSE_ID""/places/""$ROBLOX_PLACE_ID""/versions?versionType=Published"
+
+  test:
+    runs-on: ubuntu-24.04
+    name: Run test cases
+    timeout-minutes: 1
+    needs: publish
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Execute script
+        uses: grand-hawk/action-roblox-luau-execution@v1.0.1
+        with:
+          roblox_api_key: ${{ secrets.ROBLOX_DEPLOYMENT_API_KEY }}
+          universe_id: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          place_id: ${{ vars.ROBLOX_PLACE_ID }}
+          luau_file: "runTests.luau"
+          output_file: "testResults.json"
+          dump_to_summary: true
+
+      - name: Verify all tests passed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+
+              const outputFile = require("./testResults.json");
+              const testResults = outputFile[0];
+              if (!testResults) {
+
+                throw new Error("No test results found.");
+
+              }
+
+              for (const test of testResults) {
+              
+                if (!test.didPass) {
+                
+                  throw new Error("A test case failed.");
+
+                }
+
+              }
+            
+            } catch (error) {
+            
+              core.setFailed(error);
+            
+            }
