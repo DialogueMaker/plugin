@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
+        with:
+          submodules: recursive
 
       - name: Set up pesde
         uses: ernisto/setup-pesde@5f9a3399d5ae0fe78b014f5f13cd913f27755fb4
