@@ -224,7 +224,7 @@ return {
           reactRoot:render(element);
           renderedEvent.Event:Wait();
 
-          -- Simulate a click on the component.
+          -- Verify that the increase and decrease priority buttons are not present.
           local dialogueItem = screenGui:FindFirstChildOfClass("Frame");
           assert(dialogueItem, "DialogueItem should be rendered in the ScreenGui.");
 
