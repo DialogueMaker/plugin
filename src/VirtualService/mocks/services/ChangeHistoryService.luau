@@ -4,4 +4,4 @@ local VirtualChangeHistoryService = {
   currentHistory = {};
 };
 
-return VirtualChangeHistoryService;
+return (VirtualChangeHistoryService :: unknown) :: ChangeHistoryService;
