@@ -237,6 +237,51 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can preview static dialogue content string", function()
+
+        expect(function()
+
+          -- Render the component and wait for it to finish rendering.
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          assert(reactRoot, "React root should be initialized before running tests.");
+
+          local expectedMessage = "This is a static dialogue content string.";
+          local renderedEvent = Instance.new("BindableEvent");
+          local dialogueScript = Instance.new("ModuleScript");
+          dialogueScript.Name = "1";
+          dialogueScript:SetAttribute("DialogueContent", expectedMessage);
+
+          local element = React.createElement(MockComponent, {
+            dialogueScript = dialogueScript;
+            onRendered = function()
+              
+              renderedEvent:Fire();
+
+            end;
+          });
+
+          reactRoot:render(element);
+          renderedEvent.Event:Wait();
+
+          -- Simulate a click on the component.
+          local dialogueItem = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueItem, "DialogueItem should be rendered in the ScreenGui.");
+
+          local viewButton = dialogueItem:FindFirstChild("ViewButton");
+          assert(viewButton and viewButton:IsA("GuiButton"), "ViewButton should be present in the DialogueItem.");
+
+          local informationFrame = viewButton:FindFirstChild("InformationFrame");
+          assert(informationFrame, "Information should be present in the ViewButton.");
+
+          local descriptionLabel = informationFrame:FindFirstChild("DescriptionLabel");
+          assert(descriptionLabel and descriptionLabel:IsA("TextLabel"), "DescriptionLabel should be present in the InformationFrame.");
+          expect(descriptionLabel.Text).toBe(expectedMessage);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
     }
 
   end, {
