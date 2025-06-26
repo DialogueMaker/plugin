@@ -4,6 +4,8 @@ local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Pare
 local DialogueItem = require(script.Parent);
 local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
+local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
+local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
 local ReactRoblox = require(root.roblox_packages["react-roblox"]);
 local IJW = require(root.roblox_packages.ijw);
 local expect = IJW.expect;
@@ -22,6 +24,7 @@ return {
       local onRendered = properties.onRendered;
       local dialogueScript = properties.dialogueScript or Instance.new("ModuleScript");
       local layoutOrder = properties.layoutOrder or 1;
+      local onErrored = properties.onErrored or function() end;
 
       React.useEffect(function()
       
@@ -33,12 +36,17 @@ return {
 
       end, {});
 
-      return React.createElement(DialogueItem, {
-        type = dialogueType;
-        dialogueScript = dialogueScript;
-        dialogueScriptCount = if dialogueScript.Parent then #dialogueScript.Parent:GetChildren() else 1;
-        layoutOrder = layoutOrder;
-        setSettingsTarget = function() end;
+      return React.createElement(ErrorBoundary, {
+        FallbackComponent = React.Fragment;
+        onError = onErrored;
+      }, {
+        React.createElement(DialogueItem, {
+          type = dialogueType;
+          dialogueScript = dialogueScript;
+          dialogueScriptCount = if dialogueScript.Parent then #dialogueScript.Parent:GetChildren() else 1;
+          layoutOrder = layoutOrder;
+          setSettingsTarget = function() end;
+        })
       });
 
     end;
@@ -70,18 +78,29 @@ return {
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           assert(reactRoot, "React root should be initialized before running tests.");
 
-          local renderedEvent = Instance.new("BindableEvent");
-
+          local didRender = false;
+          local propagatedErrorMessage;
           local element = React.createElement(MockComponent, {
+            onErrored = function(errorMessage)
+              
+              propagatedErrorMessage = errorMessage;
+
+            end;
             onRendered = function()
               
-              renderedEvent:Fire();
+              didRender = true;
 
             end;
           });
 
           reactRoot:render(element);
-          renderedEvent.Event:Wait();
+          repeat task.wait() until didRender or propagatedErrorMessage;
+
+          if propagatedErrorMessage then
+
+            error(propagatedErrorMessage);
+          
+          end;
 
           -- Simulate a click on the component.
           local dialogueItem = screenGui:FindFirstChildOfClass("Frame");
