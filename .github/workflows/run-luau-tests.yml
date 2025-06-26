@@ -25,8 +25,8 @@ jobs:
   build:
     if: ${{ !github.event.pull_request.draft }}
     name: Build testing place
-    runs-on: ubuntu-24.04
-    timeout-minutes: 1
+    runs-on: windows-latest
+    timeout-minutes: 2
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4.1.7
