@@ -140,6 +140,95 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("refreshes the selected dialogue group if a dialogue script is removed from a dialogue folder", function()
+
+        expect(function()
+
+          -- Render the component and wait for it to finish rendering.
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          assert(reactRoot, "React root should be initialized before running tests.");
+
+          local messageCount = 4;
+          local dialogueFolder = Instance.new("Folder");
+          dialogueFolder.Name = "Messages";
+
+          local scriptToDestroy;
+
+          for i = 1, messageCount do
+
+            local dialogueScript = Instance.new("ModuleScript");
+            dialogueScript.Name = tostring(i);
+            dialogueScript:SetAttribute("DialogueType", "Message");
+            dialogueScript:AddTag("DialogueMakerDialogueScript");
+            dialogueScript.Parent = dialogueFolder;
+            scriptToDestroy = dialogueScript;
+
+          end;
+
+          local selectedScript = Instance.new("ModuleScript");
+          selectedScript:SetAttribute("DialogueType", "Message");
+          selectedScript:AddTag("DialogueMakerDialogueScript");
+          dialogueFolder.Parent = selectedScript;
+
+          local propagatedErrorMessage;
+          local didRender = false;
+          local element = React.createElement(MockComponent, {
+            selectedScript = selectedScript;
+            onErrored = function(errorMessage)
+
+              propagatedErrorMessage = errorMessage;
+
+            end;
+            onRendered = function()
+              
+              didRender = true;
+
+            end;
+          });
+
+          reactRoot:render(element);
+          repeat task.wait() until didRender or propagatedErrorMessage;
+          if propagatedErrorMessage then
+
+            error(propagatedErrorMessage);
+
+          end;
+
+          -- Verify that there are four dialogue items rendered.
+          local dialogueGroupContainer = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueGroupContainer, "DialogueGroupContainer should be rendered in the ScreenGui.");
+
+          local dialogueGroup = dialogueGroupContainer:FindFirstChild("DialogueGroup");
+          assert(dialogueGroup, "DialogueGroup should be rendered in the DialogueGroupContainer.");
+
+          local function getDialogueItems()  
+
+            local dialogueItems = {};
+            for _, child in dialogueGroup:GetChildren() do
+
+              if child:IsA("Frame") then
+                
+                table.insert(dialogueItems, child);
+              
+              end;
+
+            end;
+
+            return dialogueItems;
+
+          end;
+
+          expect(#getDialogueItems()).toBe(4);
+
+          -- Add a new dialogue script to the folder and verify that the component refreshes.
+          scriptToDestroy:Destroy();
+          dialogueGroup.ChildRemoved:Wait();
+          expect(#getDialogueItems()).toBe(3);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
