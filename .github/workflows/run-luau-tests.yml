@@ -25,7 +25,7 @@ jobs:
   build:
     if: ${{ !github.event.pull_request.draft }}
     name: Build testing place
-    runs-on: ubuntu-24.04
+    runs-on: windows-2025
     timeout-minutes: 1
     steps:
       - name: Checkout repository
