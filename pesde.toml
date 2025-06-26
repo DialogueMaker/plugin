@@ -8,18 +8,18 @@ includes = [
   "pesde.toml",
   "README.md",
   "LICENSE",
-  "src/**/*.lua",
+  "src/**/*.luau",
 ]
 workspace_members = ["src/DialogueMakerKit"]
 private = true
 
 [target]
 environment = "roblox"
-lib = "src/init.lua"
+lib = "src/init.luau"
 build_files = ["src"]
 
 [engines]
-pesde = "^0.7.0-rc.3"
+pesde = "^0.7.0-rc.6"
 lune = "^0.8.9"
 
 [indices]
@@ -36,6 +36,7 @@ sourcemap_generator = ".pesde/scripts/sourcemap_generator.luau"
 scripts = { name = "pesde/scripts_rojo", version = "^0.1.0", target = "lune" }
 rojo = { name = "pesde/rojo", version = "^7.4.4", target = "lune" }
 luau_lsp = { name = "pesde/luau_lsp", version = "^1.47.0", target = "lune" }
+ijw = { name = "beastslash/ijw", version = "^1.1.2" }
 
 [dependencies]
 react = { wally = "jsdotlua/react", version = "^17.2.1" }

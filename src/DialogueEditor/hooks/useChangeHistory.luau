@@ -4,8 +4,11 @@ local ChangeHistoryService = game:GetService("ChangeHistoryService");
 
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
+local VirtualService = require(root.VirtualService);
 
 local function useChangeHistory()
+
+  ChangeHistoryService = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.ChangeHistoryService else ChangeHistoryService;
 
   local startRecording = React.useCallback(function(label: string)
 

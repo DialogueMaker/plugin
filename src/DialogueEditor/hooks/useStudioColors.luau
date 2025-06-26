@@ -1,17 +1,39 @@
 --!strict
 
+local RunService = game:GetService("RunService");
+
 local React = require(script.Parent.Parent.Parent.roblox_packages.react);
 local Colors = require(script.Parent.Parent.Parent.Colors);
 type ColorDictionary = Colors.ColorDictionary;
 
 local function useStudioColors(): ColorDictionary
 
-  local themeName, setThemeName = React.useState(settings().Studio.Theme.Name)
+  local getColors = React.useCallback(function()
 
-  React.useEffect(function()
+    if not RunService:IsStudio() then
+
+      return Colors.Dark;
+
+    end
+
+    local themeName = settings().Studio.Theme.Name
+    return Colors[themeName] or Colors.Dark
+
+  end, {});
+
+  local colors, setColors = React.useState(getColors())
+
+  React.useEffect(function(): ()
+    
+    if not RunService:IsStudio() then
+
+      return;
+
+    end
+
     local function onThemeChanged()
 
-      setThemeName(settings().Studio.Theme.Name);
+      setColors(getColors());
 
     end
 
@@ -23,9 +45,9 @@ local function useStudioColors(): ColorDictionary
 
     end
     
-  end, {})
+  end, {getColors})
 
-  return Colors[themeName] or Colors.Dark;
+  return colors;
 
 end
 

@@ -2,9 +2,9 @@
 
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local Dialogue = require(script.components.Dialogue);
+local DialogueItem = require(script.components.DialogueItem);
 
-export type DialogueItemType = Dialogue.DialogueItemType;
+export type DialogueItemType = DialogueItem.DialogueItemType;
 
 export type DialogueGroupProperties = {
   name: DialogueItemType;
@@ -24,7 +24,7 @@ local function SettingGroup(properties: DialogueGroupProperties)
   local scriptComponents = {};
   for index, dialogueScript in scriptList do
 
-    local settingComponent = React.createElement(Dialogue, {
+    local settingComponent = React.createElement(DialogueItem, {
       key = dialogueScript:GetFullName();
       plugin = properties.plugin;
       dialogueScript = dialogueScript;
