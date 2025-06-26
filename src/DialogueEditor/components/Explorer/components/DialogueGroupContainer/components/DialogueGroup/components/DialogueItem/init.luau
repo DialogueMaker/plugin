@@ -16,7 +16,6 @@ export type DialogueItemProperties = {
   dialogueScript: ModuleScript;
   dialogueScriptCount: number;
   layoutOrder: number;
-  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueItem(props: DialogueItemProperties)
@@ -210,7 +209,7 @@ local function DialogueItem(props: DialogueItemProperties)
         PaddingTop = UDim.new(0, 15);
         PaddingBottom = UDim.new(0, 15);
       });
-      Information = React.createElement("Frame", {
+      InformationFrame = React.createElement("Frame", {
         AutomaticSize = Enum.AutomaticSize.XY;
         LayoutOrder = 1;
         BackgroundTransparency = 1;
@@ -232,7 +231,7 @@ local function DialogueItem(props: DialogueItemProperties)
           ImageColor3 = colors.text;
           ImageTransparency = if isDeprioritized then 0.5 else 0;
         });
-        Description = React.createElement("TextLabel", {
+        DescriptionLabel = React.createElement("TextLabel", {
           Text = if dialogueType == "Conversation" then dialogueScript.Name else (dialogueContent or "Nothing yet...");
           TextColor3 = colors.text;
           TextTransparency = if not isDeprioritized and (dialogueType == "Conversation" or dialogueContent) then 0 else 0.5;

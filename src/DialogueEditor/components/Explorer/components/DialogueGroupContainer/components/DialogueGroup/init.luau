@@ -3,35 +3,34 @@
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.components.DialogueItem);
+local VirtualService = require(root.VirtualService);
 
 export type DialogueItemType = DialogueItem.DialogueItemType;
 
 export type DialogueGroupProperties = {
   name: DialogueItemType;
   plugin: Plugin;
-  scriptList: {ModuleScript};
+  dialogueScripts: {ModuleScript};
   layoutOrder: number;
-  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
-local function SettingGroup(properties: DialogueGroupProperties)
+local function DialogueGroup(properties: DialogueGroupProperties)
 
   local groupName = properties.name;
-  local scriptList = properties.scriptList;
+  local dialogueScripts = properties.dialogueScripts;
   local layoutOrder = properties.layoutOrder;
-  local setSettingsTarget = properties.setSettingsTarget;
+  local plugin = if VirtualService.mocks.isEnabled then VirtualService.mocks.globals.plugin else properties.plugin;
 
   local scriptComponents = {};
-  for index, dialogueScript in scriptList do
+  for index, dialogueScript in dialogueScripts do
 
     local settingComponent = React.createElement(DialogueItem, {
       key = dialogueScript:GetFullName();
-      plugin = properties.plugin;
+      plugin = plugin;
       dialogueScript = dialogueScript;
-      dialogueScriptCount = #scriptList;
+      dialogueScriptCount = #dialogueScripts;
       layoutOrder = index;
       type = groupName :: DialogueItemType;
-      setSettingsTarget = setSettingsTarget;
     });
 
     table.insert(scriptComponents, settingComponent);
@@ -53,4 +52,4 @@ local function SettingGroup(properties: DialogueGroupProperties)
 
 end;
 
-return React.memo(SettingGroup);
+return React.memo(DialogueGroup);

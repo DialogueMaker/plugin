@@ -202,8 +202,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
       layoutOrder = categoryIndex;
       plugin = props.plugin;
       key = dialogueType;
-      scriptList = scriptList;
-      setSettingsTarget = setSettingsTarget;
+      dialogueScripts = scriptList;
     });
 
     table.insert(dialogueGroups, dialogueGroup);
