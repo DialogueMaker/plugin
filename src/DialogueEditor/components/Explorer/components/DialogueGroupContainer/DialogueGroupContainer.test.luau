@@ -221,7 +221,7 @@ return {
 
           expect(#getDialogueItems()).toBe(4);
 
-          -- Add a new dialogue script to the folder and verify that the component refreshes.
+          -- Remove a dialogue script to the folder and verify that the component refreshes.
           scriptToDestroy:Destroy();
           dialogueGroup.ChildRemoved:Wait();
           expect(#getDialogueItems()).toBe(3);
