@@ -4,6 +4,8 @@ local root = script.Parent.Parent.Parent.Parent.Parent.Parent;
 local DialogueGroupContainer = require(script.Parent);
 local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
+local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
+local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
 local ReactRoblox = require(root.roblox_packages["react-roblox"]);
 local IJW = require(root.roblox_packages.ijw);
 local expect = IJW.expect;
@@ -21,6 +23,7 @@ return {
       local dialogueType = properties.type or "Message";
       local onRendered = properties.onRendered;
       local selectedScript = properties.selectedScript;
+      local onErrored = properties.onErrored or function() end;
 
       React.useEffect(function()
       
@@ -32,11 +35,16 @@ return {
 
       end, {});
 
-      return React.createElement(DialogueGroupContainer, {
-        name = dialogueType;
-        plugin = VirtualService.mocks.globals.plugin;
-        selectedScript = selectedScript;
-        layoutOrder = 1;
+      return React.createElement(ErrorBoundary, {
+        FallbackComponent = React.Fragment;
+        onError = onErrored;
+      }, {
+        React.createElement(DialogueGroupContainer, {
+          name = dialogueType;
+          plugin = VirtualService.mocks.globals.plugin;
+          selectedScript = selectedScript;
+          layoutOrder = 1;
+        })
       });
 
     end;
@@ -51,7 +59,6 @@ return {
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           assert(reactRoot, "React root should be initialized before running tests.");
 
-          local renderedEvent = Instance.new("BindableEvent");
           local messageCount = 4;
           local dialogueFolder = Instance.new("Folder");
           dialogueFolder.Name = "Messages";
@@ -71,17 +78,29 @@ return {
           selectedScript:AddTag("DialogueMakerDialogueScript");
           dialogueFolder.Parent = selectedScript;
 
+          local propagatedErrorMessage;
+          local didRender = false;
           local element = React.createElement(MockComponent, {
             selectedScript = selectedScript;
+            onErrored = function(errorMessage)
+
+              propagatedErrorMessage = errorMessage;
+
+            end;
             onRendered = function()
               
-              renderedEvent:Fire();
+              didRender = true;
 
             end;
           });
 
           reactRoot:render(element);
-          renderedEvent.Event:Wait();
+          repeat task.wait() until didRender or propagatedErrorMessage;
+          if propagatedErrorMessage then
+
+            error(propagatedErrorMessage);
+
+          end;
 
           -- Verify that there are four dialogue items rendered.
           local dialogueGroupContainer = screenGui:FindFirstChildOfClass("Frame");
@@ -118,7 +137,7 @@ return {
           dialogueGroup.ChildAdded:Wait();
           expect(#getDialogueItems()).toBe(5);
 
-        end).toFinishBeforeSeconds(3);
+        end).toFinishBeforeSeconds(1);
 
       end);
       

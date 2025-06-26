@@ -5,10 +5,12 @@ local Selection = game:GetService("Selection");
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
+local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
 local DialogueGroup = require(script.components.DialogueGroup);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local TabSelector = require(root.DialogueEditor.components.TabSelector);
 local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.TabSelectorButton);
+local useErrorBoundary = ReactErrorBoundary.useErrorBoundary;
 
 type DialogueItemType = DialogueGroup.DialogueItemType;
 
@@ -25,6 +27,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   local layoutOrder = props.layoutOrder;
   local selectedScript = props.selectedScript;
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
+  local errorBoundary = useErrorBoundary();
 
   local getSelectedTab = React.useCallback(function(): DialogueItemType?
 
@@ -108,86 +111,98 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     local function refreshTable()
 
-      cleanupConnections();
-      refreshDialogueMakerScripts();
-      setConversations(getDialogueScripts("Conversations"));
-      setRedirects(getDialogueScripts("Redirects"));
-      setResponses(getDialogueScripts("Responses"));
-      setMessages(getDialogueScripts("Messages"));
+      local didRefresh, errorMessage = pcall(function()
 
-      if selectedTab and selectedScript then
+        cleanupConnections();
+        refreshDialogueMakerScripts();
+        setConversations(getDialogueScripts("Conversations"));
+        setRedirects(getDialogueScripts("Redirects"));
+        setResponses(getDialogueScripts("Responses"));
+        setMessages(getDialogueScripts("Messages"));
 
-        local folder = selectedScript:FindFirstChild(selectedTab);
-        setSelectedTab(if folder then selectedTab else getSelectedTab());
+        if selectedTab and selectedScript then
 
-      else
+          local folder = selectedScript:FindFirstChild(selectedTab);
+          setSelectedTab(if folder then selectedTab else getSelectedTab());
 
-        setSelectedTab(getSelectedTab());
+        else
 
-      end;
+          setSelectedTab(getSelectedTab());
 
-      -- Separate the dialogue item types.
-      if selectedScript then
+        end;
 
-        for _, folderName in {"Messages", "Responses", "Redirects"} do
-          
-          local dialogueFolder = selectedScript:FindFirstChild(folderName);
-          if not dialogueFolder then
+        -- Separate the dialogue item types.
+        if selectedScript then
 
-            continue;
-
-          end;
-
-          for _, possibleDialogueScript in dialogueFolder:GetChildren() do
-
-            if not possibleDialogueScript:HasTag("DialogueMakerDialogueScript") then
+          for _, folderName in {"Messages", "Responses", "Redirects"} do
+            
+            local dialogueFolder = selectedScript:FindFirstChild(folderName);
+            if not dialogueFolder then
 
               continue;
 
             end;
-            
-            table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
-            table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
-            table.insert(contentScriptConnections, possibleDialogueScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
 
-          end;
+            for _, possibleDialogueScript in dialogueFolder:GetChildren() do
 
-          table.insert(contentScriptConnections, dialogueFolder.ChildAdded:Connect(refreshTable));
-          table.insert(contentScriptConnections, dialogueFolder.ChildRemoved:Connect(refreshTable));
-          
-        end;
+              if not possibleDialogueScript:HasTag("DialogueMakerDialogueScript") then
 
-        table.insert(contentScriptConnections, selectedScript.ChildAdded:Connect(refreshTable));
-        table.insert(contentScriptConnections, selectedScript.ChildRemoved:Connect(refreshTable));
+                continue;
 
-      else
-        
-        local selection = Selection:Get();
-        if #selection == 1 then
-
-          local conversationsParent = if selection[1]:IsA("Folder") then selection[1] else selection[1]:FindFirstChild("Conversations");
-
-          if not conversationsParent then
-
-            table.insert(contentScriptConnections, selection[1].ChildAdded:Connect(refreshTable));
-            return;
-
-          end;
-
-          table.insert(contentScriptConnections, conversationsParent.ChildAdded:Connect(refreshTable));
-          table.insert(contentScriptConnections, conversationsParent.ChildRemoved:Connect(refreshTable));
-
-          for _, possibleConversationScript in conversationsParent:GetChildren() do
-
-            if possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:HasTag("DialogueMakerConversationScript") then
+              end;
               
-              table.insert(conversations, possibleConversationScript);
+              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
+              table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
+              table.insert(contentScriptConnections, possibleDialogueScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
+
+            end;
+
+            table.insert(contentScriptConnections, dialogueFolder.ChildAdded:Connect(refreshTable));
+            table.insert(contentScriptConnections, dialogueFolder.ChildRemoved:Connect(refreshTable));
             
+          end;
+
+          table.insert(contentScriptConnections, selectedScript.ChildAdded:Connect(refreshTable));
+          table.insert(contentScriptConnections, selectedScript.ChildRemoved:Connect(refreshTable));
+
+        else
+          
+          local selection = Selection:Get();
+          if #selection == 1 then
+
+            local conversationsParent = if selection[1]:IsA("Folder") then selection[1] else selection[1]:FindFirstChild("Conversations");
+
+            if not conversationsParent then
+
+              table.insert(contentScriptConnections, selection[1].ChildAdded:Connect(refreshTable));
+
+            else
+
+              table.insert(contentScriptConnections, conversationsParent.ChildAdded:Connect(refreshTable));
+              table.insert(contentScriptConnections, conversationsParent.ChildRemoved:Connect(refreshTable));
+
+              for _, possibleConversationScript in conversationsParent:GetChildren() do
+
+                if possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:HasTag("DialogueMakerConversationScript") then
+                  
+                  table.insert(conversations, possibleConversationScript);
+                
+                end;
+
+              end;
+
             end;
 
           end;
 
         end;
+
+      end);
+
+      if not didRefresh then
+
+        print("Error refreshing dialogue scripts: ", errorMessage);
+        errorBoundary.showBoundary(errorMessage);
 
       end;
 
@@ -201,7 +216,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     end;
 
-  end, {selectedScript :: unknown, getSelectedTab, refreshDialogueMakerScripts});
+  end, {selectedScript :: unknown, getSelectedTab, refreshDialogueMakerScripts, errorBoundary});
 
   local tabs = {};
   local dialogueGroup = React.createElement(React.Fragment);
