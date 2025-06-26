@@ -3,6 +3,7 @@
 local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent.Parent.Parent;
+local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
 local DialogueGroup = require(script.components.DialogueGroup);
 local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
@@ -15,25 +16,81 @@ export type DialogueTableBodyProperties = {
   layoutOrder: number;
   selectedScript: ModuleScript?;
   plugin: Plugin;
-  setSettingsTarget: (target: ModuleScript?) -> ();
 }
 
 local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
+  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
+
   local layoutOrder = props.layoutOrder;
   local selectedScript = props.selectedScript;
-  local setSettingsTarget = props.setSettingsTarget;
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
 
-  local conversations, setConversations = React.useState({} :: {ModuleScript});
-  local redirects, setRedirects = React.useState({} :: {ModuleScript});
-  local responses, setResponses = React.useState({} :: {ModuleScript});
-  local messages, setMessages = React.useState({} :: {ModuleScript});
-  local selectedTab: DialogueItemType?, setSelectedTab = React.useState(nil :: DialogueItemType?);
+  local getSelectedTab = React.useCallback(function(): DialogueItemType?
+
+    if not selectedScript then
+
+      return "Conversation" :: DialogueItemType;
+
+    end;
+
+    for _, dialogueType in {"Message", "Response", "Redirect"} do
+
+      local messagesFolder = selectedScript:FindFirstChild(`{dialogueType}s`);
+      if messagesFolder and #messagesFolder:GetChildren() > 0 then
+
+        return dialogueType :: DialogueItemType;
+
+      end;
+
+    end;
+
+    return;
+
+  end, {selectedScript});
+
+  local getDialogueScripts = React.useCallback(function(folderName: string): {ModuleScript}
+
+    local dialogueFolder = if selectedScript then selectedScript:FindFirstChild(folderName) else nil;
+    if not selectedScript or not dialogueFolder then
+
+      return {};
+
+    end;
+
+    local dialogueScripts: {ModuleScript} = {};
+    for _, possibleDialogueScript in dialogueFolder:GetChildren() do
+
+      if possibleDialogueScript:IsA("ModuleScript") and possibleDialogueScript:HasTag(if folderName == "Conversations" then "DialogueMakerConversationScript" else "DialogueMakerDialogueScript") then
+
+        table.insert(dialogueScripts, possibleDialogueScript);
+
+      end;
+
+    end;
+
+    local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
+        
+      local messageAPriority = tonumber(dialogueA.Name) or math.huge;
+      local messageBPriority = tonumber(dialogueB.Name) or math.huge;
+      
+      return messageAPriority < messageBPriority;
+      
+    end;
+
+    table.sort(dialogueScripts, sortByMessagePriority);
+
+    return dialogueScripts;
+
+  end, {selectedScript});
+
+  local conversations, setConversations = React.useState(getDialogueScripts("Conversations"));
+  local redirects, setRedirects = React.useState(getDialogueScripts("Redirects"));
+  local responses, setResponses = React.useState(getDialogueScripts("Responses"));
+  local messages, setMessages = React.useState(getDialogueScripts("Messages"));
+  local selectedTab: DialogueItemType?, setSelectedTab = React.useState(getSelectedTab());
 
   React.useEffect(function(): ()
-  
-    setSelectedTab(nil);
 
     local contentScriptConnections: {RBXScriptConnection} = {};
 
@@ -53,13 +110,23 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
       cleanupConnections();
       refreshDialogueMakerScripts();
+      setConversations(getDialogueScripts("Conversations"));
+      setRedirects(getDialogueScripts("Redirects"));
+      setResponses(getDialogueScripts("Responses"));
+      setMessages(getDialogueScripts("Messages"));
+
+      if selectedTab and selectedScript then
+
+        local folder = selectedScript:FindFirstChild(selectedTab);
+        setSelectedTab(if folder then selectedTab else getSelectedTab());
+
+      else
+
+        setSelectedTab(getSelectedTab());
+
+      end;
 
       -- Separate the dialogue item types.
-      local conversations: {ModuleScript} = {};
-      local responses: {ModuleScript} = {};
-      local messages: {ModuleScript} = {};
-      local redirects: {ModuleScript} = {};
-
       if selectedScript then
 
         for _, folderName in {"Messages", "Responses", "Redirects"} do
@@ -79,9 +146,6 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
             end;
             
-            local dialogueType = possibleDialogueScript:GetAttribute("DialogueType");
-            local targetTable = if dialogueType == "Message" then messages elseif dialogueType == "Response" then responses else redirects;
-            table.insert(targetTable, possibleDialogueScript);
             table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueType"):Connect(refreshTable));
             table.insert(contentScriptConnections, possibleDialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(refreshTable));
             table.insert(contentScriptConnections, possibleDialogueScript:GetPropertyChangedSignal("Name"):Connect(refreshTable));
@@ -127,28 +191,9 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
       end;
 
-      local function sortByMessagePriority(dialogueA: ModuleScript, dialogueB: ModuleScript)
-        
-        local messageAPriority = tonumber(dialogueA.Name) or math.huge;
-        local messageBPriority = tonumber(dialogueB.Name) or math.huge;
-        
-        return messageAPriority < messageBPriority;
-        
-      end;
-      
-      table.sort(conversations, sortByMessagePriority);
-      table.sort(redirects, sortByMessagePriority);
-      table.sort(responses, sortByMessagePriority);
-      table.sort(messages, sortByMessagePriority);
-      
-      setConversations(conversations);
-      setRedirects(redirects);
-      setResponses(responses);
-      setMessages(messages);
-
     end;
     
-    refreshTable();
+    task.spawn(refreshTable);
 
     return function()
 
@@ -156,10 +201,10 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     end;
 
-  end, {selectedScript});
+  end, {selectedScript :: unknown, getSelectedTab, refreshDialogueMakerScripts});
 
   local tabs = {};
-  local dialogueGroups = {};
+  local dialogueGroup = React.createElement(React.Fragment);
   for categoryIndex, scriptList in {conversations, redirects, responses, messages} do
 
     if (not selectedScript and categoryIndex > 1) or (selectedScript and categoryIndex == 1) then
@@ -169,13 +214,6 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
     end;
 
     local dialogueType: DialogueItemType = ({"Conversation", "Redirect", "Response", "Message"})[categoryIndex] :: DialogueItemType;
-    if not selectedTab and #scriptList > 0 then
-
-      setSelectedTab(dialogueType);
-      break;
-
-    end;
-
     local tab = React.createElement(TabSelectorButton, {
       key = dialogueType;
       text = `{dialogueType}s` :: string;
@@ -197,15 +235,12 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     end;
     
-    local dialogueGroup = React.createElement(DialogueGroup, {
+    dialogueGroup = React.createElement(DialogueGroup, {
       name = dialogueType :: DialogueItemType;
       layoutOrder = categoryIndex;
       plugin = props.plugin;
-      key = dialogueType;
       dialogueScripts = scriptList;
     });
-
-    table.insert(dialogueGroups, dialogueGroup);
 
   end;
 
@@ -220,7 +255,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
       Padding = UDim.new(0, 15);
     });
     TabSelector = React.createElement(TabSelector, {}, tabs);
-    DialogueGroups = React.createElement(React.Fragment, {}, dialogueGroups);
+    DialogueGroup = dialogueGroup;
   });
 
 end;
