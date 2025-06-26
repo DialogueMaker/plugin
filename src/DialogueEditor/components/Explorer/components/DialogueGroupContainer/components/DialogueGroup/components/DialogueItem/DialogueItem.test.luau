@@ -83,7 +83,6 @@ return {
           local element = React.createElement(MockComponent, {
             onErrored = function(errorMessage)
               
-              print(errorMessage);
               propagatedErrorMessage = errorMessage;
 
             end;
