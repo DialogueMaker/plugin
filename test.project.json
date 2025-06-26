@@ -1,0 +1,25 @@
+{
+  "name": "DialogueMakerPlugin",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "DialogueMakerKit": {
+        "$path": "src/DialogueMakerKit",
+        "$properties": {
+          "Tags": ["DialogueMakerKit"]
+        },
+        "roblox_packages": {
+          "$path": "roblox_packages"
+        }
+      }
+    },
+    "ServerStorage": {
+      "DialogueMakerPlugin": {
+        "$path": "src",
+        "roblox_packages": {
+          "$path": "roblox_packages"
+        }
+      }
+    }
+  }
+}

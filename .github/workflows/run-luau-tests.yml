@@ -8,14 +8,14 @@ on:
     paths:
       - "src/**"
       - "pesde.toml"
-      - "development.project.json"
+      - "test.project.json"
       - ".github/workflows/run-luau-tests.yml"
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
     paths:
       - "src/**"
       - "pesde.toml"
-      - "development.project.json"
+      - "test.project.json"
       - ".github/workflows/run-luau-tests.yml"
 
 concurrency:
