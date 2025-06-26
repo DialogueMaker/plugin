@@ -68,9 +68,21 @@ local function Toolbar(props: ToolbarProps)
 
       historyIdentifier = beginHistoryRecording(`Add {type:lower()} to NPC`);
 
+      local targetFolder = selectedScript:FindFirstChild(`{type}s`);
+      if not targetFolder then
+
+        local newTargetFolder = Instance.new("Folder");
+        newTargetFolder.Name = `{type}s`;
+        newTargetFolder.Parent = selectedScript;
+        targetFolder = newTargetFolder;
+
+      end;
+
+      assert(targetFolder); -- To silence the type checker.
+
       -- Find a name for the content script.
       local targetPriority = 1;
-      for _, instance in selectedScript:GetChildren() do
+      for _, instance in targetFolder:GetChildren() do
         
         local comparedName = tonumber(instance.Name);
         if comparedName and comparedName >= targetPriority then
@@ -90,16 +102,6 @@ local function Toolbar(props: ToolbarProps)
       if type ~= "Redirect" then
 
         newContentScript:SetAttribute("DialogueContent", "Hello world!");
-
-      end;
-
-      local targetFolder = selectedScript:FindFirstChild(`{type}s`);
-      if not targetFolder then
-
-        local newTargetFolder = Instance.new("Folder");
-        newTargetFolder.Name = `{type}s`;
-        newTargetFolder.Parent = selectedScript;
-        targetFolder = newTargetFolder;
 
       end;
 
