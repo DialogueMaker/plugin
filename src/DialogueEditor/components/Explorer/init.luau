@@ -8,11 +8,11 @@ local DialogueGroupContainer = require(script.components.DialogueGroupContainer)
 local Preview = require(script.components.Preview);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
+local useDialogueMakerScriptSelection = require(root.DialogueEditor.hooks.useDialogueMakerScriptSelection);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
 export type DialogueTableProperties = {
-  selectedScript: ModuleScript?;
   plugin: Plugin;
   setSettingsTarget: (target: ModuleScript?) -> ();
   layoutOrder: number;
@@ -21,7 +21,7 @@ export type DialogueTableProperties = {
 local function Explorer(props: DialogueTableProperties)
 
   local plugin = props.plugin;
-  local selectedScript = props.selectedScript;
+  local selectedScript = useDialogueMakerScriptSelection();
   local setSettingsTarget = props.setSettingsTarget;
   local layoutOrder = props.layoutOrder;
   local colors = useStudioColors();
