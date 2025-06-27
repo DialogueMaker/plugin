@@ -33,7 +33,7 @@ local function DialogueItem(props: DialogueItemProperties)
   local colors = useStudioColors();
   local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
-  local dialogueContent = dialogueScript:GetAttribute("DialogueContent");
+  local dialogueContent, setDialogueContent = React.useState(dialogueScript:GetAttribute("DialogueContent"));
 
   local incrementPriority = React.useCallback(function(increment: number)
     
@@ -149,6 +149,22 @@ local function DialogueItem(props: DialogueItemProperties)
     end;
 
   end, {increasePriority, decreasePriority, viewDialogue});
+
+  React.useEffect(function()
+  
+    local dialogueContentChangedConnection = dialogueScript:GetAttributeChangedSignal("DialogueContent"):Connect(function()
+      
+      setDialogueContent(dialogueScript:GetAttribute("DialogueContent"));
+
+    end);
+
+    return function()
+      
+      dialogueContentChangedConnection:Disconnect();
+
+    end;
+
+  end, {dialogueScript});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.Y;

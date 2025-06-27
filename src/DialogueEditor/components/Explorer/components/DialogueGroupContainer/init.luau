@@ -200,17 +200,16 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
         errorBoundary.showBoundary(errorMessage);
 
       end;
+      
+      table.insert(contentScriptConnections, Selection.SelectionChanged:Connect(refreshTable))
 
     end;
-
-    local selectionChangedConnection = Selection.SelectionChanged:Connect(refreshTable);
     
     task.spawn(refreshTable);
 
     return function()
 
       cleanupConnections();
-      selectionChangedConnection:Disconnect();
 
     end;
 
