@@ -200,12 +200,43 @@ return {
           expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
 
           -- Delete a new dialogue script and verify that it is not rendered.
-          assert(dialogueGroup);
-
+          local dialogueItem = getDialogueItems(screenGui)[1]
           dialogueFolder:GetChildren()[1]:Destroy();
-          dialogueGroup.ChildRemoved:Wait();
+          dialogueItem.Destroying:Wait();
           verifyReactStatus();
           expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it("refreshes the selected dialogue group if a dialogue script's static content is changed", function()
+
+        expect(function()
+
+          -- Render the component and wait for it to finish rendering.
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueFolder, selectedScript = initializeDialogueFolder(4);
+          VirtualService.mocks.services.Selection:Set({selectedScript});
+          render();
+          verifyReactStatus();
+
+          local dialogueItem = getDialogueItems(screenGui)[1];
+          local viewButton = dialogueItem:FindFirstChild("ViewButton");
+          assert(viewButton, "ViewButton should be present in the dialogue item.");
+          
+          local informationFrame = viewButton:FindFirstChild("InformationFrame");
+          assert(informationFrame, "InformationFrame should be present in the ViewButton.");
+
+          local descriptionLabel = informationFrame:FindFirstChild("DescriptionLabel");
+          assert(descriptionLabel and descriptionLabel:IsA("TextLabel"), "DescriptionLabel should be present in the InformationFrame.");
+
+          -- Verify that there are no dialogue items rendered.
+          local messageContent = "New content";
+          dialogueFolder:GetChildren()[1]:SetAttribute("DialogueContent", messageContent);
+          verifyReactStatus();
+          descriptionLabel:GetPropertyChangedSignal("Text"):Wait();
+          expect(descriptionLabel.Text).toBe(messageContent);
 
         end).toFinishBeforeSeconds(1);
 
@@ -266,13 +297,12 @@ return {
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           render();
           verifyReactStatus();
-          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
+          local dialogueItem = getDialogueItems(screenGui)[1];
 
           -- Delete the conversation script and verify that it is not rendered.
-          assert(dialogueGroup);
           conversationScript:Destroy();
+          dialogueItem.Destroying:Wait();
           verifyReactStatus();
-          dialogueGroup.ChildRemoved:Wait();
           expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
 
         end).toFinishBeforeSeconds(1);
