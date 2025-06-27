@@ -133,6 +133,7 @@ return {
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
       reactRoot = ReactRoblox.createRoot(newScreenGui);
+      VirtualService.mocks.isEnabled = true;
 
     end;
     afterEach = function()
@@ -140,12 +141,14 @@ return {
       if reactRoot then
 
         reactRoot:unmount();
+        reactRoot = nil;
 
       end;
 
       if screenGui then
 
         screenGui:Destroy();
+        screenGui = nil;
 
       end;
 
@@ -157,6 +160,7 @@ return {
       end;
 
       propagatedErrorMessage = nil;
+      VirtualService.mocks.isEnabled = false;
 
     end;
   })
