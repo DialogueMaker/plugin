@@ -4,6 +4,7 @@ local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
+local VirtualService = require(root.VirtualService);
 
 export type CheckboxProperties = {
   text: string;
@@ -22,6 +23,34 @@ local function Checkbox(properties: CheckboxProperties)
   local onChanged = properties.onChanged;
   local colors = useStudioColors();
   local icons = useStudioIcons();
+  local buttonRef = React.useRef(nil :: TextButton?);
+  
+  React.useEffect(function()
+  
+    local button = buttonRef.current;
+    assert(button, "Button reference should not be nil.");
+
+    local activatedConnection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
+
+      if not isDisabled then
+
+        onChanged(not isChecked);
+
+      end;
+
+    end);
+
+    return function()
+    
+      if activatedConnection then
+
+        activatedConnection:Disconnect();
+      
+      end;
+
+    end;
+
+  end, {onChanged});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -41,13 +70,10 @@ local function Checkbox(properties: CheckboxProperties)
       BackgroundTransparency = if isDisabled then 0.5 else 0;
       LayoutOrder = 1;
       Text = "";
-      [React.Event.Activated] = function()
+      ref = buttonRef;
+      [React.Event.Activated] = function(self)
 
-        if not isDisabled then
-
-          onChanged(not isChecked);
-        
-        end;
+        VirtualService.events.GuiButton.Activated:fireEvent(self);
 
       end;
     }, {
