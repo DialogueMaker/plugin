@@ -91,7 +91,6 @@ jobs:
           place_id: ${{ vars.ROBLOX_PLACE_ID }}
           luau_file: "runTests.luau"
           output_file: "testResults.json"
-          dump_to_summary: true
 
       - name: Verify all tests passed
         uses: actions/github-script@v7
@@ -107,18 +106,56 @@ jobs:
 
               }
 
+              let summary = core.summary.addHeading("Test results");
+              const headerStrings = ["Status", "Test suite", "Test case", "Duration", "Error message"];
+              const headers = headerStrings.map(headerString => ({
+                data: headerString,
+                header: true
+              }));
+
+              const rows = [headers];
+              let didFail = false;
               for (const test of testResults) {
               
+                const convertSecondsToSmallestRelevantUnit = (seconds) => {
+                  if (seconds < 0.001) {
+                    return `${seconds * 1000000} microseconds`;
+                  } else if (seconds < 1) {
+                    return `${seconds * 1000} milliseconds`;
+                  } else {
+                    return `${seconds} seconds`;
+                  };
+                };
+
                 if (!test.didPass) {
-                
-                  throw new Error("A test case failed.");
+
+                  didFail = true;
 
                 }
 
+                const row = [
+                  test.didPass ? "Pass ✅" : "Fail ❌",
+                  test.testSuite ? test.testSuite.name : "N/A",
+                  test.testCase.name,
+                  convertSecondsToSmallestRelevantUnit(test.durationSeconds),
+                  test.error ? JSON.stringify(test.error) : "N/A"
+                ];
+
+                rows.push(row);
+
               }
-            
+
+              summary.addTable(rows);
+              await summary.write();
+
+              if (didFail) {
+
+                throw new Error("A test case failed.");
+
+              };
+
             } catch (error) {
-            
+
               core.setFailed(error);
-            
+
             }
