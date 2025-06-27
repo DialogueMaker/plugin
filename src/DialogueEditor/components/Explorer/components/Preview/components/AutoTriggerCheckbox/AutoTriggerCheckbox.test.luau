@@ -62,7 +62,7 @@ return {
 
     end;
 
-    local function render(initialValue: boolean): ModuleScript
+    local function render(initialValue: boolean?): ModuleScript
 
       assert(reactRoot, "React root should be initialized before running tests.");
 
@@ -134,6 +134,24 @@ return {
         expect(function()
 
           verifyCheckboxFeature(false);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it(`automatically refreshes if ShouldAutoTriggerConversation attribute is toggled`, function()
+
+        expect(function()
+
+          local selectedScript = render();
+          verifyReactStatus();
+
+          local checkbox = getCheckbox();
+          selectedScript:SetAttribute("ShouldAutoTriggerConversation", true);
+          checkbox:GetPropertyChangedSignal("BackgroundColor3"):Wait();
+
+          selectedScript:SetAttribute("ShouldAutoTriggerConversation", false);
+          checkbox:GetPropertyChangedSignal("BackgroundColor3"):Wait();
 
         end).toFinishBeforeSeconds(1);
 
