@@ -12,6 +12,7 @@ export type ParagraphProperties = {
   layoutOrder: number?;
   textSize: number?;
   children: React.ReactNode?;
+  fontWeight: Enum.FontWeight?;
 }
 
 local function Paragraph(properties: ParagraphProperties)
@@ -24,13 +25,14 @@ local function Paragraph(properties: ParagraphProperties)
   local textColor3 = if properties.textColor3 ~= nil then properties.textColor3 else colors.text;
   local textSize = if properties.textSize ~= nil then properties.textSize else 14;
   local children = properties.children;
+  local fontWeight = if properties.fontWeight ~= nil then properties.fontWeight else Enum.FontWeight.Regular;
 
   return React.createElement("TextLabel", {
     AutomaticSize = automaticSize;
     Text = text;
     TextColor3 = textColor3;
     TextWrapped = textWrapped;
-    FontFace = Font.fromName("BuilderSans", Enum.FontWeight.Regular);
+    FontFace = Font.fromName("BuilderSans", fontWeight);
     TextSize = textSize;
     BackgroundTransparency = 1;
     LayoutOrder = layoutOrder;

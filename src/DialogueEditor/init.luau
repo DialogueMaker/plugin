@@ -18,7 +18,7 @@ export type DialogueEditorProperties = {
 
 local function DialogueEditor(props: DialogueEditorProperties)
 
-  local selectedScript, conversationScript = useDialogueMakerScriptSelection();
+  local selectedScript = useDialogueMakerScriptSelection();
   local settingsTarget, setSettingsTarget = React.useState(nil :: ModuleScript?);
   local closeDialogueEditor = props.closeDialogueEditor;
 

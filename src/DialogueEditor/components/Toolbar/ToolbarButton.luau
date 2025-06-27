@@ -1,6 +1,7 @@
 --!strict
 
 local TweenService = game:GetService("TweenService");
+local UserInputService = game:GetService("UserInputService");
 
 local root = script.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
@@ -11,34 +12,92 @@ export type ToolbarButtonProps = {
   text: string?;
   layoutOrder: number;
   isDisabled: boolean?;
-  isHighlighted: boolean?;
   onClick: () -> ();
+  plugin: Plugin;
 };
 
 local function ToolbarButton(props: ToolbarButtonProps)
 
   local colors = useStudioColors();
-  local buttonRef = React.useRef(nil);
-  local isUserHovering, setIsUserHovering = React.useState(false);
+  local buttonRef = React.useRef(nil :: TextButton?);
+  local plugin = props.plugin;
 
   React.useEffect(function()
   
-    if buttonRef.current then
-      local tween = TweenService:Create(buttonRef.current, TweenInfo.new(0.2), {
-        BackgroundTransparency = if isUserHovering and not props.isDisabled then 0 elseif props.isHighlighted then 0.5 else 1;
-      });
-      tween:Play();
-    end
+    local button = buttonRef.current;
+    if not button then
 
-  end, {isUserHovering :: unknown, props.isHighlighted, props.isDisabled});
+      return;
+
+    end;
+
+    local isUserHovering = false;
+    local isMouseDown = false;
+    local function playTween()
+
+      local tween = TweenService:Create(button, TweenInfo.new(0.1), {
+        BackgroundTransparency = if isMouseDown then 0.75 elseif isUserHovering then 0.25 else 1;
+      });
+
+      tween:Play();
+
+    end;
+
+    local mouseEnterConnection = button.MouseEnter:Connect(function()
+
+      isUserHovering = true;
+      playTween();
+
+    end);
+
+    local mouseLeaveConnection = button.MouseLeave:Connect(function()
+
+      isUserHovering = false;
+      playTween();
+
+    end);
+
+    local mouseButton1DownConnection = button.InputBegan:Connect(function(input)
+
+      if input.UserInputType == Enum.UserInputType.MouseButton1 and isUserHovering and not isMouseDown then
+
+        isMouseDown = true;
+        playTween();
+
+      end;
+
+    end);
+
+    local mouseButton1UpConnection = button.InputEnded:Connect(function(input)
+
+      if input.UserInputType == Enum.UserInputType.MouseButton1 then
+
+        isMouseDown = false;
+        playTween();
+
+      end;
+
+    end);
+
+    return function()
+
+      mouseEnterConnection:Disconnect();
+      mouseLeaveConnection:Disconnect();
+      mouseButton1DownConnection:Disconnect();
+      mouseButton1UpConnection:Disconnect();
+
+    end;
+
+  end, {props.isDisabled});
 
   return React.createElement("TextButton", {
     LayoutOrder = props.layoutOrder;
-    BackgroundColor3 = if props.isHighlighted then colors.backgroundWarning else colors.toolbarButton;
+    BackgroundColor3 = colors.toolbarButton;
+    BackgroundTransparency = 1;
     AutoButtonColor = false;
     ref = buttonRef;
     Text = "";
-    Size = UDim2.new(0, 0, 0, 0);
+    Size = UDim2.new();
     AutomaticSize = Enum.AutomaticSize.XY;
     BorderSizePixel = 0;
     [React.Event.Activated] = function()
@@ -48,16 +107,6 @@ local function ToolbarButton(props: ToolbarButtonProps)
         props.onClick();
 
       end;
-
-    end;
-    [React.Event.MouseEnter] = function()
-
-      setIsUserHovering(true);
-
-    end;
-    [React.Event.MouseLeave] = function()
-
-      setIsUserHovering(false);
 
     end;
   }, {

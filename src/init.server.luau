@@ -5,6 +5,9 @@ local Selection = game:GetService("Selection");
 
 local Icons = require(script.Icons);
 local React = require(script.roblox_packages.react);
+local ReactErrorBoundary = require(script.roblox_packages.ReactErrorBoundary);
+local ErrorComponent = require(script.ErrorComponent);
+local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
 local ReactRoblox = require(script.roblox_packages["react-roblox"]);
 local DialogueEditor = require(script.DialogueEditor);
 
@@ -64,7 +67,7 @@ end;
 local function openDialogueEditor(): ()
 
   local widgetInfo = DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, true, true, 584, 300, 1, 1);
-  local title = `Dialogue Maker {script:GetAttribute("Version")}`;
+  local title = `Dialogue Maker Plugin {script:GetAttribute("Version")}`;
   local newPluginGui = plugin:CreateDockWidgetPluginGui(title, widgetInfo);
   pluginGUI = newPluginGui;
 
@@ -73,11 +76,26 @@ local function openDialogueEditor(): ()
   newPluginGui:BindToClose(closeDialogueEditor);
   
   local newPluginGUIRoot = ReactRoblox.createRoot(newPluginGui);
-  newPluginGUIRoot:render(React.createElement(DialogueEditor, {
-    plugin = plugin;
-    pluginGUI = newPluginGui;
-    closeDialogueEditor = closeDialogueEditor;
-  }));
+  newPluginGUIRoot:render(
+    React.createElement(ErrorBoundary, {
+      FallbackComponent = ErrorComponent :: any;
+      onError = function(errorObject)
+
+        task.spawn(function()
+        
+          error(errorObject);
+
+        end);
+
+      end;
+    }, {
+      React.createElement(DialogueEditor, {
+        plugin = plugin;
+        pluginGUI = newPluginGui;
+        closeDialogueEditor = closeDialogueEditor;
+      })
+    })
+  );
   pluginGUIRoot = newPluginGUIRoot;
 
   refreshToolbar();
@@ -95,7 +113,6 @@ dialogueEditorButton.Click:Connect(function()
     openDialogueEditor();
     
   end;
-
 
 end);
 

@@ -4,12 +4,12 @@ local Selection = game:GetService("Selection");
 
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
-local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
 local ToolbarButton = require(script.ToolbarButton);
-local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
-local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local useDynamicSize = require(root.DialogueEditor.hooks.useDynamicSize);
+local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefreshDialogueMakerScripts);
+local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 
 export type ToolbarProps = {
@@ -24,6 +24,7 @@ export type ToolbarProps = {
 local function Toolbar(props: ToolbarProps)
 
   local icons = useStudioIcons();
+  local plugin = props.plugin;
   local pluginGUI = props.pluginGUI;
   local colors = useStudioColors();
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
@@ -114,6 +115,77 @@ local function Toolbar(props: ToolbarProps)
 
   end, {selectedScript :: unknown, refreshDialogueMakerScripts});
 
+  local buttons = {};
+
+  local viewParentButton = React.createElement(ToolbarButton, {
+    iconImage = "rbxassetid://14098871159";
+    text = if shouldShowLabels then "View parent" else nil;
+    plugin = plugin;
+    layoutOrder = #buttons + 1;
+    key = "ViewParentButton";
+    isDisabled = settingsTarget ~= nil or not selectedScript;
+    onClick = function()
+
+      if selectedScript then
+
+        Selection:Set({selectedScript.Parent});
+
+      end;
+
+    end;
+  });
+
+  table.insert(buttons, viewParentButton);
+
+  if dialogueScriptType then
+
+    local settingsButton = React.createElement(ToolbarButton, {
+      iconImage = icons.settings;
+      text = if shouldShowLabels then (if settingsTarget == nil then "Settings" else "Close settings") else nil;
+      layoutOrder = #buttons + 1;
+      plugin = plugin;
+      key = "SettingsButton";
+      onClick = function()
+
+        setSettingsTarget(if settingsTarget then nil else selectedScript);
+
+      end;
+    });
+
+    table.insert(buttons, settingsButton);
+
+  end;
+
+  if not selectedScript or dialogueScriptType == "Redirect" then
+
+    for _, dialogueType in {"Conversation", "Message", "Response", "Redirect"} do
+
+      if not selectedScript and dialogueType ~= "Conversation" then
+
+        continue;
+
+      end;
+
+      local addDialogueButton = React.createElement(ToolbarButton, {
+        iconImage = icons[dialogueType:lower()];
+        text = if shouldShowLabels then `Add {dialogueType:lower()}` else nil;
+        layoutOrder = #buttons + 1;
+        plugin = plugin;
+        key = `Add{dialogueType}Button`;
+        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
+        onClick = function()
+
+          addDialogueScript(dialogueType :: "Conversation" | "Message" | "Response" | "Redirect");
+
+        end;
+      });
+
+      table.insert(buttons, addDialogueButton);
+
+    end;
+
+  end;
+
   return React.createElement("Frame", {
     Size = UDim2.new(1, 0, 0, 40);
     LayoutOrder = layoutOrder;
@@ -130,93 +202,7 @@ local function Toolbar(props: ToolbarProps)
       PaddingRight = UDim.new(0, 15);
       PaddingBottom = UDim.new(0, 5);
     });
-    ViewParentButton = React.createElement(ToolbarButton, {
-      iconImage = "rbxassetid://14098871159";
-      text = if shouldShowLabels then "View parent" else nil;
-      layoutOrder = 1;
-      isDisabled = settingsTarget ~= nil or not selectedScript;
-      onClick = function()
-
-        if selectedScript then
-
-          Selection:Set({selectedScript.Parent});
-
-        end;
-
-      end;
-    });
-    SettingsButton = if dialogueScriptType then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.settings;
-        text = if shouldShowLabels then (if settingsTarget == nil then "Settings" else "Close settings") else nil;
-        layoutOrder = 2;
-        onClick = function()
-
-          if settingsTarget then
-
-            setSettingsTarget(nil);
-
-          else
-
-            setSettingsTarget(selectedScript);
-
-          end;
-
-        end;
-      })
-    else nil;
-    AddConversationButton = if not selectedScript then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.conversation;
-        text = if shouldShowLabels then "Add conversation" else nil;
-        layoutOrder = 3;
-        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
-        onClick = function()
-
-          addDialogueScript("Conversation");
-
-        end;
-      })
-    else nil;
-    AddMessageButton = if selectedScript and dialogueScriptType ~= "Redirect" then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.message;
-        text = if shouldShowLabels then "Add message" else nil;
-        layoutOrder = 4;
-        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
-        onClick = function()
-
-          addDialogueScript("Message");
-
-        end;
-      })
-    else nil;
-    AddResponseButton = if selectedScript and dialogueScriptType ~= "Redirect" then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.response;
-        text = if shouldShowLabels then "Add response" else nil;
-        layoutOrder = 5;
-        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
-        onClick = function()
-
-          addDialogueScript("Response");
-
-        end;
-      })
-    else nil;
-    AddRedirectButton = if selectedScript and dialogueScriptType ~= "Redirect" then
-      React.createElement(ToolbarButton, {
-        iconImage = icons.redirect;
-        text = if shouldShowLabels then (if shouldShowLabels then "Add redirect" else nil) else nil;
-        layoutOrder = 6;
-        isDisabled = settingsTarget ~= nil or #Selection:Get() ~= 1;
-        onClick = function()
-
-          addDialogueScript("Redirect");
-
-        end;
-      })
-    else nil;
+    Buttons = React.createElement(React.Fragment, {}, buttons);
   });
 
 end;
