@@ -1,5 +1,7 @@
 --!strict
 
+local StarterPlayer = game:GetService("StarterPlayer");
+
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local AutoTriggerCheckbox = require(script.Parent);
 local VirtualService = require(root.VirtualService);
@@ -15,6 +17,8 @@ local it = IJW.it;
 local screenGui: ScreenGui?;
 local reactRoot: ReactRoblox.RootType?;
 local propagatedErrorMessage;
+local originalLoaderScript;
+local childAddedConnection: RBXScriptConnection?;
 
 return {
 
@@ -156,10 +160,37 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can automatically create loader script from template", function()
+
+        expect(function()
+
+          verifyCheckboxFeature(true);
+
+          local createdLoaderScript = StarterPlayer.StarterPlayerScripts:FindFirstChild("DialogueLoader");
+
+          expect(createdLoaderScript).toNotBe(nil);
+
+          createdLoaderScript:Destroy();
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
   end, {
+    beforeAll = function()
+
+      local loaderScript = StarterPlayer.StarterPlayerScripts:FindFirstChild("DialogueMakerLoader");
+      if loaderScript then
+
+        originalLoaderScript = loaderScript;
+        loaderScript.Parent = nil;
+
+      end;
+
+    end,
     beforeEach = function()
 
       local newScreenGui = Instance.new("ScreenGui");
@@ -182,6 +213,22 @@ return {
       end;
 
       propagatedErrorMessage = nil;
+
+    end;
+    afterAll = function()
+
+      if originalLoaderScript then
+
+        originalLoaderScript.Parent = StarterPlayer.StarterPlayerScripts;
+
+      end;
+
+      if childAddedConnection then
+
+        childAddedConnection:Disconnect();
+        childAddedConnection = nil;
+
+      end;
 
     end;
   })
