@@ -11,12 +11,12 @@ local useRefreshDialogueMakerScripts = require(root.DialogueEditor.hooks.useRefr
 local TabSelector = require(root.DialogueEditor.components.TabSelector);
 local TabSelectorButton = require(root.DialogueEditor.components.TabSelector.TabSelectorButton);
 local useErrorBoundary = ReactErrorBoundary.useErrorBoundary;
+local useDialogueMakerScriptSelection = require(root.DialogueEditor.hooks.useDialogueMakerScriptSelection);
 
 type DialogueItemType = DialogueGroup.DialogueItemType;
 
 export type DialogueTableBodyProperties = {
   layoutOrder: number;
-  selectedScript: ModuleScript?;
   plugin: Plugin;
 }
 
@@ -25,7 +25,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
   Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
 
   local layoutOrder = props.layoutOrder;
-  local selectedScript = props.selectedScript;
+  local selectedScript = useDialogueMakerScriptSelection();
   local refreshDialogueMakerScripts = useRefreshDialogueMakerScripts();
   local errorBoundary = useErrorBoundary();
 
@@ -54,8 +54,10 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
   local getDialogueScripts = React.useCallback(function(folderName: string): {ModuleScript}
 
-    local dialogueFolder = if selectedScript then selectedScript:FindFirstChild(folderName) else nil;
-    if not selectedScript or not dialogueFolder then
+    local selection = Selection:Get();
+    local conversationsParent = if selection[1] then (if selection[1]:IsA("Folder") and selection[1].Name == "Conversations" then selection[1] else selection[1]:FindFirstChild("Conversations")) else nil;
+    local dialogueFolder = if selectedScript then selectedScript:FindFirstChild(folderName) else conversationsParent;
+    if not dialogueFolder then
 
       return {};
 
@@ -111,7 +113,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     local function refreshTable()
 
-      local didRefresh, errorMessage = pcall(function()
+      local didRefresh, errorMessage = pcall(function(): nil
 
         cleanupConnections();
         refreshDialogueMakerScripts();
@@ -168,51 +170,47 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
         else
           
           local selection = Selection:Get();
-          if #selection == 1 then
+          if #selection ~= 1 then
 
-            local conversationsParent = if selection[1]:IsA("Folder") then selection[1] else selection[1]:FindFirstChild("Conversations");
+            return;
 
-            if not conversationsParent then
+          end;
 
-              table.insert(contentScriptConnections, selection[1].ChildAdded:Connect(refreshTable));
+          local conversationsParent = if selection[1]:IsA("Folder") and selection[1].Name == "Conversations" then selection[1] else selection[1]:FindFirstChild("Conversations");
 
-            else
+          if conversationsParent then
 
-              table.insert(contentScriptConnections, conversationsParent.ChildAdded:Connect(refreshTable));
-              table.insert(contentScriptConnections, conversationsParent.ChildRemoved:Connect(refreshTable));
+            table.insert(contentScriptConnections, conversationsParent.ChildAdded:Connect(refreshTable));
+            table.insert(contentScriptConnections, conversationsParent.ChildRemoved:Connect(refreshTable));
 
-              for _, possibleConversationScript in conversationsParent:GetChildren() do
+          else
 
-                if possibleConversationScript:IsA("ModuleScript") and possibleConversationScript:HasTag("DialogueMakerConversationScript") then
-                  
-                  table.insert(conversations, possibleConversationScript);
-                
-                end;
-
-              end;
-
-            end;
+            table.insert(contentScriptConnections, selection[1].ChildAdded:Connect(refreshTable));
 
           end;
 
         end;
 
+        return;
+
       end);
 
       if not didRefresh then
 
-        print("Error refreshing dialogue scripts: ", errorMessage);
         errorBoundary.showBoundary(errorMessage);
 
       end;
 
     end;
+
+    local selectionChangedConnection = Selection.SelectionChanged:Connect(refreshTable);
     
     task.spawn(refreshTable);
 
     return function()
 
       cleanupConnections();
+      selectionChangedConnection:Disconnect();
 
     end;
 

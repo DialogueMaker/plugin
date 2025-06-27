@@ -54,7 +54,6 @@ local function DialogueEditor(props: DialogueEditorProperties)
     });
     Explorer = if not settingsTarget then
       React.createElement(Explorer, {
-        selectedScript = selectedScript;
         plugin = props.plugin;
         setSettingsTarget = setSettingsTarget;
         layoutOrder = 2;

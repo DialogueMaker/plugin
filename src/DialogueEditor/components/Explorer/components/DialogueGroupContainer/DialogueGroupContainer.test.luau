@@ -14,15 +14,18 @@ local it = IJW.it;
 
 local screenGui: ScreenGui?;
 local reactRoot: ReactRoblox.RootType?;
+local propagatedErrorMessage;
+local dialogueGroupContainer;
+local dialogueGroup;
 
 return {
+
   describe("DialogueGroupContainer", function()
 
     local function MockComponent(properties: any)
 
       local dialogueType = properties.type or "Message";
       local onRendered = properties.onRendered;
-      local selectedScript = properties.selectedScript;
       local onErrored = properties.onErrored or function() end;
 
       React.useEffect(function()
@@ -42,10 +45,100 @@ return {
         React.createElement(DialogueGroupContainer, {
           name = dialogueType;
           plugin = VirtualService.mocks.globals.plugin;
-          selectedScript = selectedScript;
           layoutOrder = 1;
         })
       });
+
+    end;
+
+    local function verifyReactStatus()
+
+      if propagatedErrorMessage then
+
+        error(propagatedErrorMessage);
+
+      end;
+
+    end;
+
+    local function getDialogueItems(screenGui: ScreenGui): {Frame} 
+
+      dialogueGroupContainer = screenGui:FindFirstChildOfClass("Frame");
+      assert(dialogueGroupContainer, "DialogueGroupContainer should be rendered in the ScreenGui.");
+
+      dialogueGroup = dialogueGroupContainer:FindFirstChild("DialogueGroup");
+      if not dialogueGroup then
+
+        return {};
+
+      end;
+
+      local dialogueItems = {};
+      for _, child in dialogueGroup:GetChildren() do
+
+        if child:IsA("Frame") then
+          
+          table.insert(dialogueItems, child);
+        
+        end;
+
+      end;
+
+      return dialogueItems;
+
+    end;
+
+    local function createDialogueScript(name: string)
+
+      local dialogueScript = Instance.new("ModuleScript");
+      dialogueScript.Name = name;
+      dialogueScript:SetAttribute("DialogueType", "Message");
+      dialogueScript:AddTag("DialogueMakerDialogueScript");
+      return dialogueScript;
+
+    end;
+
+    local function initializeDialogueFolder(messageCount: number)
+
+      local dialogueFolder = Instance.new("Folder");
+      dialogueFolder.Name = "Messages";
+
+      for i = 1, messageCount do
+
+        local dialogueScript = createDialogueScript(tostring(i));
+        dialogueScript.Parent = dialogueFolder;
+
+      end;
+
+      local selectedScript = Instance.new("ModuleScript");
+      selectedScript:SetAttribute("DialogueType", "Message");
+      selectedScript:AddTag("DialogueMakerDialogueScript");
+      dialogueFolder.Parent = selectedScript;
+
+      return dialogueFolder, selectedScript;
+
+    end;
+
+    local function render()
+
+      assert(reactRoot, "React root should be initialized before running tests.");
+
+      local didRender = false;
+      local element = React.createElement(MockComponent, {
+        onErrored = function(errorMessage)
+
+          propagatedErrorMessage = errorMessage;
+
+        end;
+        onRendered = function()
+          
+          didRender = true;
+
+        end;
+      });
+
+      reactRoot:render(element);
+      repeat task.wait() until didRender or propagatedErrorMessage;
 
     end;
 
@@ -57,85 +150,31 @@ return {
 
           -- Render the component and wait for it to finish rendering.
           assert(screenGui, "ScreenGui should be initialized before running tests.");
-          assert(reactRoot, "React root should be initialized before running tests.");
+          render();
+          verifyReactStatus();
 
-          local messageCount = 4;
-          local dialogueFolder = Instance.new("Folder");
-          dialogueFolder.Name = "Messages";
+          -- Verify that there are no dialogue items rendered.
+          expect(#getDialogueItems(screenGui)).toBe(0);
+          assert(dialogueGroupContainer);
 
-          for i = 1, messageCount do
+          local dialogueFolder, selectedScript = initializeDialogueFolder(4);
+          VirtualService.mocks.services.Selection:Set({selectedScript});
+          dialogueGroupContainer.ChildAdded:Wait();
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
 
-            local dialogueScript = Instance.new("ModuleScript");
-            dialogueScript.Name = tostring(i);
-            dialogueScript:SetAttribute("DialogueType", "Message");
-            dialogueScript:AddTag("DialogueMakerDialogueScript");
-            dialogueScript.Parent = dialogueFolder;
+          -- Create a new dialogue script, but verify that it is not rendered yet.
+          assert(dialogueGroup);
 
-          end;
+          local newDialogueScript = createDialogueScript(tostring(#dialogueFolder:GetChildren() + 1));
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
 
-          local selectedScript = Instance.new("ModuleScript");
-          selectedScript:SetAttribute("DialogueType", "Message");
-          selectedScript:AddTag("DialogueMakerDialogueScript");
-          dialogueFolder.Parent = selectedScript;
-
-          local propagatedErrorMessage;
-          local didRender = false;
-          local element = React.createElement(MockComponent, {
-            selectedScript = selectedScript;
-            onErrored = function(errorMessage)
-
-              propagatedErrorMessage = errorMessage;
-
-            end;
-            onRendered = function()
-              
-              didRender = true;
-
-            end;
-          });
-
-          reactRoot:render(element);
-          repeat task.wait() until didRender or propagatedErrorMessage;
-          if propagatedErrorMessage then
-
-            error(propagatedErrorMessage);
-
-          end;
-
-          -- Verify that there are four dialogue items rendered.
-          local dialogueGroupContainer = screenGui:FindFirstChildOfClass("Frame");
-          assert(dialogueGroupContainer, "DialogueGroupContainer should be rendered in the ScreenGui.");
-
-          local dialogueGroup = dialogueGroupContainer:FindFirstChild("DialogueGroup");
-          assert(dialogueGroup, "DialogueGroup should be rendered in the DialogueGroupContainer.");
-
-          local function getDialogueItems()  
-
-            local dialogueItems = {};
-            for _, child in dialogueGroup:GetChildren() do
-
-              if child:IsA("Frame") then
-                
-                table.insert(dialogueItems, child);
-              
-              end;
-
-            end;
-
-            return dialogueItems;
-
-          end;
-
-          expect(#getDialogueItems()).toBe(4);
-
-          -- Add a new dialogue script to the folder and verify that the component refreshes.
-          local newDialogueScript = Instance.new("ModuleScript");
-          newDialogueScript.Name = tostring(messageCount + 1);
-          newDialogueScript:SetAttribute("DialogueType", "Message");
-          newDialogueScript:AddTag("DialogueMakerDialogueScript");
+          -- Add the new dialogue script to the folder and verify that it is rendered.
           newDialogueScript.Parent = dialogueFolder;
           dialogueGroup.ChildAdded:Wait();
-          expect(#getDialogueItems()).toBe(5);
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
 
         end).toFinishBeforeSeconds(1);
 
@@ -147,84 +186,62 @@ return {
 
           -- Render the component and wait for it to finish rendering.
           assert(screenGui, "ScreenGui should be initialized before running tests.");
-          assert(reactRoot, "React root should be initialized before running tests.");
+          render();
+          verifyReactStatus();
 
-          local messageCount = 4;
-          local dialogueFolder = Instance.new("Folder");
-          dialogueFolder.Name = "Messages";
+          -- Verify that there are no dialogue items rendered.
+          expect(#getDialogueItems(screenGui)).toBe(0);
+          assert(dialogueGroupContainer);
 
-          local scriptToDestroy;
+          local dialogueFolder, selectedScript = initializeDialogueFolder(4);
+          VirtualService.mocks.services.Selection:Set({selectedScript});
+          dialogueGroupContainer.ChildAdded:Wait();
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
 
-          for i = 1, messageCount do
+          -- Delete a new dialogue script and verify that it is not rendered.
+          assert(dialogueGroup);
 
-            local dialogueScript = Instance.new("ModuleScript");
-            dialogueScript.Name = tostring(i);
-            dialogueScript:SetAttribute("DialogueType", "Message");
-            dialogueScript:AddTag("DialogueMakerDialogueScript");
-            dialogueScript.Parent = dialogueFolder;
-            scriptToDestroy = dialogueScript;
-
-          end;
-
-          local selectedScript = Instance.new("ModuleScript");
-          selectedScript:SetAttribute("DialogueType", "Message");
-          selectedScript:AddTag("DialogueMakerDialogueScript");
-          dialogueFolder.Parent = selectedScript;
-
-          local propagatedErrorMessage;
-          local didRender = false;
-          local element = React.createElement(MockComponent, {
-            selectedScript = selectedScript;
-            onErrored = function(errorMessage)
-
-              propagatedErrorMessage = errorMessage;
-
-            end;
-            onRendered = function()
-              
-              didRender = true;
-
-            end;
-          });
-
-          reactRoot:render(element);
-          repeat task.wait() until didRender or propagatedErrorMessage;
-          if propagatedErrorMessage then
-
-            error(propagatedErrorMessage);
-
-          end;
-
-          -- Verify that there are four dialogue items rendered.
-          local dialogueGroupContainer = screenGui:FindFirstChildOfClass("Frame");
-          assert(dialogueGroupContainer, "DialogueGroupContainer should be rendered in the ScreenGui.");
-
-          local dialogueGroup = dialogueGroupContainer:FindFirstChild("DialogueGroup");
-          assert(dialogueGroup, "DialogueGroup should be rendered in the DialogueGroupContainer.");
-
-          local function getDialogueItems()  
-
-            local dialogueItems = {};
-            for _, child in dialogueGroup:GetChildren() do
-
-              if child:IsA("Frame") then
-                
-                table.insert(dialogueItems, child);
-              
-              end;
-
-            end;
-
-            return dialogueItems;
-
-          end;
-
-          expect(#getDialogueItems()).toBe(4);
-
-          -- Remove a dialogue script to the folder and verify that the component refreshes.
-          scriptToDestroy:Destroy();
+          dialogueFolder:GetChildren()[1]:Destroy();
           dialogueGroup.ChildRemoved:Wait();
-          expect(#getDialogueItems()).toBe(3);
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it("refreshes the conversation group if a conversation is added", function()
+
+        expect(function()
+
+          -- Render the component and wait for it to finish rendering.
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          render();
+          verifyReactStatus();
+
+          -- Select the conversations folder parent and verify that there are no conversations rendered.
+          local conversationsFolderParent = Instance.new("Folder");
+          local conversationsFolder = Instance.new("Folder");
+          conversationsFolder.Name = "Conversations";
+          conversationsFolder.Parent = conversationsFolderParent;
+
+          VirtualService.mocks.services.Selection:Set({conversationsFolderParent});
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
+
+          -- Create a new conversation script, but verify that it is not rendered yet.
+          local conversationScript = Instance.new("ModuleScript");
+          conversationScript:AddTag("DialogueMakerConversationScript");
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
+
+          -- Add the conversation script to the conversations folder and verify that it is rendered.
+          conversationScript.Parent = conversationsFolder;
+          verifyReactStatus();
+          assert(dialogueGroup);
+          dialogueGroup.ChildAdded:Wait();
+          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
 
         end).toFinishBeforeSeconds(1);
 
@@ -257,6 +274,12 @@ return {
         screenGui:Destroy();
 
       end;
+
+      VirtualService.mocks.services.Selection:Set({});
+
+      propagatedErrorMessage = nil;
+      dialogueGroupContainer = nil;
+      dialogueGroup = nil;
 
     end;
   })
