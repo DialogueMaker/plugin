@@ -246,6 +246,38 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("refreshes the conversation group if a conversation is removed", function()
+
+        expect(function()
+
+          -- Select the conversations folder parent.
+          local conversationsFolderParent = Instance.new("Folder");
+          local conversationsFolder = Instance.new("Folder");
+          conversationsFolder.Name = "Conversations";
+          conversationsFolder.Parent = conversationsFolderParent;
+
+          local conversationScript = Instance.new("ModuleScript");
+          conversationScript:AddTag("DialogueMakerConversationScript");
+          conversationScript.Parent = conversationsFolder;
+          VirtualService.mocks.services.Selection:Set({conversationsFolderParent});
+
+          -- Render the component and wait for it to finish rendering.
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          render();
+          verifyReactStatus();
+          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
+
+          -- Delete the conversation script and verify that it is not rendered.
+          assert(dialogueGroup);
+          conversationScript:Destroy();
+          verifyReactStatus();
+          dialogueGroup.ChildRemoved:Wait();
+          expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
