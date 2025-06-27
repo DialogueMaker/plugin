@@ -18,7 +18,7 @@ local propagatedErrorMessage;
 
 return {
 
-  describe("DialogueGroupContainer", function()
+  describe("AutoTriggerCheckbox", function()
 
     local function MockComponent(properties: any)
 
@@ -62,11 +62,13 @@ return {
 
     end;
 
-    local function render(): ModuleScript
+    local function render(initialValue: boolean): ModuleScript
 
       assert(reactRoot, "React root should be initialized before running tests.");
 
       local selectedScript = createDialogueScript("TestDialogueScript");
+      selectedScript:SetAttribute("ShouldAutoTriggerConversation", initialValue);
+
       local didRender = false;
       local element = React.createElement(MockComponent, {
         selectedScript = selectedScript;
@@ -89,26 +91,49 @@ return {
 
     end;
 
+    local function getCheckbox()
+
+      assert(screenGui, "ScreenGui should be initialized before running tests.");
+
+      local checkboxFrame = screenGui:FindFirstChildOfClass("Frame");
+      assert(checkboxFrame, "Frame should be present in the ScreenGui.");
+
+      local checkbox = checkboxFrame:FindFirstChild("Checkbox");
+      assert(checkbox and checkbox:IsA("TextButton"), "Checkbox should be present in the frame.");
+
+      return checkbox;
+
+    end;
+
+    local function verifyCheckboxFeature(goalValue: boolean)
+
+      local selectedScript = render(not goalValue);
+      verifyReactStatus();
+
+      local checkbox = getCheckbox();
+
+      VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
+      expect(selectedScript:GetAttribute("ShouldAutoTriggerConversation")).toBe(goalValue);
+
+    end;
+
     return {
 
       it(`can add "ShouldAutoTriggerConversation" tag to selected script`, function()
 
         expect(function()
 
-          -- Render the component and wait for it to finish rendering.
-          assert(screenGui, "ScreenGui should be initialized before running tests.");
-          local selectedScript = render();
-          verifyReactStatus();
+          verifyCheckboxFeature(true);
 
-          -- Verify that the checkbox is unchecked.
-          local checkboxFrame = screenGui:FindFirstChildOfClass("Frame");
-          assert(checkboxFrame, "Frame should be present in the ScreenGui.");
+        end).toFinishBeforeSeconds(1);
 
-          local checkbox = checkboxFrame:FindFirstChild("Checkbox");
-          assert(checkbox and checkbox:IsA("TextButton"), "Checkbox should be present in the frame.");
+      end);
 
-          VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
-          expect(selectedScript:GetAttribute("ShouldAutoTriggerConversation")).toBe(true);
+      it(`can remove "ShouldAutoTriggerConversation" tag from selected script`, function()
+
+        expect(function()
+
+          verifyCheckboxFeature(false);
 
         end).toFinishBeforeSeconds(1);
 
