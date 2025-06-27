@@ -1,0 +1,163 @@
+--!strict
+
+local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
+local DialogueOptions = require(script.Parent);
+local VirtualService = require(root.VirtualService);
+local React = require(root.roblox_packages.react);
+local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
+local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
+local ReactRoblox = require(root.roblox_packages["react-roblox"]);
+local IJW = require(root.roblox_packages.ijw);
+local expect = IJW.expect;
+local describe = IJW.describe;
+local it = IJW.it;
+
+local screenGui: ScreenGui?;
+local reactRoot: ReactRoblox.RootType?;
+local propagatedErrorMessage;
+local eventConnection: RBXScriptConnection?;
+
+return {
+
+  describe("DialogueOptions", function()
+
+    local function MockComponent(properties: any)
+
+      local selectedScript = properties.selectedScript;
+      local onErrored = properties.onErrored or function() end;
+      local onRendered = properties.onRendered or function() end;
+
+      React.useEffect(function()
+
+        onRendered();
+
+      end, {onRendered});
+
+      return React.createElement(ErrorBoundary, {
+        FallbackComponent = React.Fragment;
+        onError = onErrored;
+      }, {
+        React.createElement(DialogueOptions, {
+          selectedScript = selectedScript;
+          plugin = VirtualService.mocks.globals.plugin;
+          selectedDialogueType = selectedScript:GetAttribute("DialogueType") or "Conversation";
+          layoutOrder = 1;
+        })
+      });
+
+    end;
+
+    local function verifyReactStatus()
+
+      if propagatedErrorMessage then
+
+        error(propagatedErrorMessage);
+
+      end;
+
+    end;
+
+    local function createDialogueScript(name: string)
+
+      local dialogueScript = Instance.new("ModuleScript");
+      dialogueScript:AddTag("DialogueMakerConversationScript");
+      return dialogueScript;
+
+    end;
+
+    local function render(): ModuleScript
+
+      assert(reactRoot, "React root should be initialized before running tests.");
+
+      local selectedScript = createDialogueScript("TestDialogueScript");
+      local didRender = false;
+      local element = React.createElement(MockComponent, {
+        selectedScript = selectedScript;
+        onErrored = function(errorMessage)
+
+          propagatedErrorMessage = errorMessage;
+
+        end;
+        onRendered = function()
+          
+          didRender = true;
+
+        end;
+      });
+
+      reactRoot:render(element);
+      repeat task.wait() until didRender or propagatedErrorMessage;
+      verifyReactStatus();
+
+      return selectedScript;
+
+    end;
+
+    return {
+
+      it("can delete selected script", function()
+
+        expect(function()
+
+          local selectedScript = render();
+          local testFolder = Instance.new("Folder");
+          selectedScript.Parent = testFolder;
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local deleteButton = dialogueOptions:FindFirstChild("DeleteButton");
+          assert(deleteButton and deleteButton:IsA("TextButton"), "Delete button should be present in the DialogueOptions.");
+
+          local didChangeParent = false;
+          eventConnection = selectedScript:GetPropertyChangedSignal("Parent"):Once(function()
+
+            didChangeParent = true;
+
+          end);
+          VirtualService.events.GuiButton.Activated:fireEvent(deleteButton);
+          repeat task.wait() until didChangeParent or propagatedErrorMessage;
+          verifyReactStatus();
+          expect(selectedScript.Parent).toBe(nil);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+      
+    }
+
+  end, {
+    beforeEach = function()
+
+      local newScreenGui = Instance.new("ScreenGui");
+      screenGui = newScreenGui;
+      reactRoot = ReactRoblox.createRoot(newScreenGui);
+
+    end;
+    afterEach = function()
+
+      if reactRoot then
+
+        reactRoot:unmount();
+
+      end;
+
+      if screenGui then
+
+        screenGui:Destroy();
+
+      end;
+
+      if eventConnection then
+
+        eventConnection:Disconnect();
+        eventConnection = nil;
+
+      end;
+
+      propagatedErrorMessage = nil;
+
+    end;
+  })
+};

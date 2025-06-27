@@ -3,6 +3,7 @@
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local VirtualService = require(root.VirtualService);
 
 export type ButtonProperties = {
   text: string;
@@ -20,6 +21,30 @@ local function Button(properties: ButtonProperties)
   local text = properties.text;
   local isDisabled = properties.isDisabled;
   local onClick = properties.onClick;
+  local buttonRef = React.useRef(nil);
+
+  React.useEffect(function()
+
+    local button = buttonRef.current;
+    assert(button, "Button reference is nil.");
+
+    local activatedConnection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function(self)
+
+      if not isDisabled then
+
+        onClick();
+        
+      end;
+
+    end);
+
+    return function()
+
+      activatedConnection:Disconnect();
+
+    end;
+  
+  end, {onClick});
 
   return React.createElement("TextButton", {
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -27,13 +52,10 @@ local function Button(properties: ButtonProperties)
     Text = "";
     LayoutOrder = layoutOrder;
     Size = UDim2.fromOffset(0, 30);
-    [React.Event.Activated] = function()
+    ref = buttonRef;
+    [React.Event.Activated] = function(self)
     
-      if not isDisabled then
-
-        onClick();
-        
-      end;
+      VirtualService.events.GuiButton.Activated:fireEvent(self);
 
     end;
   }, {
