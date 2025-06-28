@@ -5,6 +5,7 @@ local StarterPlayer = game:GetService("StarterPlayer");
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local AutoTriggerCheckbox = require(script.Parent);
 local VirtualService = require(root.VirtualService);
+local VirtualChangeHistoryService = require(root.DialogueEditor.mocks.ChangeHistoryService);
 local React = require(root.roblox_packages.react);
 local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
 local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
@@ -196,6 +197,21 @@ return {
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
       reactRoot = ReactRoblox.createRoot(newScreenGui);
+
+      local virtualChangeHistoryService = VirtualChangeHistoryService.new();
+      VirtualService.globals.game = {
+        GetService = function(self, serviceName: string): unknown
+
+          if serviceName == "ChangeHistoryService" then
+
+            return virtualChangeHistoryService;
+
+          end;
+
+          return game:GetService(serviceName);
+
+        end;
+      };
 
     end;
     afterEach = function()
