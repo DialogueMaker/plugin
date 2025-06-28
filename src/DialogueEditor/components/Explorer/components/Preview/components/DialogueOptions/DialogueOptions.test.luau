@@ -272,6 +272,35 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can request to open condition script in Roblox script editor", function()
+
+        expect(function()
+          
+          render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
+          assert(actionsDropdown, "Actions dropdown should be present in the DialogueOptions.");
+
+          local toggleButton = actionsDropdown:FindFirstChild("ToggleButton");
+          assert(toggleButton and toggleButton:IsA("TextButton"), "Toggle button should be present in the ActionsDropdown.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(toggleButton);
+          
+          local optionsFrame = actionsDropdown:WaitForChild("OptionsFrame");
+          local initializationButton = optionsFrame:FindFirstChild("InitializationButton");
+          assert(initializationButton and initializationButton:IsA("TextButton"), "Initialization button should be present in the ActionsDropdown options.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(initializationButton);
+          repeat task.wait() until didOpenScript or propagatedErrorMessage;
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
