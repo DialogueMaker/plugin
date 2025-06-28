@@ -124,6 +124,26 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("hides condition and action buttons for conversations", function()
+
+        expect(function()
+
+          render();
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local conditionButton = dialogueOptions:FindFirstChild("ConditionButton");
+          expect(conditionButton).toBe(nil);
+
+          local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
+          expect(actionsDropdown).toBe(nil);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
