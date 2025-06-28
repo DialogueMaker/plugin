@@ -273,7 +273,7 @@ return {
 
       end);
 
-      it("can request to open condition script in Roblox script editor", function()
+      it("can request to open action script in Roblox script editor", function()
 
         expect(function()
           
