@@ -10,6 +10,7 @@ local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local VirtualService = require(root.VirtualService);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
@@ -21,6 +22,8 @@ export type DialogueOptionsProperties = {
 }
 
 local function DialogueOptions(properties: DialogueOptionsProperties)
+
+  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
 
   local selectedScript = properties.selectedScript;
   local selectedDialogueType = properties.selectedDialogueType;
