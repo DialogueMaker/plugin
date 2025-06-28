@@ -212,7 +212,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
     end;
 
-  end, {selectedScript :: unknown, getSelectedTab, refreshDialogueMakerScripts, errorBoundary});
+  end, {selectedScript :: unknown, getSelectedTab, getDialogueScripts, refreshDialogueMakerScripts, errorBoundary});
 
   local tabs = {};
   local dialogueGroup = React.createElement(React.Fragment);
@@ -248,7 +248,7 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
     
     dialogueGroup = React.createElement(DialogueGroup, {
       name = dialogueType :: DialogueItemType;
-      layoutOrder = categoryIndex;
+      layoutOrder = 2;
       plugin = props.plugin;
       dialogueScripts = scriptList;
     });
@@ -265,7 +265,9 @@ local function DialogueGroupContainer(props: DialogueTableBodyProperties)
       SortOrder = Enum.SortOrder.LayoutOrder;
       Padding = UDim.new(0, 15);
     });
-    TabSelector = React.createElement(TabSelector, {}, tabs);
+    TabSelector = React.createElement(TabSelector, {
+      layoutOrder = 1;
+    }, tabs);
     DialogueGroup = dialogueGroup;
   });
 

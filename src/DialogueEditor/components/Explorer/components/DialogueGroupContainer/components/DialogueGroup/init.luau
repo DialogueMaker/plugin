@@ -1,5 +1,7 @@
 --!strict
 
+local HttpService = game:GetService("HttpService");
+
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.components.DialogueItem);
@@ -23,8 +25,17 @@ local function DialogueGroup(properties: DialogueGroupProperties)
   local scriptComponents = {};
   for index, dialogueScript in dialogueScripts do
 
+    -- All I want for Christmas is Instance.UniqueID
+    local dialogueUniqueID = dialogueScript:GetAttribute("DialogueUniqueID");
+    if not dialogueUniqueID then
+
+      dialogueUniqueID = HttpService:GenerateGUID(false);
+      dialogueScript:SetAttribute("DialogueUniqueID", dialogueUniqueID);
+
+    end;
+
     local settingComponent = React.createElement(DialogueItem, {
-      key = dialogueScript:GetFullName();
+      key = dialogueUniqueID;
       plugin = plugin;
       dialogueScript = dialogueScript;
       dialogueScriptCount = #dialogueScripts;
