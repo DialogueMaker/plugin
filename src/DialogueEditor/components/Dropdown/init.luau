@@ -31,7 +31,7 @@ local function Dropdown(props: DropdownProps)
   React.useEffect(function()
 
     local toggleButton = toggleButtonRef.current;
-    assert(toggleButton, "Toggle button reference is nil.");
+    if not toggleButton or not toggleButton:IsA("TextButton") then return end;
 
     local connection = VirtualService.events.GuiButton.Activated:getSignal(toggleButton):Connect(function()
 
@@ -42,7 +42,7 @@ local function Dropdown(props: DropdownProps)
     return function()
 
       connection:Disconnect();
-      
+
     end;
 
   end, {isOpen :: unknown, setIsOpen});
