@@ -30,13 +30,11 @@ local function Checkbox(properties: CheckboxProperties)
     local button = buttonRef.current;
     assert(button, "Button reference should not be nil.");
 
+    if isDisabled then return end;
+
     local activatedConnection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
 
-      if not isDisabled then
-
-        onChanged(not isChecked);
-
-      end;
+      onChanged(not isChecked);
 
     end);
 
@@ -50,7 +48,7 @@ local function Checkbox(properties: CheckboxProperties)
 
     end;
 
-  end, {onChanged});
+  end, {onChanged :: unknown, isDisabled});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
@@ -71,11 +69,6 @@ local function Checkbox(properties: CheckboxProperties)
       LayoutOrder = 1;
       Text = "";
       ref = buttonRef;
-      [React.Event.Activated] = function(self)
-
-        VirtualService.events.GuiButton.Activated:fireEvent(self);
-
-      end;
     }, {
       UICorner = React.createElement("UICorner", {
         CornerRadius = UDim.new(0, 5);

@@ -27,11 +27,12 @@ local function Dropdown(props: DropdownProps)
   local setIsOpen = props.setIsOpen;
   local layoutOrder = props.layoutOrder or 0;
   local toggleButtonRef = React.useRef(nil);
+  local isDisabled = props.isDisabled or false;
 
   React.useEffect(function()
 
     local toggleButton = toggleButtonRef.current;
-    if not toggleButton or not toggleButton:IsA("TextButton") then return end;
+    if isDisabled or not toggleButton or not toggleButton:IsA("TextButton") then return end;
 
     local connection = VirtualService.events.GuiButton.Activated:getSignal(toggleButton):Connect(function()
 
@@ -45,7 +46,7 @@ local function Dropdown(props: DropdownProps)
 
     end;
 
-  end, {isOpen :: unknown, setIsOpen});
+  end, {isOpen :: unknown, setIsOpen, isDisabled});
 
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
@@ -65,11 +66,6 @@ local function Dropdown(props: DropdownProps)
       BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else colors.input;
       BackgroundTransparency = if props.isDisabled then 0.75 else 0;
       ref = toggleButtonRef;
-      [React.Event.Activated] = if props.isDisabled then nil else function(self)
-
-        VirtualService.events.GuiButton.Activated:fireEvent(self);
-
-      end;
       Text = "";
     }, {
       UICorner = React.createElement("UICorner", {
@@ -143,15 +139,15 @@ local function Dropdown(props: DropdownProps)
       AutomaticCanvasSize = Enum.AutomaticSize.Y;
       AutomaticSize = Enum.AutomaticSize.Y;
       CanvasSize = UDim2.fromScale(1, 1);
-      -- [React.Event.InputEnded] = function(self, input)
+      [React.Event.InputEnded] = function(self, input)
 
-      --   if input == Enum.UserInputType.MouseButton1 then
+        if input == Enum.UserInputType.MouseButton1 then
 
-      --     setIsOpen(not isOpen);
+          setIsOpen(not isOpen);
 
-      --   end;
+        end;
 
-      -- end;
+      end;
     }, {
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;

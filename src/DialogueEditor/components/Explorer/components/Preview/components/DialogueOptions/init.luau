@@ -124,7 +124,8 @@ local function DialogueOptions(properties: DialogueOptionsProperties)
 
       local historyIdentifier = beginHistoryRecording(`Delete {selectedDialogueType:lower()} script`);
 
-      Selection:Set({selectedScript.Parent});
+      local newSelection = if selectedScript.Parent then selectedScript.Parent.Parent else nil;
+      Selection:Set({newSelection});
       selectedScript.Parent = nil;
 
       finishHistoryRecording(historyIdentifier);

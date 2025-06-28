@@ -18,6 +18,7 @@ local function DropdownOption(props: DropdownOptionProperties)
   local buttonRef = React.useRef(nil);
 
   React.useEffect(function()
+    
     local button = buttonRef.current;
     assert(button and button:IsA("TextButton"), "Button reference is not a TextButton");
 
@@ -32,6 +33,7 @@ local function DropdownOption(props: DropdownOptionProperties)
       connection:Disconnect();
 
     end;
+
   end, {props.onClick});
 
   return React.createElement("TextButton", {
@@ -40,11 +42,6 @@ local function DropdownOption(props: DropdownOptionProperties)
     BackgroundColor3 = colors.backgroundTableRow;
     Text = "";
     ref = buttonRef;
-    [React.Event.Activated] = function(self)
-
-      VirtualService.events.GuiButton.Activated:fireEvent(self);
-
-    end;
     BorderSizePixel = 0;
   }, {
     UIListLayout = React.createElement("UIListLayout", {

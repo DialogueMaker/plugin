@@ -53,11 +53,6 @@ local function Button(properties: ButtonProperties)
     LayoutOrder = layoutOrder;
     Size = UDim2.fromOffset(0, 30);
     ref = buttonRef;
-    [React.Event.Activated] = function(self)
-    
-      VirtualService.events.GuiButton.Activated:fireEvent(self);
-
-    end;
   }, {
     UICorner = React.createElement("UICorner", {
       CornerRadius = UDim.new(0, 5);
