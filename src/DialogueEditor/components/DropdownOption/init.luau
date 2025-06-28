@@ -3,6 +3,7 @@
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local VirtualService = require(root.VirtualService);
 
 export type DropdownOptionProperties = {
   layoutOrder: number;
@@ -14,15 +15,34 @@ export type DropdownOptionProperties = {
 local function DropdownOption(props: DropdownOptionProperties)
 
   local colors = useStudioColors();
+  local buttonRef = React.useRef(nil);
+
+  React.useEffect(function()
+    local button = buttonRef.current;
+    assert(button and button:IsA("TextButton"), "Button reference is not a TextButton");
+
+    local connection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
+
+      props.onClick();
+
+    end);
+
+    return function()
+
+      connection:Disconnect();
+
+    end;
+  end, {props.onClick});
 
   return React.createElement("TextButton", {
     LayoutOrder = props.layoutOrder;
     Size = UDim2.new(1, 0, 0, 25);
     BackgroundColor3 = colors.backgroundTableRow;
     Text = "";
-    [React.Event.Activated] = function()
+    ref = buttonRef;
+    [React.Event.Activated] = function(self)
 
-      props.onClick();
+      VirtualService.events.GuiButton.Activated:fireEvent(self);
 
     end;
     BorderSizePixel = 0;
