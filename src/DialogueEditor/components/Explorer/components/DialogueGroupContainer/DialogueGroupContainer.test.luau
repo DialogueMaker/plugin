@@ -11,6 +11,7 @@ local IJW = require(root.roblox_packages.ijw);
 local expect = IJW.expect;
 local describe = IJW.describe;
 local it = IJW.it;
+local VirtualSelection = require(root.DialogueEditor.mocks.Selection);
 
 local screenGui: ScreenGui?;
 local reactRoot: ReactRoblox.RootType?;
@@ -44,7 +45,7 @@ return {
       }, {
         React.createElement(DialogueGroupContainer, {
           name = dialogueType;
-          plugin = VirtualService.mocks.globals.plugin;
+          plugin = VirtualService.globals.plugin;
           layoutOrder = 1;
         })
       });
@@ -158,7 +159,7 @@ return {
           assert(dialogueGroupContainer);
 
           local dialogueFolder, selectedScript = initializeDialogueFolder(4);
-          VirtualService.mocks.services.Selection:Set({selectedScript});
+          VirtualService.globals.game:GetService("Selection"):Set({selectedScript});
           dialogueGroupContainer.ChildAdded:Wait();
           verifyReactStatus();
           expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
@@ -194,7 +195,7 @@ return {
           assert(dialogueGroupContainer);
 
           local dialogueFolder, selectedScript = initializeDialogueFolder(4);
-          VirtualService.mocks.services.Selection:Set({selectedScript});
+          VirtualService.globals.game:GetService("Selection"):Set({selectedScript});
           dialogueGroupContainer.ChildAdded:Wait();
           verifyReactStatus();
           expect(#getDialogueItems(screenGui)).toBe(#dialogueFolder:GetChildren());
@@ -217,7 +218,7 @@ return {
           -- Render the component and wait for it to finish rendering.
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           local dialogueFolder, selectedScript = initializeDialogueFolder(4);
-          VirtualService.mocks.services.Selection:Set({selectedScript});
+          VirtualService.globals.game:GetService("Selection"):Set({selectedScript});
           render();
           verifyReactStatus();
 
@@ -257,7 +258,7 @@ return {
           conversationsFolder.Name = "Conversations";
           conversationsFolder.Parent = conversationsFolderParent;
 
-          VirtualService.mocks.services.Selection:Set({conversationsFolderParent});
+          VirtualService.globals.game:GetService("Selection"):Set({conversationsFolderParent});
           verifyReactStatus();
           expect(#getDialogueItems(screenGui)).toBe(#conversationsFolder:GetChildren());
 
@@ -291,7 +292,7 @@ return {
           local conversationScript = Instance.new("ModuleScript");
           conversationScript:AddTag("DialogueMakerConversationScript");
           conversationScript.Parent = conversationsFolder;
-          VirtualService.mocks.services.Selection:Set({conversationsFolderParent});
+          VirtualService.globals.game:GetService("Selection"):Set({conversationsFolderParent});
 
           -- Render the component and wait for it to finish rendering.
           assert(screenGui, "ScreenGui should be initialized before running tests.");
@@ -313,17 +314,28 @@ return {
 
   end, {
     beforeEach = function()
-      
-      VirtualService.mocks.isEnabled = true;
 
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
       reactRoot = ReactRoblox.createRoot(newScreenGui);
 
+      local virtualSelection = VirtualSelection.new();
+      VirtualService.globals.game = {
+        GetService = function(self, serviceName: string)
+
+          if serviceName == "Selection" then
+
+            return virtualSelection;
+
+          end;
+
+          return game:GetService(serviceName);
+
+        end;
+      }
+
     end;
     afterEach = function()
-
-      VirtualService.mocks.isEnabled = false;
 
       if reactRoot then
 
@@ -337,12 +349,13 @@ return {
 
       end;
 
-      VirtualService.mocks.services.Selection:Set({});
+      VirtualService.globals.game = game;
 
       propagatedErrorMessage = nil;
       dialogueGroupContainer = nil;
       dialogueGroup = nil;
 
     end;
-  })
+  });
+
 };

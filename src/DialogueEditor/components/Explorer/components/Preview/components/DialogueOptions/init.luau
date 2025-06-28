@@ -1,7 +1,5 @@
 --!strict
 
-local Selection = game:GetService("Selection");
-
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Button = require(root.DialogueEditor.components.Button);
@@ -23,7 +21,7 @@ export type DialogueOptionsProperties = {
 
 local function DialogueOptions(properties: DialogueOptionsProperties)
 
-  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
+  local Selection = VirtualService.globals.game:GetService("Selection");
 
   local selectedScript = properties.selectedScript;
   local selectedDialogueType = properties.selectedDialogueType;

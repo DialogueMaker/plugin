@@ -1,7 +1,5 @@
 --!strict
 
-local Selection = game:GetService("Selection");
-
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
@@ -22,7 +20,8 @@ local function DialogueItem(props: DialogueItemProperties)
 
   -- Replace services with VirtualService services for testing.
   -- VirtualService services are used to mock specific Roblox services in tests.
-  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
+  local game = VirtualService.globals.game;
+  local Selection = game:GetService("Selection");
 
   local dialogueType = props.type;
   local dialogueScript = props.dialogueScript;

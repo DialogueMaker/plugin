@@ -3,15 +3,10 @@
 local EventProvider = require(script.EventProvider);
 
 local VirtualService = {
-  mocks = {
-    isEnabled = false;
-    services = {
-      ChangeHistoryService = require(script.mocks.services.ChangeHistoryService);
-      Selection = require(script.mocks.services.Selection);
-    };
-    globals = {
-      plugin = require(script.mocks.globals.plugin);
-    };
+  globals = {
+    plugin = plugin;
+    game = game;
+    script = script;
   };
   events = {
     GuiButton = {
