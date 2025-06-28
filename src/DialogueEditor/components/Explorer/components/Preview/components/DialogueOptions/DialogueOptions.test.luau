@@ -57,19 +57,34 @@ return {
 
     end;
 
-    local function createDialogueScript(name: string)
+    local function createDialogueScript(name: string, type: "Conversation" | "Dialogue")
 
       local dialogueScript = Instance.new("ModuleScript");
-      dialogueScript:AddTag("DialogueMakerConversationScript");
+
+      if type == "Conversation" then
+        
+        dialogueScript:AddTag("DialogueMakerConversationScript");
+
+      elseif type == "Dialogue" then
+
+        dialogueScript:AddTag("DialogueMakerDialogueScript");
+        dialogueScript:SetAttribute("DialogueType", "Message");
+
+      else
+
+        error("Invalid dialogue script type: " .. tostring(type));
+
+      end;
+
       return dialogueScript;
 
     end;
 
-    local function render(): ModuleScript
+    local function render(type: "Conversation" | "Dialogue"): ModuleScript
 
       assert(reactRoot, "React root should be initialized before running tests.");
 
-      local selectedScript = createDialogueScript("TestDialogueScript");
+      local selectedScript = createDialogueScript("TestDialogueScript", type);
       local didRender = false;
       local element = React.createElement(MockComponent, {
         selectedScript = selectedScript;
@@ -99,7 +114,7 @@ return {
 
         expect(function()
 
-          local selectedScript = render();
+          local selectedScript = render("Conversation");
           local testFolder = Instance.new("Folder");
           selectedScript.Parent = testFolder;
 
@@ -129,7 +144,7 @@ return {
 
         expect(function()
 
-          render();
+          render("Conversation");
 
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
@@ -140,6 +155,26 @@ return {
 
           local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
           expect(actionsDropdown).toBe(nil);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it("shows condition and action buttons for dialogue", function()
+
+        expect(function()
+
+          render("Dialogue");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local conditionButton = dialogueOptions:FindFirstChild("ConditionButton");
+          expect(conditionButton).toNotBe(nil);
+
+          local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
+          expect(actionsDropdown).toNotBe(nil);
 
         end).toFinishBeforeSeconds(1);
 
