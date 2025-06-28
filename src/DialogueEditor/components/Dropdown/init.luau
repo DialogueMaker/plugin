@@ -3,6 +3,7 @@
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local useStudioColors = require(root.DialogueEditor.hooks.useStudioColors);
+local VirtualService = require(root.VirtualService);
 
 export type DropdownProps = {
   text: string;
@@ -25,6 +26,26 @@ local function Dropdown(props: DropdownProps)
   local isOpen = props.isOpen;
   local setIsOpen = props.setIsOpen;
   local layoutOrder = props.layoutOrder or 0;
+  local toggleButtonRef = React.useRef(nil);
+
+  React.useEffect(function()
+
+    local toggleButton = toggleButtonRef.current;
+    assert(toggleButton, "Toggle button reference is nil.");
+
+    local connection = VirtualService.events.GuiButton.Activated:getSignal(toggleButton):Connect(function()
+
+      setIsOpen(not isOpen);
+
+    end);
+
+    return function()
+
+      connection:Disconnect();
+      
+    end;
+
+  end, {isOpen :: unknown, setIsOpen});
 
   return React.createElement("Frame", {
     BackgroundTransparency = 1;
@@ -43,9 +64,10 @@ local function Dropdown(props: DropdownProps)
       Size = UDim2.fromScale(1, 1);
       BackgroundColor3 = if props.isDisabled then Color3.new(0.501961, 0.501961, 0.501961) else colors.input;
       BackgroundTransparency = if props.isDisabled then 0.75 else 0;
-      [React.Event.Activated] = if props.isDisabled then nil else function()
+      ref = toggleButtonRef;
+      [React.Event.Activated] = if props.isDisabled then nil else function(self)
 
-        setIsOpen(not isOpen);
+        VirtualService.events.GuiButton.Activated:fireEvent(self);
 
       end;
       Text = "";
@@ -121,15 +143,15 @@ local function Dropdown(props: DropdownProps)
       AutomaticCanvasSize = Enum.AutomaticSize.Y;
       AutomaticSize = Enum.AutomaticSize.Y;
       CanvasSize = UDim2.fromScale(1, 1);
-      [React.Event.InputEnded] = function(self, input)
+      -- [React.Event.InputEnded] = function(self, input)
 
-        if input == Enum.UserInputType.MouseButton1 then
+      --   if input == Enum.UserInputType.MouseButton1 then
 
-          setIsOpen(not isOpen);
+      --     setIsOpen(not isOpen);
 
-        end;
+      --   end;
 
-      end;
+      -- end;
     }, {
       UIListLayout = React.createElement("UIListLayout", {
         SortOrder = Enum.SortOrder.LayoutOrder;

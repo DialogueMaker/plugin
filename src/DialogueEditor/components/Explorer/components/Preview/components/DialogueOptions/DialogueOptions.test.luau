@@ -57,7 +57,7 @@ return {
 
     end;
 
-    local function createDialogueScript(name: string, type: "Conversation" | "Dialogue")
+    local function createDialogueScript(name: string, type: "Conversation" | "Message" | "Redirect")
 
       local dialogueScript = Instance.new("ModuleScript");
 
@@ -65,14 +65,10 @@ return {
         
         dialogueScript:AddTag("DialogueMakerConversationScript");
 
-      elseif type == "Dialogue" then
-
-        dialogueScript:AddTag("DialogueMakerDialogueScript");
-        dialogueScript:SetAttribute("DialogueType", "Message");
-
       else
 
-        error("Invalid dialogue script type: " .. tostring(type));
+        dialogueScript:AddTag("DialogueMakerDialogueScript");
+        dialogueScript:SetAttribute("DialogueType", type);
 
       end;
 
@@ -80,7 +76,7 @@ return {
 
     end;
 
-    local function render(type: "Conversation" | "Dialogue"): ModuleScript
+    local function render(type: "Conversation" | "Message" | "Redirect"): ModuleScript
 
       assert(reactRoot, "React root should be initialized before running tests.");
 
@@ -164,7 +160,7 @@ return {
 
         expect(function()
 
-          render("Dialogue");
+          render("Message");
 
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
@@ -175,6 +171,33 @@ return {
 
           local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
           expect(actionsDropdown).toNotBe(nil);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it(`hides non-initialization actions for "Redirect"-type dialogue scripts`, function()
+
+        expect(function()
+
+          render("Redirect");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local actionsDropdown = dialogueOptions:FindFirstChild("ActionsDropdown");
+          assert(actionsDropdown, "Actions dropdown should be present in the DialogueOptions.");
+
+          local toggleButton = actionsDropdown:FindFirstChild("ToggleButton");
+          assert(toggleButton and toggleButton:IsA("TextButton"), "Toggle button should be present in the ActionsDropdown.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(toggleButton);
+          
+          local optionsFrame = actionsDropdown:WaitForChild("OptionsFrame");
+          expect(optionsFrame:FindFirstChild("InitializationButton")).toNotBe(nil);
+          expect(optionsFrame:FindFirstChild("CompletionButton")).toBe(nil);
+          expect(optionsFrame:FindFirstChild("CleanupButton")).toBe(nil);
 
         end).toFinishBeforeSeconds(1);
 

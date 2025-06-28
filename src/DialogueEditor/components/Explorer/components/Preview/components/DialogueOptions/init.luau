@@ -77,7 +77,7 @@ local function DialogueOptions(properties: DialogueOptionsProperties)
       end;
 
       local option = React.createElement(DropdownOption, {
-        key = actionType :: string;
+        key = `{actionType}Button`;
         text = actionType :: string;
         layoutOrder = index;
         onClick = function()
