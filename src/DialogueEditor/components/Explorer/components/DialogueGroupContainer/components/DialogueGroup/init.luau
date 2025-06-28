@@ -3,7 +3,6 @@
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local DialogueItem = require(script.components.DialogueItem);
-local VirtualService = require(root.VirtualService);
 
 export type DialogueItemType = DialogueItem.DialogueItemType;
 
@@ -19,7 +18,7 @@ local function DialogueGroup(properties: DialogueGroupProperties)
   local groupName = properties.name;
   local dialogueScripts = properties.dialogueScripts;
   local layoutOrder = properties.layoutOrder;
-  local plugin = if VirtualService.mocks.isEnabled then VirtualService.mocks.globals.plugin else properties.plugin;
+  local plugin = properties.plugin;
 
   local scriptComponents = {};
   for index, dialogueScript in dialogueScripts do

@@ -11,11 +11,14 @@ local IJW = require(root.roblox_packages.ijw);
 local expect = IJW.expect;
 local describe = IJW.describe;
 local it = IJW.it;
+local VirtualSelection = require(root.DialogueEditor.mocks.Selection);
+local VirtualChangeHistoryService = require(root.DialogueEditor.mocks.ChangeHistoryService);
 
 local screenGui: ScreenGui?;
 local reactRoot: ReactRoblox.RootType?;
 local propagatedErrorMessage;
 local eventConnection: RBXScriptConnection?;
+local didOpenScript = false;
 
 return {
 
@@ -39,7 +42,7 @@ return {
       }, {
         React.createElement(DialogueOptions, {
           selectedScript = selectedScript;
-          plugin = VirtualService.mocks.globals.plugin;
+          plugin = VirtualService.globals.plugin;
           selectedDialogueType = selectedScript:GetAttribute("DialogueType") or "Conversation";
           layoutOrder = 1;
         })
@@ -250,6 +253,25 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can request to open condition script in Roblox script editor", function()
+
+        expect(function()
+          
+          render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local conditionButton = dialogueOptions:FindFirstChild("ConditionButton");
+          assert(conditionButton and conditionButton:IsA("TextButton"), "Condition button should be present in the DialogueOptions.");
+          VirtualService.events.GuiButton.Activated:fireEvent(conditionButton);
+          repeat task.wait() until didOpenScript or propagatedErrorMessage;
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
@@ -259,7 +281,34 @@ return {
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
       reactRoot = ReactRoblox.createRoot(newScreenGui);
-      VirtualService.mocks.isEnabled = true;
+
+      local virtualSelection = VirtualSelection.new();
+      local virtualChangeHistoryService = VirtualChangeHistoryService.new();
+      VirtualService.globals.game = {
+        GetService = function(self, serviceName: string): unknown
+
+          if serviceName == "Selection" then
+
+            return virtualSelection;
+
+          elseif serviceName == "ChangeHistoryService" then
+
+            return virtualChangeHistoryService;
+
+          end;
+
+          return game:GetService(serviceName);
+
+        end;
+      };
+
+      VirtualService.globals.plugin = {
+        OpenScript = function(script)
+
+          didOpenScript = true;
+
+        end
+      } :: any;
 
     end;
     afterEach = function()
@@ -286,7 +335,9 @@ return {
       end;
 
       propagatedErrorMessage = nil;
-      VirtualService.mocks.isEnabled = false;
+      VirtualService.globals.game = game;
+      VirtualService.globals.plugin = plugin;
+      didOpenScript = false;
 
     end;
   })

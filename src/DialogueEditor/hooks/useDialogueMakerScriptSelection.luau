@@ -1,14 +1,13 @@
 --!strict
 
-local Selection = game:GetService("Selection");
-
 local root = script.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local VirtualService = require(root.VirtualService);
 
 local function useDialogueMakerScriptSelection()
 
-  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
+  local game = VirtualService.globals.game;
+  local Selection = game:GetService("Selection");
 
   local getScripts = React.useCallback(function()
 

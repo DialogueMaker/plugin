@@ -35,7 +35,7 @@ return {
 
       return React.createElement(DialogueGroup, {
         name = dialogueType;
-        plugin = VirtualService.mocks.globals.plugin;
+        plugin = VirtualService.globals.plugin;
         dialogueScripts = dialogueScripts;
         layoutOrder = layoutOrder;
       });
@@ -113,8 +113,6 @@ return {
 
   end, {
     beforeEach = function()
-      
-      VirtualService.mocks.isEnabled = true;
 
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
@@ -122,8 +120,6 @@ return {
 
     end;
     afterEach = function()
-
-      VirtualService.mocks.isEnabled = false;
 
       if reactRoot then
 

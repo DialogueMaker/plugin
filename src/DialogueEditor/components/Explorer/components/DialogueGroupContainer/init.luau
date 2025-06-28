@@ -1,7 +1,5 @@
 --!strict
 
-local Selection = game:GetService("Selection");
-
 local root = script.Parent.Parent.Parent.Parent.Parent;
 local VirtualService = require(root.VirtualService);
 local React = require(root.roblox_packages.react);
@@ -22,7 +20,8 @@ export type DialogueTableBodyProperties = {
 
 local function DialogueGroupContainer(props: DialogueTableBodyProperties)
 
-  Selection = if VirtualService.mocks.isEnabled then VirtualService.mocks.services.Selection else Selection;
+  local game = VirtualService.globals.game;
+  local Selection = game:GetService("Selection");
 
   local layoutOrder = props.layoutOrder;
   local selectedScript = useDialogueMakerScriptSelection();

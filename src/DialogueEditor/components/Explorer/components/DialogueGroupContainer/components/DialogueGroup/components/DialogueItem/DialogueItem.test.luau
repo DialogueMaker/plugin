@@ -3,6 +3,8 @@
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local DialogueItem = require(script.Parent);
 local VirtualService = require(root.VirtualService);
+local VirtualSelection = require(root.DialogueEditor.mocks.Selection);
+local VirtualChangeHistoryService = require(root.DialogueEditor.mocks.ChangeHistoryService);
 local React = require(root.roblox_packages.react);
 local ReactErrorBoundary = require(root.roblox_packages.ReactErrorBoundary);
 local ErrorBoundary = ReactErrorBoundary.ErrorBoundary;
@@ -110,7 +112,7 @@ return {
           assert(viewButton and viewButton:IsA("GuiButton"), "ViewButton should be present in the DialogueItem.");
 
           local didSelectionChange = false;
-          VirtualService.mocks.services.Selection.SelectionChanged:Once(function()
+          VirtualService.globals.game:GetService("Selection").SelectionChanged:Once(function()
           
             didSelectionChange = true;
 
@@ -305,17 +307,35 @@ return {
 
   end, {
     beforeEach = function()
-      
-      VirtualService.mocks.isEnabled = true;
 
       local newScreenGui = Instance.new("ScreenGui");
       screenGui = newScreenGui;
       reactRoot = ReactRoblox.createRoot(newScreenGui);
 
+      local virtualSelection = VirtualSelection.new();
+      local virtualChangeHistoryService = VirtualChangeHistoryService.new();
+      VirtualService.globals.game = {
+        GetService = function(self, serviceName: string): unknown
+
+          if serviceName == "Selection" then
+
+            return virtualSelection;
+
+          elseif serviceName == "ChangeHistoryService" then
+
+            return virtualChangeHistoryService;
+
+          end;
+
+          return VirtualService.globals.game:GetService(serviceName);
+
+        end;
+      }
+
     end;
     afterEach = function()
 
-      VirtualService.mocks.isEnabled = false;
+      VirtualService.globals.game = game;
 
       if reactRoot then
 
