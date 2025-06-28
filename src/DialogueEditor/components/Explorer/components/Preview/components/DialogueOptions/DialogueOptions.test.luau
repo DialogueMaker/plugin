@@ -202,6 +202,25 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can initialize a condition script", function()
+
+        expect(function()
+
+          local selectedScript = render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueOptions = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueOptions, "DialogueOptions should be rendered.");
+
+          local conditionButton = dialogueOptions:FindFirstChild("ConditionButton");
+          assert(conditionButton and conditionButton:IsA("TextButton"), "Condition button should be present in the DialogueOptions.");
+          VirtualService.events.GuiButton.Activated:fireEvent(conditionButton);
+          selectedScript:WaitForChild("ConditionScript");
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
