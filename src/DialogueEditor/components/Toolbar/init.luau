@@ -156,11 +156,11 @@ local function Toolbar(props: ToolbarProps)
 
   end;
 
-  if not selectedScript or dialogueScriptType == "Redirect" then
+  if dialogueScriptType ~= "Redirect" then
 
     for _, dialogueType in {"Conversation", "Message", "Response", "Redirect"} do
 
-      if not selectedScript and dialogueType ~= "Conversation" then
+      if (selectedScript and dialogueType == "Conversation") or (not selectedScript and dialogueType ~= "Conversation") then
 
         continue;
 
