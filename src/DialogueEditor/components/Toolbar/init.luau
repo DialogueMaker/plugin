@@ -44,26 +44,33 @@ local function Toolbar(props: ToolbarProps)
       historyIdentifier = beginHistoryRecording("Add conversation");
 
       local parent = Selection:Get()[1];
-      if not parent:IsA("Folder") or parent.Name ~= "Conversations" then
+      local conversationsFolder = if parent then (
+        if parent:IsA("Folder") and parent.Name == "Conversations" then parent 
+        elseif parent:FindFirstChild("Conversations") and parent:FindFirstChild("Conversations"):IsA("Folder") then parent:FindFirstChild("Conversations")
+        else nil
+      ) else nil;
+      if not conversationsFolder then
 
-        local conversationsFolder = parent:FindFirstChild("Conversations");
-        if not conversationsFolder then
-
-          local newConversationsFolder = Instance.new("Folder");
-          newConversationsFolder.Name = "Conversations";
-          newConversationsFolder.Parent = parent;
-          conversationsFolder = newConversationsFolder;
-
-        end;
-
-        parent = conversationsFolder;
+        local newConversationsFolder = Instance.new("Folder");
+        newConversationsFolder.Name = "Conversations";
+        newConversationsFolder.Parent = parent;
+        conversationsFolder = newConversationsFolder;
 
       end;
+
+      assert(conversationsFolder); -- To silence the type checker.
 
       local newContentScript = root.Templates.ConversationTemplate:Clone();
       newContentScript.Name = "Conversation";
       newContentScript:AddTag("DialogueMakerConversationScript");
-      newContentScript.Parent = parent;
+
+      if #conversationsFolder:GetChildren() == 0 then
+
+        newContentScript:SetAttribute("ShouldAutoTriggerConversation", true);
+
+      end;
+
+      newContentScript.Parent = conversationsFolder;
       
     elseif selectedScript then
 
