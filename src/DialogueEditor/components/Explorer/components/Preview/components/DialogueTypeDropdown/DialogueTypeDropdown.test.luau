@@ -225,6 +225,51 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("can delete old dialogue folder if it doesn't have anymore dialogue scripts", function()
+
+        expect(function()
+
+          local selectedScript = render("Message");
+          local messagesFolder = Instance.new("Folder");
+          messagesFolder.Name = "Messages";
+          selectedScript.Parent = messagesFolder;
+
+          local parentDialogueScript = Instance.new("ModuleScript");
+          messagesFolder.Parent = parentDialogueScript;
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueTypeDropdown = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueTypeDropdown, "DialogueTypeDropdown should be rendered.");
+
+          local toggleButton = dialogueTypeDropdown:FindFirstChild("ToggleButton");
+          assert(toggleButton and toggleButton:IsA("TextButton"), "ToggleButton should be present in DialogueTypeDropdown.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(toggleButton);
+
+          local optionsFrame = dialogueTypeDropdown:WaitForChild("OptionsFrame");
+          assert(optionsFrame, "OptionsFrame should be present in DialogueTypeDropdown.");
+
+          local responseButton = optionsFrame:FindFirstChild("ResponseButton");
+          assert(responseButton and responseButton:IsA("TextButton"), "ResponseButton should be present in OptionsFrame.");
+
+          local didDeleteFolder = false;
+          eventConnection = messagesFolder:GetPropertyChangedSignal("Parent"):Once(function()
+
+            if messagesFolder.Parent == nil then
+
+              didDeleteFolder = true;
+
+            end;
+
+          end);
+          VirtualService.events.GuiButton.Activated:fireEvent(responseButton);
+          repeat task.wait() until didDeleteFolder or propagatedErrorMessage;
+          verifyReactStatus();
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
