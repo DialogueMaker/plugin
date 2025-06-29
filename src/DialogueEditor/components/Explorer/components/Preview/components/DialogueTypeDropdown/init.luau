@@ -1,7 +1,5 @@
 --!strict
 
-local Selection = game:GetService("Selection");
-
 local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Dropdown = require(root.DialogueEditor.components.Dropdown);
@@ -9,6 +7,7 @@ local DropdownOption = require(root.DialogueEditor.components.DropdownOption);
 local useStudioIcons = require(root.DialogueEditor.hooks.useStudioIcons);
 local useDialogueScriptType = require(root.DialogueEditor.hooks.useDialogueScriptType);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local VirtualService = require(root.VirtualService);
 
 type DialogueScriptType = useDialogueScriptType.DialogueScriptType;
 
@@ -18,6 +17,9 @@ export type DialogueTypeDropdownProperties = {
 }
 
 local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
+
+  local game = VirtualService.globals.game;
+  local Selection = game:GetService("Selection");
 
   local selectedScript = properties.selectedScript;
   local selectedDialogueType = properties.selectedDialogueType;
