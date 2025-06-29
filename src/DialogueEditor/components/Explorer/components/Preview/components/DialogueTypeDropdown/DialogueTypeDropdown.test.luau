@@ -58,7 +58,7 @@ return {
 
     end;
 
-    local function createDialogueScript(name: string, type: "Conversation" | "Message" | "Redirect")
+    local function createDialogueScript(type: "Conversation" | "Message" | "Redirect")
 
       local dialogueScript = Instance.new("ModuleScript");
 
@@ -81,7 +81,7 @@ return {
 
       assert(reactRoot, "React root should be initialized before running tests.");
 
-      local selectedScript = createDialogueScript("TestDialogueScript", type);
+      local selectedScript = createDialogueScript(type);
       local didRender = false;
       local element = React.createElement(MockComponent, {
         selectedScript = selectedScript;
@@ -111,8 +111,7 @@ return {
 
         expect(function()
 
-          local dialogueType = "Conversation";
-          render(dialogueType :: any);
+          local selectedScript = render("Message");
 
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           local dialogueTypeDropdown = screenGui:FindFirstChildOfClass("Frame");
@@ -126,7 +125,7 @@ return {
 
           local textLabel = selectionFrame:FindFirstChild("TextLabel");
           assert(textLabel and textLabel:IsA("TextLabel"), "TextLabel should be present in SelectionFrame.");
-          expect(textLabel.Text).toBe(dialogueType);
+          expect(textLabel.Text).toBe(selectedScript:GetAttribute("DialogueType"));
 
         end).toFinishBeforeSeconds(1);
 
@@ -136,8 +135,7 @@ return {
 
         expect(function()
 
-          local dialogueType = "Conversation";
-          render(dialogueType :: any);
+          render("Conversation");
 
           assert(screenGui, "ScreenGui should be initialized before running tests.");
           local dialogueTypeDropdown = screenGui:FindFirstChildOfClass("Frame");
@@ -145,6 +143,41 @@ return {
 
           local toggleButton = dialogueTypeDropdown:FindFirstChild("ToggleButton");
           assert(toggleButton and toggleButton:IsA("TextLabel"), "ToggleButton should be present and disabled in DialogueTypeDropdown.");
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
+
+      it("can set the DialogueType attribute of the selected script", function()
+
+        expect(function()
+
+          local selectedScript = render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueTypeDropdown = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueTypeDropdown, "DialogueTypeDropdown should be rendered.");
+
+          local toggleButton = dialogueTypeDropdown:FindFirstChild("ToggleButton");
+          assert(toggleButton and toggleButton:IsA("TextButton"), "ToggleButton should be present in DialogueTypeDropdown.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(toggleButton);
+
+          local optionsFrame = dialogueTypeDropdown:WaitForChild("OptionsFrame");
+          assert(optionsFrame, "OptionsFrame should be present in DialogueTypeDropdown.");
+
+          local responseButton = optionsFrame:FindFirstChild("ResponseButton");
+          assert(responseButton and responseButton:IsA("TextButton"), "ResponseButton should be present in OptionsFrame.");
+
+          local didDialogueTypeChange = false;
+          eventConnection = selectedScript:GetAttributeChangedSignal("DialogueType"):Once(function()
+
+            didDialogueTypeChange = true;
+
+          end);
+          VirtualService.events.GuiButton.Activated:fireEvent(responseButton);
+          repeat task.wait() until didDialogueTypeChange or propagatedErrorMessage;
+          verifyReactStatus();
 
         end).toFinishBeforeSeconds(1);
 
