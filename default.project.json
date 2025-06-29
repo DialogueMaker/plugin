@@ -1,5 +1,5 @@
 {
-  "name": "DialoguePlugDialogueMakerPlugininScript",
+  "name": "DialogueMakerPlugin",
   "tree": {
     "$path": "src",
     "roblox_packages": {

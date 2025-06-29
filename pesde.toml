@@ -1,5 +1,5 @@
 name = "dialoguemaker/plugin"
-version = "5.0.0-rc.1"
+version = "5.0.0-rc.2"
 description = "A helpful user interface to create dialogue in games."
 authors = ["Christian Toney <christian.toney@beastslash.com>"]
 repository = "https://github.com/DialogueMaker/plugin"
