@@ -70,7 +70,6 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
 
           end;
 
-          task.wait();
           Selection:Set({selectedScript});
 
           finishHistoryRecording(historyIdentifier);

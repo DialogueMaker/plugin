@@ -31,7 +31,7 @@ local function useDialogueContentScript(dialogueScript: ModuleScript): (ModuleSc
 
     local childAddedConnection = dialogueScript.ChildAdded:Connect(updateDialogueContentScript);
     local childRemovedConnection = dialogueScript.ChildRemoved:Connect(updateDialogueContentScript);
-    updateDialogueContentScript();
+    task.spawn(updateDialogueContentScript);
 
     return function()
 

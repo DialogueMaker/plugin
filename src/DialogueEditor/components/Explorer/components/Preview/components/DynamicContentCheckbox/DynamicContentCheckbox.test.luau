@@ -125,6 +125,39 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it(`can toggle "IsDisabled" attribute on ContentScript`, function()
+
+        expect(function()
+
+          local selectedScript = render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dynamicContentCheckbox = screenGui:FindFirstChildOfClass("Frame");
+          assert(dynamicContentCheckbox, "DynamicContentCheckbox should be rendered.");
+
+          local checkbox = dynamicContentCheckbox:FindFirstChild("Checkbox");
+          assert(checkbox and checkbox:IsA("TextButton"), "Checkbox should be rendered inside DynamicContentCheckbox.");
+
+          VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
+          local contentScript = selectedScript:WaitForChild("ContentScript");
+          verifyReactStatus();
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          expect(contentScript:GetAttribute("IsDisabled")).toBe(false);
+
+          VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          verifyReactStatus();
+          expect(contentScript:GetAttribute("IsDisabled")).toBe(true);
+
+          VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          verifyReactStatus();
+          expect(contentScript:GetAttribute("IsDisabled")).toBe(false);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
