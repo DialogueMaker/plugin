@@ -131,6 +131,24 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it("is disabled for conversation scripts", function()
+
+        expect(function()
+
+          local dialogueType = "Conversation";
+          render(dialogueType :: any);
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dialogueTypeDropdown = screenGui:FindFirstChildOfClass("Frame");
+          assert(dialogueTypeDropdown, "DialogueTypeDropdown should be rendered.");
+
+          local toggleButton = dialogueTypeDropdown:FindFirstChild("ToggleButton");
+          assert(toggleButton and toggleButton:IsA("TextLabel"), "ToggleButton should be present and disabled in DialogueTypeDropdown.");
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
