@@ -4,25 +4,23 @@ local root = script.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 local React = require(root.roblox_packages.react);
 local Checkbox = require(root.DialogueEditor.components.Checkbox);
 local useChangeHistory = require(root.DialogueEditor.hooks.useChangeHistory);
+local useDialogueContentScript = require(script.Parent.Parent.hooks.useDialogueContentScript);
 
 export type DynamicContentCheckboxProperties = {
   selectedScript: ModuleScript;
-  isChecked: boolean;
-  dialogueContentScript: ModuleScript?;
   layoutOrder: number;
 }
 
 local function DynamicContentCheckbox(properties: DynamicContentCheckboxProperties)
 
   local selectedScript = properties.selectedScript;
-  local isChecked = properties.isChecked;
-  local dialogueContentScript = properties.dialogueContentScript;
+  local dialogueContentScript, isDialogueContentScriptEnabled = useDialogueContentScript(selectedScript);
   local layoutOrder = properties.layoutOrder;
   local beginHistoryRecording, finishHistoryRecording = useChangeHistory();
 
   return React.createElement(Checkbox, {
     text = "Dynamic content";
-    isChecked = isChecked;
+    isChecked = isDialogueContentScriptEnabled;
     layoutOrder = layoutOrder;
     onChanged = function(isChecked: boolean)
 

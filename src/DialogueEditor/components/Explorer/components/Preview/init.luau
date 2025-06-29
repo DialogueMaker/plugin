@@ -84,8 +84,6 @@ local function Preview(properties: PreviewProperties)
         React.createElement(DynamicContentCheckbox, {
           layoutOrder = 3;
           selectedScript = selectedScript;
-          isChecked = isDialogueContentScriptEnabled;
-          dialogueContentScript = dialogueContentScript;
         })
       else nil;
     });
