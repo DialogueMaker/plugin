@@ -158,6 +158,39 @@ return {
         end).toFinishBeforeSeconds(1);
 
       end);
+
+      it(`automatically refreshes if "IsDisabled" attribute is toggled`, function()
+
+        expect(function()
+
+          local selectedScript = render("Message");
+
+          assert(screenGui, "ScreenGui should be initialized before running tests.");
+          local dynamicContentCheckbox = screenGui:FindFirstChildOfClass("Frame");
+          assert(dynamicContentCheckbox, "DynamicContentCheckbox should be rendered.");
+
+          local checkbox = dynamicContentCheckbox:FindFirstChild("Checkbox");
+          assert(checkbox and checkbox:IsA("TextButton"), "Checkbox should be rendered inside DynamicContentCheckbox.");
+
+          -- Create the ContentScript
+          VirtualService.events.GuiButton.Activated:fireEvent(checkbox);
+          local contentScript = selectedScript:WaitForChild("ContentScript");
+          verifyReactStatus();
+
+          -- Initially, the ContentScript should not be disabled, so let's disable it.
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          contentScript:SetAttribute("IsDisabled", true);
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          expect(checkbox:GetAttribute("IsChecked")).toBe(false);
+
+          -- Now, let's enable it again.
+          contentScript:SetAttribute("IsDisabled", false);
+          checkbox:GetAttributeChangedSignal("IsChecked"):Wait();
+          expect(checkbox:GetAttribute("IsChecked")).toBe(true);
+
+        end).toFinishBeforeSeconds(1);
+
+      end);
       
     }
 
