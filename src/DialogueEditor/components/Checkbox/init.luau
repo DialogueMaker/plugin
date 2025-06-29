@@ -24,22 +24,28 @@ local function Checkbox(properties: CheckboxProperties)
   local colors = useStudioColors();
   local icons = useStudioIcons();
   local buttonRef = React.useRef(nil :: TextButton?);
-  
-  React.useEffect(function()
+
+  React.useEffect(function(): ()
   
     local button = buttonRef.current;
     assert(button, "Button reference should not be nil.");
 
-    if isDisabled then return end;
+    local activatedConnection: RBXScriptConnection? = nil;
 
-    local activatedConnection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
+    if not isDisabled then
 
-      onChanged(not isChecked);
+      activatedConnection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
 
-    end);
+        onChanged(not isChecked);
+
+      end);
+
+    end;
+
+    button:SetAttribute("IsChecked", isChecked);
 
     return function()
-    
+
       if activatedConnection then
 
         activatedConnection:Disconnect();
@@ -48,7 +54,7 @@ local function Checkbox(properties: CheckboxProperties)
 
     end;
 
-  end, {onChanged :: unknown, isDisabled});
+  end, {onChanged :: unknown, isDisabled, isChecked});
 
   return React.createElement("Frame", {
     AutomaticSize = Enum.AutomaticSize.XY;
