@@ -34,7 +34,7 @@ local function DialogueTypeDropdown(properties: DialogueTypeDropdownProperties)
     for index, dialogueType in dialogueTypes do
 
       local option = React.createElement(DropdownOption, {
-        key = dialogueType;
+        key = `{dialogueType}Button`;
         text = dialogueType;
         layoutOrder = index;
         iconImage = icons[`{dialogueType:sub(1, 1):upper()}{dialogueType:sub(2)}`];

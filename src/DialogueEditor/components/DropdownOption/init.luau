@@ -16,6 +16,7 @@ local function DropdownOption(props: DropdownOptionProperties)
 
   local colors = useStudioColors();
   local buttonRef = React.useRef(nil);
+  local onClick = props.onClick;
 
   React.useEffect(function()
     
@@ -24,7 +25,7 @@ local function DropdownOption(props: DropdownOptionProperties)
 
     local connection = VirtualService.events.GuiButton.Activated:getSignal(button):Connect(function()
 
-      props.onClick();
+      onClick();
 
     end);
 
@@ -34,7 +35,7 @@ local function DropdownOption(props: DropdownOptionProperties)
 
     end;
 
-  end, {props.onClick});
+  end, {onClick});
 
   return React.createElement("TextButton", {
     LayoutOrder = props.layoutOrder;
